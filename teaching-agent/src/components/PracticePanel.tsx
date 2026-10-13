@@ -207,7 +207,9 @@ export function PracticePanel({
                       }`}
                     >
                       <span className="shrink-0 tabular-nums text-ink-faint">{o.id}</span>
-                      <span className="min-w-0 flex-1">{o.text}</span>
+                      <span className="min-w-0 flex-1">
+                        <Markdown text={o.text} className="md-inline" />
+                      </span>
                     </Button>
                   );
                 })}
@@ -309,9 +311,9 @@ export function PracticePanel({
             {/* 答案区：答错或主动点开才显示 */}
             {s.showAnswer && hasAnswer ? (
               <div className="mt-2 rounded-lg bg-paper-soft px-2.5 py-2">
-                <div className="text-[12px] leading-5 text-ink">答案：{answerLabel(q)}</div>
+                <Markdown text={`答案：${answerLabel(q)}`} className="md-inline text-[12px] leading-5 text-ink" />
                 {q.analysis ? (
-                  <div className="mt-1 text-[12px] leading-5 text-ink-soft">{q.analysis}</div>
+                  <Markdown text={q.analysis} className="md-inline mt-1 text-[12px] leading-5 text-ink-soft" />
                 ) : null}
                 {q.verified === false ? (
                   <div className="mt-1 text-[11px] text-ink-faint">该题答案未经复核，仅供参考。</div>

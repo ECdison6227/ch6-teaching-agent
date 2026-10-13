@@ -130,6 +130,85 @@ check(
 const display = render("独立公式\n$$\\frac{M}{W}$$\n讲完。");
 check("$$...$$ 仍能排", display.html.includes("katex") && !display.text.includes("\\frac"), display.text);
 
+const sc52 = render(
+  "受弯构件发生适筋破坏时，受拉钢筋应变 ε_s [推断1] 和受压边缘混凝土应变 ε_c [推断2] 分别为(  　)。",
+);
+check(
+  "SC-52 题干去掉推断标记，下标进公式",
+  !sc52.text.includes("推断") &&
+    !sc52.prepared.includes("[推断") &&
+    sc52.html.includes("katex") &&
+    !sc52.text.includes("ε_s") &&
+    !sc52.text.includes("_s") &&
+    !sc52.text.includes("_c"),
+  `prepared=${sc52.prepared}\nvisible=${sc52.text}`,
+);
+
+const sc52opt = render("ε_s>ε_y，ε_c=ε_cu `[推断]`");
+check(
+  "SC-52 选项去掉反引号和推断标记，比较号在公式里",
+  !sc52opt.text.includes("推断") &&
+    !sc52opt.text.includes("`") &&
+    !sc52opt.prepared.includes("`") &&
+    sc52opt.html.includes("katex") &&
+    !sc52opt.text.includes("_"),
+  `prepared=${sc52opt.prepared}\nvisible=${sc52opt.text}`,
+);
+
+const implicit = render("εs>εy，εc=εcu");
+check(
+  "没有下划线的 εs 也排成下标",
+  implicit.html.includes("msupsub") &&
+    implicit.prepared.includes("\\varepsilon_{s}") &&
+    implicit.prepared.includes("\\varepsilon_{cu}") &&
+    !implicit.text.includes("_"),
+  `prepared=${implicit.prepared}\nvisible=${implicit.text}`,
+);
+
+const lambda = render("对于无腹筋梁，当 **λ<1** `[推断]` 时，常发生斜压破坏。");
+check(
+  "剪跨比 λ<1 去掉推断标记并排成公式",
+  !lambda.text.includes("推断") && lambda.html.includes("katex") && !lambda.prepared.includes("[推断"),
+  `prepared=${lambda.prepared}\nvisible=${lambda.text}`,
+);
+
+const chain = render("2a_s′≤x≤ξ_b h₀");
+check(
+  "带撇号和 unicode 下标的不等式整段进公式",
+  chain.html.includes("msupsub") &&
+    chain.prepared.includes("a_{s}'") &&
+    chain.prepared.includes("\\xi_{b}") &&
+    chain.prepared.includes("h_{0}") &&
+    !chain.text.includes("_"),
+  `prepared=${chain.prepared}\nvisible=${chain.text}`,
+);
+
+const rho = render("当满足条件ρmin≤ρ≤ρmax时，ρ越大。");
+check(
+  "ρmin 这类紧挨着的下标会排",
+  rho.html.includes("msupsub") &&
+    rho.prepared.includes("\\rho_{min}") &&
+    rho.prepared.includes("\\rho_{max}") &&
+    !rho.text.includes("_"),
+  `prepared=${rho.prepared}\nvisible=${rho.text}`,
+);
+
+const alpha = render("截面抵抗矩系数 α_s=ξ(1−0.5ξ)∈[0,0.5]");
+check(
+  "带括号和区间的公式不断成两截",
+  alpha.prepared.includes("\\alpha_{s}=\\xi(1-0.5\\xi)\\in [0,0.5]") &&
+    !alpha.prepared.includes("$$") &&
+    alpha.html.includes("katex"),
+  `prepared=${alpha.prepared}\nvisible=${alpha.text}`,
+);
+
+const keepGrade = render("混凝土强度等级不应低于C25，钢筋用HRB400。");
+check(
+  "混凝土等级和钢筋牌号不要被当成下标",
+  keepGrade.text.includes("C25") && keepGrade.text.includes("HRB400") && !keepGrade.prepared.includes("$C"),
+  `prepared=${keepGrade.prepared}\nvisible=${keepGrade.text}`,
+);
+
 const code = render("代码里的 `\\text{kN/m}^2` 保持原样，正文（ \\rho ）要排。");
 check(
   "行内代码不改，旁边的 \\rho 要排",

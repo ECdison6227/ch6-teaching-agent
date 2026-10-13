@@ -51,6 +51,13 @@ textarea {
   line-height: 1.75;
   word-break: break-word;
 }
+.md-body.md-inline {
+  font-size: inherit;
+  line-height: inherit;
+}
+.md-body.md-inline p {
+  margin: 0;
+}
 .md-body > *:first-child {
   margin-top: 0;
 }

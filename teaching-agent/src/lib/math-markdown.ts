@@ -691,6 +691,491 @@ function isKatexError(node: HastNode): boolean {
   return list.includes("katex-error");
 }
 
+/**
+ * 题库里的编辑标记，只给整理题目的人看。
+ * `[推断]`、`[推断1]`、`[待补]`、`[待核]`、`[规范值]` 以及包住它们的反引号，不进同学看到的正文。
+ */
+function stripEditorialMarks(text: string): string {
+  return text
+    .replace(
+      /[ \t]*`?\*{0,2}[ \t]*[\[［]\s*(?:推断\d*|待补|待核|规范值)\s*[\]］][ \t]*`?\*{0,2}/g,
+      " ",
+    )
+    .replace(/\*\*(?:\s*)\*\*/g, " ")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/[ \t]+([，。；：、！？])/g, "$1");
+}
+
+const GREEK_TO_TEX: Record<string, string> = {
+  α: "\\alpha",
+  β: "\\beta",
+  γ: "\\gamma",
+  δ: "\\delta",
+  ε: "\\varepsilon",
+  ϵ: "\\varepsilon",
+  ζ: "\\zeta",
+  η: "\\eta",
+  θ: "\\theta",
+  ι: "\\iota",
+  κ: "\\kappa",
+  λ: "\\lambda",
+  μ: "\\mu",
+  ν: "\\nu",
+  ξ: "\\xi",
+  π: "\\pi",
+  ρ: "\\rho",
+  σ: "\\sigma",
+  τ: "\\tau",
+  φ: "\\varphi",
+  ϕ: "\\varphi",
+  χ: "\\chi",
+  ψ: "\\psi",
+  ω: "\\omega",
+  Γ: "\\Gamma",
+  Δ: "\\Delta",
+  Θ: "\\Theta",
+  Λ: "\\Lambda",
+  Ξ: "\\Xi",
+  Π: "\\Pi",
+  Σ: "\\Sigma",
+  Φ: "\\Phi",
+  Ψ: "\\Psi",
+  Ω: "\\Omega",
+};
+
+const UNI_SUB: Record<string, string> = {
+  "₀": "0",
+  "₁": "1",
+  "₂": "2",
+  "₃": "3",
+  "₄": "4",
+  "₅": "5",
+  "₆": "6",
+  "₇": "7",
+  "₈": "8",
+  "₉": "9",
+  "ₐ": "a",
+  "ₑ": "e",
+  "ₕ": "h",
+  "ᵢ": "i",
+  "ⱼ": "j",
+  "ₖ": "k",
+  "ₗ": "l",
+  "ₘ": "m",
+  "ₙ": "n",
+  "ₒ": "o",
+  "ₚ": "p",
+  "ᵣ": "r",
+  "ₛ": "s",
+  "ₜ": "t",
+  "ᵤ": "u",
+  "ᵥ": "v",
+  "ₓ": "x",
+};
+
+const UNI_SUP: Record<string, string> = {
+  "⁰": "0",
+  "¹": "1",
+  "²": "2",
+  "³": "3",
+  "⁴": "4",
+  "⁵": "5",
+  "⁶": "6",
+  "⁷": "7",
+  "⁸": "8",
+  "⁹": "9",
+  "ⁿ": "n",
+};
+
+/** 粘在一起的工程符号，如 fcbh0、h0、As、Smax。长的放前面。 */
+const GLUED: [string, string][] = [
+  ["smax", "S_{max}"],
+  ["bh0", "bh_{0}"],
+  ["h0", "h_{0}"],
+  ["fc", "f_{c}"],
+  ["fy", "f_{y}"],
+  ["ft", "f_{t}"],
+  ["fu", "f_{u}"],
+  ["fb", "f_{b}"],
+  ["as", "A_{s}"],
+  ["b", "b"],
+  ["h", "h"],
+  ["d", "d"],
+];
+
+const OP_TO_TEX: Record<string, string> = {
+  "≤": "\\le ",
+  "≥": "\\ge ",
+  "≠": "\\ne ",
+  "≈": "\\approx ",
+  "∈": "\\in ",
+  "×": "\\times ",
+  "·": "\\cdot ",
+  "÷": "\\div ",
+  "＝": "=",
+  "＜": "\\lt ",
+  "＞": "\\gt ",
+  "＋": "+",
+  "－": "-",
+  "−": "-",
+  "–": "-",
+  "<": "\\lt ",
+  ">": "\\gt ",
+  "=": "=",
+  "+": "+",
+  "-": "-",
+  "/": "/",
+};
+
+type PlainAtom = { end: number; latex: string; strong: boolean };
+type PlainExpr = { end: number; latex: string; strong: boolean };
+
+function isAsciiLetter(ch: string): boolean {
+  return /[A-Za-z]/.test(ch);
+}
+
+function isFullwidthLetter(ch: string): boolean {
+  if (!ch) return false;
+  const c = ch.charCodeAt(0);
+  return (c >= 0xff21 && c <= 0xff3a) || (c >= 0xff41 && c <= 0xff5a);
+}
+
+function isLatinLetter(ch: string): boolean {
+  return isAsciiLetter(ch) || isFullwidthLetter(ch);
+}
+
+function foldLetter(ch: string): string {
+  if (!isFullwidthLetter(ch)) return ch;
+  return String.fromCharCode(ch.charCodeAt(0) - 0xfee0);
+}
+
+function isPrimeChar(ch: string): boolean {
+  return ch === "′" || ch === "'" || ch === "’" || ch === "＇";
+}
+
+function readPrimeSup(text: string, j: number): { end: number; latex: string } {
+  let end = j;
+  let latex = "";
+  let primes = "";
+  while (isPrimeChar(text[end] || "")) {
+    primes += "'";
+    end += 1;
+    if (primes.length >= 2) break;
+  }
+  if (primes) latex += primes;
+  let sup = "";
+  while (text[end] && UNI_SUP[text[end]]) {
+    sup += UNI_SUP[text[end]];
+    end += 1;
+  }
+  if (sup) latex += `^{${sup}}`;
+  return { end, latex };
+}
+
+function readExplicitSub(text: string, j: number): { end: number; sub: string } | null {
+  if (text[j] !== "_") return null;
+  let k = j + 1;
+  let sub = "";
+  if (text[k] === "{") {
+    const close = text.indexOf("}", k + 1);
+    if (close < 0 || close - k > 24) return null;
+    sub = text.slice(k + 1, close);
+    k = close + 1;
+  } else if (GREEK_TO_TEX[text[k] || ""]) {
+    sub = GREEK_TO_TEX[text[k]];
+    k += 1;
+  } else if (/[A-Za-z0-9]/.test(text[k] || "")) {
+    while (k < text.length && /[A-Za-z0-9]/.test(text[k])) {
+      if (isAsciiLetter(text[k]) && UNI_SUB[text[k + 1]]) break;
+      sub += text[k];
+      k += 1;
+    }
+  } else {
+    return null;
+  }
+  if (!sub) return null;
+  const more = /^,(min|max|cu|cr)\b/.exec(text.slice(k));
+  if (more) {
+    sub += `,${more[1]}`;
+    k += more[0].length;
+  }
+  return { end: k, sub };
+}
+
+function parseGlued(word: string): string | null {
+  const lower = word.toLowerCase();
+  if (lower === "as" && word === "as") return null;
+  let k = 0;
+  const parts: string[] = [];
+  let strong = false;
+  while (k < lower.length) {
+    let hit: [string, string] | null = null;
+    for (const pair of GLUED) {
+      if (!lower.startsWith(pair[0], k)) continue;
+      if (pair[0].length === 1 && lower.length === 1) continue;
+      hit = pair;
+      break;
+    }
+    if (!hit) return null;
+    let latex = hit[1];
+    if (hit[0] === "as") latex = word[k] === "a" ? "a_{s}" : "A_{s}";
+    if (hit[0] === "smax") latex = `${word[k] === "s" ? "s" : "S"}_{max}`;
+    if (latex.includes("_")) strong = true;
+    parts.push(latex);
+    k += hit[0].length;
+  }
+  if (!strong) return null;
+  return parts.join("");
+}
+
+function readGreekAtom(text: string, i: number): PlainAtom | null {
+  const cmd = GREEK_TO_TEX[text[i] || ""];
+  if (!cmd) return null;
+  let j = i + 1;
+  let sub = "";
+  const explicit = readExplicitSub(text, j);
+  if (explicit) {
+    sub = explicit.sub;
+    j = explicit.end;
+  } else if (isAsciiLetter(text[j] || "")) {
+    const m = /^[A-Za-z]{1,3}/.exec(text.slice(j));
+    if (m) {
+      sub = m[0];
+      j += m[0].length;
+    }
+  } else {
+    const spaced = /^[ \t]+(\d)(?![0-9.])/.exec(text.slice(j));
+    if (spaced) {
+      const after = text[j + spaced[0].length] || "";
+      if (!after || after in OP_TO_TEX || isCjk(after) || isCjkPunct(after) || /\s/.test(after)) {
+        sub = spaced[1];
+        j += spaced[0].length;
+      }
+    }
+  }
+  let uni = "";
+  while (UNI_SUB[text[j] || ""]) {
+    uni += UNI_SUB[text[j]];
+    j += 1;
+  }
+  if (uni) sub = sub ? sub + uni : uni;
+  const tail = readPrimeSup(text, j);
+  let latex = cmd;
+  if (sub) latex += `_{${sub}}`;
+  latex += tail.latex;
+  return { end: tail.end, latex, strong: true };
+}
+
+function readLatinAtom(text: string, i: number): PlainAtom | null {
+  if (!isLatinLetter(text[i] || "")) return null;
+  if (i > 0 && isLatinLetter(text[i - 1])) return null;
+  const baseM = /^[A-Za-z\uFF21-\uFF3A\uFF41-\uFF5A]+/.exec(text.slice(i));
+  if (!baseM) return null;
+  const base = [...baseM[0]].map(foldLetter).join("");
+  let j = i + baseM[0].length;
+
+  const explicit = readExplicitSub(text, j);
+  if (explicit) {
+    const tail = readPrimeSup(text, explicit.end);
+    return { end: tail.end, latex: `${base}_{${explicit.sub}}${tail.latex}`, strong: true };
+  }
+  if (UNI_SUB[text[j] || ""]) {
+    let uni = "";
+    while (UNI_SUB[text[j] || ""]) {
+      uni += UNI_SUB[text[j]];
+      j += 1;
+    }
+    const tail = readPrimeSup(text, j);
+    return { end: tail.end, latex: `${base}_{${uni}}${tail.latex}`, strong: true };
+  }
+  if (base.length <= 2 && (UNI_SUP[text[j] || ""] || isPrimeChar(text[j] || ""))) {
+    const tail = readPrimeSup(text, j);
+    if (tail.end > j) return { end: tail.end, latex: `${base}${tail.latex}`, strong: true };
+  }
+
+  const chunkM = /^[A-Za-z0-9\uFF21-\uFF3A\uFF41-\uFF5A]+/.exec(text.slice(i));
+  if (chunkM) {
+    const word = [...chunkM[0]].map((c) => (isLatinLetter(c) ? foldLetter(c) : c)).join("");
+    const glued = parseGlued(word);
+    if (glued) {
+      const tail = readPrimeSup(text, i + chunkM[0].length);
+      return { end: tail.end, latex: `${glued}${tail.latex}`, strong: true };
+    }
+    if (/\d/.test(word)) return null;
+  }
+  if (base.length === 1) return { end: i + baseM[0].length, latex: base, strong: false };
+  return null;
+}
+
+function readNumberAtom(text: string, i: number): PlainAtom | null {
+  if (i > 0 && /[A-Za-z0-9.]/.test(text[i - 1] || "")) return null;
+  const m = /^(\d+(?:\.\d+)?)(%?)/.exec(text.slice(i));
+  if (!m) return null;
+  return { end: i + m[0].length, latex: m[2] ? `${m[1]}\\%` : m[1], strong: false };
+}
+
+function readPlainAtom(text: string, i: number): PlainAtom | null {
+  return readGreekAtom(text, i) || readLatinAtom(text, i) || readNumberAtom(text, i);
+}
+
+function readOpAt(text: string, i: number): { end: number; latex: string } | null {
+  const ch = text[i];
+  if (!ch || !(ch in OP_TO_TEX)) return null;
+  if (ch === "=" && text[i + 1] === "=") return null;
+  if ((ch === "<" || ch === ">") && text[i + 1] === ch) return null;
+  return { end: i + 1, latex: OP_TO_TEX[ch] };
+}
+
+function skipPlainSpace(text: string, i: number): number {
+  let j = i;
+  while (text[j] === " " || text[j] === "\t") j += 1;
+  return j;
+}
+
+function readGroup(text: string, i: number): PlainExpr | null {
+  const open = text[i];
+  if (open !== "(" && open !== "[") return null;
+  const close = open === "(" ? ")" : "]";
+  const inner = matchPlainExpr(text, i + 1, true, false);
+  if (!inner || !inner.latex || text[inner.end] !== close) return null;
+  return { end: inner.end + 1, latex: open + inner.latex + close, strong: inner.strong };
+}
+
+function matchPlainExpr(text: string, i: number, allowComma: boolean, requireStrong = true): PlainExpr | null {
+  let latex = "";
+  let strong = false;
+  let pos = i;
+  let end = i;
+  let pending = "";
+  let expectAtom = true;
+
+  const commit = (piece: string, next: number, isStrong: boolean) => {
+    latex += pending + piece;
+    pending = "";
+    if (isStrong) strong = true;
+    pos = next;
+    end = next;
+    expectAtom = false;
+  };
+
+  for (let guard = 0; guard < 80 && pos < text.length; guard += 1) {
+    if (expectAtom) {
+      const j = latex || pending ? skipPlainSpace(text, pos) : pos;
+      const group = readGroup(text, j);
+      if (group) {
+        commit(group.latex, group.end, group.strong);
+        continue;
+      }
+      const atom = readPlainAtom(text, j);
+      if (!atom) break;
+      commit(atom.latex, atom.end, atom.strong);
+      continue;
+    }
+
+    const sp = skipPlainSpace(text, pos);
+    const gap = sp > pos ? " " : "";
+    if (allowComma && text[sp] === ",") {
+      const next = skipPlainSpace(text, sp + 1);
+      if (readPlainAtom(text, next) || text[next] === "(" || text[next] === "[") {
+        pending = `${gap},`;
+        pos = sp + 1;
+        expectAtom = true;
+        continue;
+      }
+    }
+    const op = readOpAt(text, sp);
+    if (op) {
+      pending = gap + op.latex;
+      pos = op.end;
+      expectAtom = true;
+      continue;
+    }
+    const group = readGroup(text, sp);
+    if (group) {
+      commit(gap + group.latex, group.end, group.strong);
+      continue;
+    }
+    const atom = readPlainAtom(text, sp);
+    if (atom?.strong) {
+      commit(gap + atom.latex, atom.end, true);
+      continue;
+    }
+    break;
+  }
+  if (!latex) return null;
+  if (requireStrong && !strong) return null;
+  return { end, latex, strong };
+}
+
+function tryPlainExpr(text: string, i: number): PlainExpr | null {
+  if (i > 0) {
+    const prev = text[i - 1];
+    if (isLatinLetter(prev) || /[0-9.]/.test(prev) || prev === "\\") return null;
+  }
+  const ch = text[i];
+  if (!ch || ch === "$" || ch === "`" || ch === "*") return null;
+  if (!(GREEK_TO_TEX[ch] || isLatinLetter(ch) || /[0-9(]/.test(ch))) return null;
+  return matchPlainExpr(text, i, false);
+}
+
+function pullLeadingOps(out: string): { out: string; latex: string } {
+  let i = out.length;
+  let latex = "";
+  while (i > 0) {
+    let j = i;
+    while (j > 0 && (out[j - 1] === " " || out[j - 1] === "\t")) j -= 1;
+    if (j === 0 || out[j - 1] === "$") break;
+    const start = j - 1;
+    const op = readOpAt(out, start);
+    if (!op || op.end !== j) break;
+    if (out[start] === "=" && out[start - 1] === "=") break;
+    latex = op.latex + latex;
+    i = start;
+  }
+  return { out: out.slice(0, i), latex };
+}
+
+/**
+ * 把题库里写成纯文本的公式补上 $...$。
+ * ε_s、εs、ξ_b、a_s′、h₀、λ<1 这类都会进 KaTeX；已经写好的 $...$ 和行内代码不动。
+ */
+function promotePlainFormulas(text: string): string {
+  let out = "";
+  let i = 0;
+  while (i < text.length) {
+    if (text[i] === "\uE002") {
+      const end = text.indexOf("\uE003", i);
+      const to = end < 0 ? text.length : end + 1;
+      out += text.slice(i, to);
+      i = to;
+      continue;
+    }
+    if (text[i] === "$") {
+      const display = text[i + 1] === "$";
+      const from = i + (display ? 2 : 1);
+      const close = findClosing(text, from, display);
+      if (close < 0) {
+        out += text.slice(i);
+        break;
+      }
+      const to = close + (display ? 2 : 1);
+      out += text.slice(i, to);
+      i = to;
+      continue;
+    }
+    const hit = tryPlainExpr(text, i);
+    if (hit) {
+      const pulled = pullLeadingOps(out);
+      out = pulled.out + `$${pulled.latex}${hit.latex}$`;
+      i = hit.end;
+      continue;
+    }
+    out += text[i];
+    i += 1;
+  }
+  return out;
+}
+
 /** KaTeX 仍失败时，用可读文字换掉红色源码，避免整段空白或把反斜杠甩给学生 */
 export function rehypeDemoteKatexErrors() {
   return (tree: HastNode) => {
@@ -715,9 +1200,11 @@ export function prepareMathMarkdown(text: string): string {
   let t = text;
   const fence = t.search(/```(card|diagram|slide|verdict)/);
   if (fence >= 0) t = t.slice(0, fence);
+  t = stripEditorialMarks(t);
   const masked = maskCode(t);
+  const promoted = promotePlainFormulas(masked.text);
   let out = "";
-  for (const tok of splitMathRegions(masked.text)) {
+  for (const tok of splitMathRegions(promoted)) {
     out += tok.t === "math" ? finalize(tok.body, tok.display) : wrapBareLatex(tok.s);
   }
   return unmask(applyHighlight(out), masked.blocks);
