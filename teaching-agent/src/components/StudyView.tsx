@@ -35,7 +35,7 @@ const BETA_KEY = "ch6-study-beta";
 
 export function StudyView() {
   const { ask, close, open, bindSlide } = useAiDrawer();
-  const { notes: savedNotes, add: addNote } = useNotes();
+  const { notes: savedNotes, add: addNote, remove: removeNote } = useNotes();
 
   /** slide-notes.json 由脚本后台生成，可能不存在或只覆盖部分页 → 动态载入 + 兜底 */
   const [notes, setNotes] = useState<Record<string, SlideNote>>({});
@@ -103,8 +103,10 @@ export function StudyView() {
   const slide = group?.pages.find((p) => p.page === pageNo) ?? group?.pages[0];
   const idx = group ? group.pages.findIndex((p) => p.page === pageNo) : -1;
   const pageTitle = slide ? pageNoteTitle(slide.page) : null;
-  const pageSaved =
-    !!pageTitle && savedNotes.some((note) => note.kind === "page" && displayNoteTitle(note) === pageTitle);
+  const savedPageNotes = pageTitle
+    ? savedNotes.filter((note) => note.kind === "page" && displayNoteTitle(note) === pageTitle)
+    : [];
+  const pageSaved = savedPageNotes.length > 0;
 
   const goSection = (section: string) => {
     const g = groups.find((x) => x.section === section);
@@ -367,7 +369,11 @@ export function StudyView() {
                       : "border-black/5 text-ink-faint hover:text-ink"
                   }`}
                   onClick={() => {
-                    if (pageSaved || !pageTitle) return;
+                    if (!pageTitle) return;
+                    if (pageSaved) {
+                      for (const note of savedPageNotes) removeNote(note.id);
+                      return;
+                    }
                     addNote({
                       kind: "page",
                       title: pageTitle,
