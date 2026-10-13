@@ -1,10 +1,15 @@
 "use client";
 
 import { useRef } from "react";
-import { ArrowUp, ImagePlus } from "lucide-react";
+import { ArrowUp, GraduationCap, ImagePlus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ChatModelOption } from "@/lib/models/options";
+
+function ModelIcon({ provider }: { provider?: ChatModelOption["provider"] }) {
+  const Icon = provider === "school" ? GraduationCap : Sparkles;
+  return <Icon className="size-3.5 shrink-0 text-ink-soft" aria-hidden />;
+}
 
 export function Composer({
   value,
@@ -138,8 +143,11 @@ export function Composer({
             </SelectTrigger>
             <SelectContent side="top" align="end" className="z-[60]">
               {models.map((m) => (
-                <SelectItem key={m.id} value={m.id}>
-                  {m.label}
+                <SelectItem key={m.id} value={m.id} textValue={m.label}>
+                  <span className="flex items-center gap-1.5">
+                    <ModelIcon provider={m.provider} />
+                    {m.label}
+                  </span>
                 </SelectItem>
               ))}
             </SelectContent>
