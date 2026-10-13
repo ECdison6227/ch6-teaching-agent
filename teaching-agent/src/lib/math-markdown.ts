@@ -697,6 +697,7 @@ function isKatexError(node: HastNode): boolean {
  */
 function stripEditorialMarks(text: string): string {
   return text
+    .replace(/\s*-\s*\*注：[\s\S]*?\*/g, "")
     .replace(
       /[ \t]*`?\*{0,2}[ \t]*[\[［]\s*(?:推断\d*|待补|待核|规范值)\s*[\]］][ \t]*`?\*{0,2}/g,
       " ",

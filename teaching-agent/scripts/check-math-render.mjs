@@ -131,12 +131,14 @@ const display = render("独立公式\n$$\\frac{M}{W}$$\n讲完。");
 check("$$...$$ 仍能排", display.html.includes("katex") && !display.text.includes("\\frac"), display.text);
 
 const sc52 = render(
-  "受弯构件发生适筋破坏时，受拉钢筋应变 ε_s [推断1] 和受压边缘混凝土应变 ε_c [推断2] 分别为(  　)。",
+  "受弯构件发生适筋破坏时，受拉钢筋应变 ε_s [推断1] 和受压边缘混凝土应变 ε_c [推断2] 分别为(  　)。 - *注：受拉钢筋应变 ε_s 与受压边缘混凝土应变 ε_c（选项四组为二者与 ε_y、ε_cu 的大小组合）*",
 );
 check(
   "SC-52 题干去掉推断标记，下标进公式",
   !sc52.text.includes("推断") &&
+    !sc52.text.includes("注：") &&
     !sc52.prepared.includes("[推断") &&
+    !sc52.prepared.includes("注：") &&
     sc52.html.includes("katex") &&
     !sc52.text.includes("ε_s") &&
     !sc52.text.includes("_s") &&
