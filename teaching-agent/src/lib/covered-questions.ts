@@ -207,7 +207,10 @@ function placements<T extends CoveredQuestion>(questions: T[], slides: CoveredSl
   });
 }
 
-/** 每一页：当前章节里、讲到这一页为止已经能对上的题。越近讲完的越靠前。 */
+/**
+ * 讲到这一页为止、当前章节里已经能对上的题。越近讲完的越靠前。
+ * 自学课件不再把这份名单贴在内容页下面；对得上的题由 questionsAfterSlide 各自占一页。
+ */
 export function questionsByPage<T extends CoveredQuestion>(
   questions: T[],
   slides: CoveredSlide[],

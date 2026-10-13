@@ -15,7 +15,7 @@ import {
   type SlideNote,
 } from "@/components/StudyNotes";
 import { PracticePanel, pickQuestions, type Question } from "@/components/PracticePanel";
-import { questionsAfterSlide, questionsByPage } from "@/lib/covered-questions";
+import { questionsAfterSlide } from "@/lib/covered-questions";
 import { NextChapterButton } from "@/components/NextChapterButton";
 import { SlideStage } from "@/components/SlideStage";
 import { ReinforcementLab } from "@/components/ReinforcementLab";
@@ -36,12 +36,12 @@ const BETA_KEY = "ch6-study-beta";
 
 type DeckItem =
   | { kind: "slide"; page: number }
-  | { kind: "quiz"; afterPage: number; questions: Question[] }
+  | { kind: "quiz"; afterPage: number; question: Question }
   | { kind: "lab" };
 
 function deckId(item: DeckItem): string {
   if (item.kind === "slide") return `s:${item.page}`;
-  if (item.kind === "quiz") return `q:${item.afterPage}`;
+  if (item.kind === "quiz") return `q:${item.afterPage}:${item.question.id}`;
   return "lab";
 }
 
@@ -49,7 +49,22 @@ function deckId(item: DeckItem): string {
 function deckIndex(deck: DeckItem[], pos: string): number {
   const exact = deck.findIndex((item) => deckId(item) === pos);
   if (exact >= 0) return exact;
-  const page = Number(/^[sq]:(\d+)$/.exec(pos)?.[1] ?? "");
+  const quiz = /^q:(\d+)(?::(.+))?$/.exec(pos);
+  if (quiz) {
+    const page = Number(quiz[1]);
+    const qid = quiz[2];
+    if (qid) {
+      const hit = deck.findIndex(
+        (item) => item.kind === "quiz" && item.afterPage === page && item.question.id === qid,
+      );
+      if (hit >= 0) return hit;
+    }
+    const first = deck.findIndex((item) => item.kind === "quiz" && item.afterPage === page);
+    if (first >= 0) return first;
+    const slide = deck.findIndex((item) => item.kind === "slide" && item.page === page);
+    if (slide >= 0) return slide;
+  }
+  const page = Number(/^s:(\d+)$/.exec(pos)?.[1] ?? "");
   if (page > 0) {
     const slide = deck.findIndex((item) => item.kind === "slide" && item.page === page);
     if (slide >= 0) return slide;
@@ -131,14 +146,14 @@ export function StudyView() {
     () => slides.map((s) => ({ ...s, note: notes[String(s.page)] })),
     [notes],
   );
-  const questionsOnPage = useMemo(() => questionsByPage(questions, coveredSlides, 3), [coveredSlides]);
   const afterSlide = useMemo(() => questionsAfterSlide(questions, coveredSlides), [coveredSlides]);
   const deck = useMemo(() => {
     const items: DeckItem[] = [];
     for (const s of group?.pages ?? []) {
       items.push({ kind: "slide", page: s.page });
-      const qs = afterSlide.get(s.page);
-      if (qs?.length) items.push({ kind: "quiz", afterPage: s.page, questions: qs });
+      for (const question of afterSlide.get(s.page) ?? []) {
+        items.push({ kind: "quiz", afterPage: s.page, question });
+      }
       if (beta && s.page === LAB_AFTER) items.push({ kind: "lab" });
     }
     return items;
@@ -150,7 +165,7 @@ export function StudyView() {
   const slide = group?.pages.find((p) => p.page === anchorPage) ?? group?.pages[0];
   const onQuiz = item?.kind === "quiz";
   const onLab = item?.kind === "lab" && !bookSel && !chapterGate;
-  const quizQuestions = item?.kind === "quiz" ? item.questions : [];
+  const quizQuestions = item?.kind === "quiz" ? [item.question] : [];
   const pageTitle = slide ? pageNoteTitle(slide.page) : null;
   const savedPageNotes = pageTitle
     ? savedNotes.filter((note) => note.kind === "page" && displayNoteTitle(note) === pageTitle)
@@ -211,7 +226,7 @@ export function StudyView() {
     };
   }, [slide, notes]);
 
-  /** 纯教材节仍按节名挑题。有课件的节改成「讲到这一页为止」才能做。 */
+  /** 纯教材节仍按节名挑题，留在本节练习。课件里对得上的题各自占一页，不贴在内容页下面。 */
   const activeSection = bookSel
     ? `${bookSel} ${KNOWLEDGE_SECTIONS.find((s) => s.id === bookSel)?.name ?? ""}`
     : selSection;
@@ -219,8 +234,6 @@ export function StudyView() {
     () => (bookSel ? pickQuestions(questions, activeSection, 3) : []),
     [bookSel, activeSection],
   );
-  const pageQuestions =
-    item?.kind === "slide" && slide && !bookSel ? (questionsOnPage.get(slide.page) ?? []) : [];
 
   const pageCtx = {
     page: anchorPage ?? 0,
@@ -408,7 +421,7 @@ export function StudyView() {
                 {onLab
                   ? `第 ${LAB_AFTER} 页之后 · 配筋率示意`
                   : onQuiz
-                    ? `${idx + 1} / ${deck.length} · 第 ${anchorPage} 页之后 · 随堂题`
+                    ? `${idx + 1} / ${deck.length} · 第 ${anchorPage} 页之后 · ${quizQuestions[0]?.id ?? "随堂题"}`
                     : `${idx + 1} / ${deck.length} · 第 ${slide.page} 页`}
               </span>
               <button
@@ -428,7 +441,11 @@ export function StudyView() {
                     <ListChecks className="size-4 shrink-0" />
                     <span>第 {anchorPage} 页已经讲过，这一页直接做</span>
                   </div>
-                  <PracticePanel key={`quiz:${anchorPage}`} questions={quizQuestions} context={pageCtx} />
+                  <PracticePanel
+                    key={`quiz:${anchorPage}:${quizQuestions[0]?.id ?? ""}`}
+                    questions={quizQuestions}
+                    context={pageCtx}
+                  />
                 </div>
               ) : (
               <SlideStage page={slide.page} alt={noteBlock.title} />
@@ -501,15 +518,6 @@ export function StudyView() {
                 <ChevronRight />
               </Button>
             </div>
-            {pageQuestions.length && !onLab ? (
-              <div className="mt-4">
-                <PracticePanel
-                  key={`${selSection}#${slide.page}`}
-                  questions={pageQuestions}
-                  context={pageCtx}
-                />
-              </div>
-            ) : null}
           </>
         ) : null}
 
