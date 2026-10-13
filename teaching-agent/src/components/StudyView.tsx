@@ -16,6 +16,7 @@ import {
 } from "@/components/StudyNotes";
 import { PracticePanel, pickQuestions, type Question } from "@/components/PracticePanel";
 import { questionsByPage } from "@/lib/covered-questions";
+import { NextChapterButton } from "@/components/NextChapterButton";
 import { SlideStage } from "@/components/SlideStage";
 import { ReinforcementLab } from "@/components/ReinforcementLab";
 import slidesData from "@/content/slides.json";
@@ -312,9 +313,7 @@ export function StudyView() {
             >
               <ChevronLeft />
             </Button>
-            <Button type="button" onClick={goNextChapter}>
-              进入下一章 · {nextLabel}
-            </Button>
+            <NextChapterButton label={nextLabel} onClick={goNextChapter} />
           </div>
         ) : bookSel ? (
           <div className="relative rounded-2xl border border-paper-line bg-paper p-6">
