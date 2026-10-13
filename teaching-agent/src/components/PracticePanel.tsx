@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Markdown } from "./Markdown";
 import { useAiDrawer } from "./AiDrawer";
 import { useNotes } from "./notes";
@@ -165,7 +168,7 @@ export function PracticePanel({
         const reset = () => patch(q.id, EMPTY);
 
         return (
-          <div key={q.id} className="rounded-xl border border-paper-line bg-paper px-3 py-3">
+          <Card key={q.id} className="rounded-xl border-paper-line bg-paper px-3 py-3 shadow-none">
             <div className="flex items-center gap-2">
               <span className="text-[11px] tabular-nums text-ink-faint">{q.id}</span>
               <span className="rounded-full border border-paper-line px-1.5 py-[1px] text-[10.5px] text-ink-faint">
@@ -188,87 +191,105 @@ export function PracticePanel({
                   const right = s.submitted && normLetter(o.id) === normLetter(q.answer ?? "");
                   const wrong = s.submitted && picked && !right;
                   return (
-                    <button
+                    <Button
                       key={o.id}
+                      type="button"
+                      variant="outline"
                       onClick={() => patch(q.id, { value: o.id, submitted: false, correct: null })}
-                      className={`flex w-full items-start gap-2 rounded-lg border px-2.5 py-2 text-left text-[12.5px] leading-5 transition-colors ${
+                      className={`h-auto w-full items-start justify-start gap-2 whitespace-normal rounded-lg px-2.5 py-2 text-left text-[12.5px] font-normal leading-5 shadow-none ${
                         right
-                          ? "border-ink bg-paper-soft text-ink"
+                          ? "border-ink bg-paper-soft text-ink hover:bg-paper-soft hover:text-ink"
                           : wrong
-                            ? "border-ink-faint bg-paper-soft text-ink-faint line-through"
+                            ? "border-ink-faint bg-paper-soft text-ink-faint line-through hover:bg-paper-soft hover:text-ink-faint"
                             : picked
-                              ? "border-ink bg-paper-soft text-ink"
-                              : "border-paper-line text-ink-soft hover:bg-paper-soft"
+                              ? "border-ink bg-paper-soft text-ink hover:bg-paper-soft hover:text-ink"
+                              : "border-paper-line text-ink-soft hover:bg-paper-soft hover:text-ink-soft"
                       }`}
                     >
                       <span className="shrink-0 tabular-nums text-ink-faint">{o.id}</span>
                       <span className="min-w-0 flex-1">{o.text}</span>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
             ) : (
-              <input
+              <Input
                 value={s.value}
                 onChange={(e) => patch(q.id, { value: e.target.value, submitted: false, correct: null })}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") submit();
                 }}
                 placeholder={q.type === "fill" ? "把答案填在这里" : "输入你的答案"}
-                className="mt-2 w-full rounded-lg border border-paper-line bg-paper px-2.5 py-2 text-[12.5px] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-ink-faint"
+                className="mt-2 h-auto border-paper-line bg-paper px-2.5 py-2 text-[12.5px] text-ink shadow-none placeholder:text-ink-faint focus-visible:ring-ink-faint"
               />
             )}
 
             {/* 操作区 */}
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               {!hasAnswer ? (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() =>
                     ask({
                       question: `这道题我没有标准答案，能不能一步步带我做：${q.prompt}`,
                       context,
                     })
                   }
-                  className="rounded-lg border border-paper-line px-3 py-1.5 text-[12px] text-ink-soft transition-colors hover:bg-paper-soft"
+                  className="border-paper-line text-ink-soft shadow-none hover:bg-paper-soft"
                 >
                   暂无标准答案，问 AI
-                </button>
+                </Button>
               ) : !s.submitted ? (
                 <>
-                  <button
+                  <Button
+                    type="button"
+                    size="sm"
                     onClick={submit}
                     disabled={!s.value.trim()}
-                    className="rounded-lg bg-ink px-3.5 py-1.5 text-[12px] text-paper transition-opacity disabled:opacity-30"
+                    className="bg-ink text-paper hover:bg-ink/90"
                   >
                     提交
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={() => patch(q.id, { showAnswer: true })}
-                    className="px-1 py-1.5 text-[12px] text-ink-faint transition-colors hover:text-ink"
+                    className="text-ink-faint hover:bg-transparent hover:text-ink"
                   >
                     不会做，直接看答案
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <>
                   <span className="text-[11.5px] font-medium">
                     {s.correct ? "答对了" : "答错了"}
                   </span>
-                  <button
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => patch(q.id, { showAnswer: !s.showAnswer })}
-                    className="rounded-lg border border-paper-line px-3 py-1.5 text-[12px] text-ink-soft transition-colors hover:bg-paper-soft"
+                    className="border-paper-line text-ink-soft shadow-none hover:bg-paper-soft"
                   >
                     {s.showAnswer ? "收起答案" : "查看答案"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={reset}
-                    className="px-1 py-1.5 text-[12px] text-ink-faint transition-colors hover:text-ink"
+                    className="text-ink-faint hover:bg-transparent hover:text-ink"
                   >
                     再做一次
-                  </button>
+                  </Button>
                   {!s.correct ? (
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() =>
                         add({
                           kind: "question",
@@ -276,10 +297,10 @@ export function PracticePanel({
                           text: `题目：${q.prompt}\n我的作答：${s.value}\n这道题我做错了。`,
                         })
                       }
-                      className="px-1 py-1.5 text-[12px] text-ink-faint hover:text-ink"
+                      className="text-ink-faint hover:bg-transparent hover:text-ink"
                     >
                       收藏这道题
-                    </button>
+                    </Button>
                   ) : null}
                 </>
               )}
@@ -295,20 +316,23 @@ export function PracticePanel({
                 {q.verified === false ? (
                   <div className="mt-1 text-[11px] text-ink-faint">该题答案未经复核，仅供参考。</div>
                 ) : null}
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() =>
                     ask({
                       question: `我不太懂这道题：${q.prompt}\n答案是 ${answerLabel(q)}，但我没看懂，能不能一步步讲？`,
                       context,
                     })
                   }
-                  className="mt-2 rounded-lg border border-paper-line bg-paper px-3 py-1.5 text-[12px] text-ink-soft transition-colors hover:border-ink-faint hover:text-ink"
+                  className="mt-2 border-paper-line bg-paper text-ink-soft shadow-none hover:border-ink-faint hover:bg-paper hover:text-ink"
                 >
                   还是不懂，问 AI
-                </button>
+                </Button>
               </div>
             ) : null}
-          </div>
+          </Card>
         );
       })}
     </div>

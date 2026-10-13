@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bookmark, ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
+import { Bookmark, ChevronLeft, ChevronRight, ListChecks, StickyNote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAiDrawer } from "@/components/AiDrawer";
@@ -15,7 +15,7 @@ import {
   type SlideNote,
 } from "@/components/StudyNotes";
 import { PracticePanel, pickQuestions, type Question } from "@/components/PracticePanel";
-import { questionsByPage } from "@/lib/covered-questions";
+import { questionsAfterSlide, questionsByPage } from "@/lib/covered-questions";
 import { NextChapterButton } from "@/components/NextChapterButton";
 import { SlideStage } from "@/components/SlideStage";
 import { ReinforcementLab } from "@/components/ReinforcementLab";
@@ -30,9 +30,36 @@ const questions = questionsData as Question[];
 const slideArrow =
   "absolute top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-black/30 text-white shadow-sm hover:bg-black/45 hover:text-white disabled:opacity-25";
 
-/** 第 37 页讲的是配筋率。Beta 打开时，它的下一页是可拖的截面，不是第 38 页。 */
+/** 第 37 页讲的是配筋率。Beta 打开时，这一页（以及刚插在它后面的随堂题）之后是可拖的截面。 */
 const LAB_AFTER = 37;
 const BETA_KEY = "ch6-study-beta";
+
+type DeckItem =
+  | { kind: "slide"; page: number }
+  | { kind: "quiz"; afterPage: number; questions: Question[] }
+  | { kind: "lab" };
+
+function deckId(item: DeckItem): string {
+  if (item.kind === "slide") return `s:${item.page}`;
+  if (item.kind === "quiz") return `q:${item.afterPage}`;
+  return "lab";
+}
+
+/** 笔记晚到、或关掉 Beta 时，当前位置可能暂时对不上，就回到对应的课件页。 */
+function deckIndex(deck: DeckItem[], pos: string): number {
+  const exact = deck.findIndex((item) => deckId(item) === pos);
+  if (exact >= 0) return exact;
+  const page = Number(/^[sq]:(\d+)$/.exec(pos)?.[1] ?? "");
+  if (page > 0) {
+    const slide = deck.findIndex((item) => item.kind === "slide" && item.page === page);
+    if (slide >= 0) return slide;
+  }
+  if (pos === "lab") {
+    const anchor = deck.findIndex((item) => item.kind === "slide" && item.page === LAB_AFTER);
+    if (anchor >= 0) return anchor;
+  }
+  return 0;
+}
 
 export function StudyView() {
   const { ask, close, open, bindSlide } = useAiDrawer();
@@ -71,13 +98,12 @@ export function StudyView() {
   const bookOnly = KNOWLEDGE_SECTIONS.filter((s) => s.only === "book");
 
   const [selSection, setSelSection] = useState<string>(groups[0]?.section ?? "");
-  const [pageNo, setPageNo] = useState<number>(groups[0]?.pages[0]?.page ?? 1);
+  const [pos, setPos] = useState("");
   const [bookSel, setBookSel] = useState<string | null>(null);
   const [chaptersOpen, setChaptersOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [chapterGate, setChapterGate] = useState(false);
   const [beta, setBeta] = useState(false);
-  const [labOpen, setLabOpen] = useState(false);
   const notesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,21 +114,43 @@ export function StudyView() {
     setBeta((on) => {
       const next = !on;
       window.localStorage.setItem(BETA_KEY, next ? "1" : "0");
-      if (!next) setLabOpen(false);
+      if (!next) setPos((cur) => (cur === "lab" ? `s:${LAB_AFTER}` : cur));
       return next;
     });
   };
 
   /** 切章 / 翻页时把各栏的滚动位置拉回顶部（移动端整页共用一个滚动容器） */
   const shellRef = useRef<HTMLDivElement>(null);
-  const scrollKey = chapterGate ? `${bookSel ?? selSection}#gate` : (bookSel ?? `${selSection}#${pageNo}`);
+  const scrollKey = chapterGate ? `${bookSel ?? selSection}#gate` : (bookSel ?? `${selSection}#${pos}`);
   useEffect(() => {
     shellRef.current?.scrollTo({ top: 0 });
   }, [scrollKey]);
 
   const group = groups.find((g) => g.section === selSection);
-  const slide = group?.pages.find((p) => p.page === pageNo) ?? group?.pages[0];
-  const idx = group ? group.pages.findIndex((p) => p.page === pageNo) : -1;
+  const coveredSlides = useMemo(
+    () => slides.map((s) => ({ ...s, note: notes[String(s.page)] })),
+    [notes],
+  );
+  const questionsOnPage = useMemo(() => questionsByPage(questions, coveredSlides, 3), [coveredSlides]);
+  const afterSlide = useMemo(() => questionsAfterSlide(questions, coveredSlides), [coveredSlides]);
+  const deck = useMemo(() => {
+    const items: DeckItem[] = [];
+    for (const s of group?.pages ?? []) {
+      items.push({ kind: "slide", page: s.page });
+      const qs = afterSlide.get(s.page);
+      if (qs?.length) items.push({ kind: "quiz", afterPage: s.page, questions: qs });
+      if (beta && s.page === LAB_AFTER) items.push({ kind: "lab" });
+    }
+    return items;
+  }, [group, afterSlide, beta]);
+  const idx = deckIndex(deck, pos);
+  const item = deck[idx];
+  const anchorPage =
+    item?.kind === "quiz" ? item.afterPage : item?.kind === "lab" ? LAB_AFTER : item?.kind === "slide" ? item.page : group?.pages[0]?.page;
+  const slide = group?.pages.find((p) => p.page === anchorPage) ?? group?.pages[0];
+  const onQuiz = item?.kind === "quiz";
+  const onLab = item?.kind === "lab" && !bookSel && !chapterGate;
+  const quizQuestions = item?.kind === "quiz" ? item.questions : [];
   const pageTitle = slide ? pageNoteTitle(slide.page) : null;
   const savedPageNotes = pageTitle
     ? savedNotes.filter((note) => note.kind === "page" && displayNoteTitle(note) === pageTitle)
@@ -112,13 +160,12 @@ export function StudyView() {
   const goSection = (section: string) => {
     const g = groups.find((x) => x.section === section);
     setChapterGate(false);
-    setLabOpen(false);
     setBookSel(null);
     setSelSection(section);
-    if (g) setPageNo(g.pages[0].page);
+    if (g?.pages[0]) setPos(`s:${g.pages[0].page}`);
   };
 
-  const atLast = !bookSel && !!group && idx === group.pages.length - 1;
+  const atLast = !bookSel && deck.length > 0 && idx >= deck.length - 1;
   const nextLabel = (() => {
     if (bookSel) {
       const i = bookOnly.findIndex((s) => s.id === bookSel);
@@ -172,18 +219,18 @@ export function StudyView() {
     () => (bookSel ? pickQuestions(questions, activeSection, 3) : []),
     [bookSel, activeSection],
   );
-  const questionsOnPage = useMemo(() => {
-    const covered = slides.map((s) => ({ ...s, note: notes[String(s.page)] }));
-    return questionsByPage(questions, covered, 3);
-  }, [notes]);
-  const pageQuestions = slide && !bookSel ? (questionsOnPage.get(slide.page) ?? []) : [];
+  const pageQuestions =
+    item?.kind === "slide" && slide && !bookSel ? (questionsOnPage.get(slide.page) ?? []) : [];
 
-  const onLab = beta && labOpen && !bookSel && !chapterGate;
   const pageCtx = {
-    page: onLab ? LAB_AFTER : (slide?.page ?? 0),
+    page: anchorPage ?? 0,
     section: activeSection,
-    title: onLab ? "配筋率示意" : noteBlock.title,
-    bullets: onLab ? ["拖动配筋率，看少筋、适筋、超筋"] : noteBlock.points.slice(0, 6),
+    title: onLab ? "配筋率示意" : onQuiz ? `第 ${anchorPage} 页之后的随堂题` : noteBlock.title,
+    bullets: onLab
+      ? ["拖动配筋率，看少筋、适筋、超筋"]
+      : onQuiz
+        ? quizQuestions.map((q) => q.prompt).slice(0, 6)
+        : noteBlock.points.slice(0, 6),
     classmate: beta,
   };
 
@@ -204,7 +251,7 @@ export function StudyView() {
 
   useEffect(() => {
     setNotesOpen(false);
-  }, [pageNo, bookSel]);
+  }, [pos, bookSel]);
 
   useEffect(() => {
     if (!slide || bookSel) {
@@ -219,9 +266,31 @@ export function StudyView() {
 
   const askPage = () =>
     ask({
-      question: `帮我讲讲第 ${slide?.page} 页的 ${noteBlock.title}`,
+      question: onQuiz
+        ? `我看完第 ${anchorPage} 页，后面这道题还是不会：${quizQuestions.map((q) => q.prompt).join("；")}`
+        : `帮我讲讲第 ${slide?.page} 页的 ${noteBlock.title}`,
       context: pageCtx,
     });
+
+  const goPrev = () => {
+    if (idx <= 0) return;
+    setNotesOpen(false);
+    const prev = deck[idx - 1];
+    if (prev) setPos(deckId(prev));
+  };
+
+  const goNext = () => {
+    if (idx < deck.length - 1) {
+      setNotesOpen(false);
+      const next = deck[idx + 1];
+      if (next) setPos(deckId(next));
+      return;
+    }
+    if (nextLabel) {
+      setNotesOpen(false);
+      setChapterGate(true);
+    }
+  };
 
   return (
     <div ref={shellRef} className="relative h-full min-h-0 overflow-y-auto">
@@ -285,7 +354,6 @@ export function StudyView() {
               type="button"
               onClick={() => {
                 setChapterGate(false);
-                setLabOpen(false);
                 setBookSel(s.id);
                 setChaptersOpen(false);
               }}
@@ -337,7 +405,11 @@ export function StudyView() {
           <>
             <div className="mb-3 flex items-center justify-between gap-3">
               <span className="text-[12px] tabular-nums text-ink-faint">
-                {onLab ? `第 ${LAB_AFTER} 页之后 · 配筋率示意` : `${idx + 1} / ${group?.pages.length} · 第 ${slide.page} 页`}
+                {onLab
+                  ? `第 ${LAB_AFTER} 页之后 · 配筋率示意`
+                  : onQuiz
+                    ? `${idx + 1} / ${deck.length} · 第 ${anchorPage} 页之后 · 随堂题`
+                    : `${idx + 1} / ${deck.length} · 第 ${slide.page} 页`}
               </span>
               <button
                 type="button"
@@ -350,10 +422,18 @@ export function StudyView() {
             <div className="relative" ref={notesRef}>
               {onLab ? (
                 <ReinforcementLab />
+              ) : onQuiz ? (
+                <div className="flex min-h-[24rem] flex-col justify-center rounded-2xl border border-paper-line bg-paper px-12 py-6 sm:px-16">
+                  <div className="mb-3 flex items-center gap-2 text-[13px] text-ink-soft">
+                    <ListChecks className="size-4 shrink-0" />
+                    <span>第 {anchorPage} 页已经讲过，这一页直接做</span>
+                  </div>
+                  <PracticePanel key={`quiz:${anchorPage}`} questions={quizQuestions} context={pageCtx} />
+                </div>
               ) : (
               <SlideStage page={slide.page} alt={noteBlock.title} />
               )}
-              {onLab ? null : (
+              {onLab || onQuiz ? null : (
               <div className="absolute right-2 top-2 z-20 flex items-center gap-1">
                 <Button
                   type="button"
@@ -393,7 +473,7 @@ export function StudyView() {
                 </button>
               </div>
               )}
-              {notesOpen && !onLab ? (
+              {notesOpen && !onLab && !onQuiz ? (
                 <div className="absolute right-2 top-12 z-20 max-h-72 w-72 overflow-y-auto rounded-xl border bg-card p-3 shadow-md">
                   <StudyNotes title={noteBlock.title} points={noteBlock.points} keys={noteBlock.keys} />
                 </div>
@@ -403,20 +483,8 @@ export function StudyView() {
                 size="icon"
                 variant="ghost"
                 aria-label="上一页"
-                disabled={idx <= 0 && !onLab}
-                onClick={() => {
-                  if (onLab) {
-                    setLabOpen(false);
-                    return;
-                  }
-                  if (beta && slide.page === LAB_AFTER + 1) {
-                    setPageNo(LAB_AFTER);
-                    setLabOpen(true);
-                    return;
-                  }
-                  const prev = group?.pages[idx - 1];
-                  if (prev) setPageNo(prev.page);
-                }}
+                disabled={idx <= 0}
+                onClick={goPrev}
                 className={`${slideArrow} left-2`}
               >
                 <ChevronLeft />
@@ -427,28 +495,7 @@ export function StudyView() {
                 variant="ghost"
                 aria-label="下一页"
                 disabled={atLast && !nextLabel}
-                onClick={() => {
-                  if (!group) return;
-                  if (onLab) {
-                    setLabOpen(false);
-                    setPageNo(LAB_AFTER + 1);
-                    return;
-                  }
-                  if (beta && slide.page === LAB_AFTER) {
-                    setNotesOpen(false);
-                    setLabOpen(true);
-                    return;
-                  }
-                  if (idx < group.pages.length - 1) {
-                    const next = group.pages[idx + 1];
-                    if (next) setPageNo(next.page);
-                    return;
-                  }
-                  if (nextLabel) {
-                    setNotesOpen(false);
-                    setChapterGate(true);
-                  }
-                }}
+                onClick={goNext}
                 className={`${slideArrow} right-2`}
               >
                 <ChevronRight />

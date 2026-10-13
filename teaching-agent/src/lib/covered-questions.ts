@@ -187,12 +187,7 @@ function placeQuestion<T extends CoveredQuestion>(
   return { question: q, section: best.section, unlock: best.unlock };
 }
 
-/** 每一页：当前章节里、讲到这一页为止已经能对上的题。越近讲完的越靠前。 */
-export function questionsByPage<T extends CoveredQuestion>(
-  questions: T[],
-  slides: CoveredSlide[],
-  n = 3,
-): Map<number, T[]> {
+function placements<T extends CoveredQuestion>(questions: T[], slides: CoveredSlide[]): Placement<T>[] {
   const deck = [...slides]
     .sort((a, b) => a.page - b.page)
     .map((sl) => {
@@ -206,13 +201,22 @@ export function questionsByPage<T extends CoveredQuestion>(
   const df = new Map<string, number>();
   for (const s of deck) for (const p of s.phrases) df.set(p, (df.get(p) ?? 0) + 1);
 
-  const placed = questions.filter(usable).flatMap((q) => {
+  return questions.filter(usable).flatMap((q) => {
     const hit = placeQuestion(q, teach, deck, df);
     return hit ? [hit] : [];
   });
+}
 
+/** 每一页：当前章节里、讲到这一页为止已经能对上的题。越近讲完的越靠前。 */
+export function questionsByPage<T extends CoveredQuestion>(
+  questions: T[],
+  slides: CoveredSlide[],
+  n = 3,
+): Map<number, T[]> {
+  const placed = placements(questions, slides);
   const out = new Map<number, T[]>();
-  for (const s of teach) {
+  const pages = [...slides].filter((s) => !s.section.startsWith("封面")).sort((a, b) => a.page - b.page);
+  for (const s of pages) {
     const list = placed
       .filter((p) => p.section === s.section && p.unlock <= s.page)
       .sort(
@@ -224,6 +228,28 @@ export function questionsByPage<T extends CoveredQuestion>(
       .slice(0, n)
       .map((p) => p.question);
     out.set(s.page, list);
+  }
+  return out;
+}
+
+/**
+ * 刚好在这一页讲完的题。调用方应把它们放在该页的下一页，
+ * 不要堆到章末，也不要放到更早的页后面。对不上的题不会出现在这里。
+ */
+export function questionsAfterSlide<T extends CoveredQuestion>(
+  questions: T[],
+  slides: CoveredSlide[],
+): Map<number, T[]> {
+  const out = new Map<number, T[]>();
+  for (const hit of placements(questions, slides)) {
+    const list = out.get(hit.unlock) ?? [];
+    list.push(hit.question);
+    out.set(hit.unlock, list);
+  }
+  for (const list of out.values()) {
+    list.sort(
+      (a, b) => Number(b.verified === true) - Number(a.verified === true) || a.id.localeCompare(b.id),
+    );
   }
   return out;
 }
