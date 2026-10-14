@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bookmark, BookOpen, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, MessageSquare, MessageSquarePlus, StickyNote, Trash2 } from "lucide-react";
+import { Bookmark, BookOpen, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, StickyNote, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,6 +28,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Card as AnswerCardData } from "@/lib/cards";
@@ -222,7 +223,7 @@ function HelpDetail({ id }: { id: HelpId }) {
   );
 }
 
-export type AppView = "chat" | "study" | "materials";
+export type AppView = "home" | "chat" | "study" | "materials";
 
 export function Sidebar({
   view,
@@ -231,13 +232,14 @@ export function Sidebar({
   view: AppView;
   onView: (v: AppView) => void;
 }) {
+  const { state, isMobile } = useSidebar();
   const { notes, remove } = useNotes();
   const [openNote, setOpenNote] = useState<Note | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [helpId, setHelpId] = useState<HelpId | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
-  const nav: { id: AppView; label: string; icon: typeof MessageSquare }[] = [
+  const nav: { id: Exclude<AppView, "home">; label: string; icon: typeof MessageSquare }[] = [
     { id: "chat", label: "引导对话", icon: MessageSquare },
     { id: "study", label: "自学天地", icon: BookOpen },
     { id: "materials", label: "资料下载", icon: Download },
@@ -283,7 +285,23 @@ export function Sidebar({
                   <CircleHelp />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right">用法说明</TooltipContent>
+              <TooltipContent side={isMobile || state === "expanded" ? "bottom" : "right"}>用法说明</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 shrink-0 gap-1 px-2 text-xs group-data-[collapsible=icon]:size-7 group-data-[collapsible=icon]:px-0"
+                  aria-label="返回首页"
+                  onClick={() => onView("home")}
+                >
+                  <Home />
+                  <span className="group-data-[collapsible=icon]:hidden">返回首页</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">返回首页</TooltipContent>
             </Tooltip>
           </div>
         </SidebarHeader>
@@ -376,11 +394,11 @@ export function Sidebar({
               >
                 <button type="button" onClick={() => setHelpId(item.id)} className="block w-full text-left">
                   <Card className="shadow-sm transition-colors hover:bg-accent/40">
-                    <div className="flex items-center gap-3 p-3">
-                      <HelpVisual id={item.id} />
-                      {item.id === "ask" ? null : (
-                        <span className="text-sm font-medium">{item.title}</span>
-                      )}
+                    <div className="grid grid-cols-[9rem_minmax(0,1fr)] items-center gap-3 p-3">
+                      <div className="flex min-w-0 items-center justify-center">
+                        <HelpVisual id={item.id} />
+                      </div>
+                      <span className="text-sm font-medium">{item.title}</span>
                     </div>
                   </Card>
                 </button>
