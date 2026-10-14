@@ -5,7 +5,16 @@ import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { materialSections } from "@/lib/material-catalog";
+import { coverPage, materialSections } from "@/lib/material-catalog";
+import { MATERIAL_PDF_VERSION } from "@/lib/material-version";
+
+/** 带上版本号，免得浏览器把上一版生成的旧 PDF 直接拿出来用 */
+const versioned = (path: string) => `${path}${path.includes("?") ? "&" : "?"}v=${MATERIAL_PDF_VERSION}`;
+
+/** 课件页图的地址，下载页拿去当缩略图 */
+const slideThumb = (page: number) => `/slides/slide-${String(page).padStart(3, "0")}.png`;
+
+const thumbClass = "shrink-0 rounded-md bg-white object-cover object-top ring-1 ring-paper-line";
 
 export function MaterialsView() {
   const [downloading, setDownloading] = useState<string | null>(null);
@@ -54,15 +63,24 @@ export function MaterialsView() {
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-8">
         <div className="mx-auto flex max-w-3xl flex-col gap-4">
           <Card>
-            <CardHeader>
-              <CardTitle>原版课件 PDF</CardTitle>
-              <CardDescription>课件原图，按页序排好，不含后加的要点。</CardDescription>
+            <CardHeader className="flex-row items-start gap-3 space-y-0">
+              <img
+                src={slideThumb(coverPage)}
+                alt="原版课件第一页"
+                className={`${thumbClass} h-24 w-auto`}
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="min-w-0 space-y-1.5">
+                <CardTitle>原版课件 PDF</CardTitle>
+                <CardDescription>课件原图，按页序排好，不含后加的要点。</CardDescription>
+              </div>
             </CardHeader>
             <CardFooter className="justify-end">
               <Button
                 type="button"
                 disabled={downloading !== null}
-                onClick={() => downloadMaterial("original", "/api/materials?kind=original", "第六章-原版课件.pdf")}
+                onClick={() => downloadMaterial("original", versioned("/api/materials?kind=original"), "第六章-原版课件.pdf")}
               >
                 <Download />
                 {downloading === "original" ? "正在生成…" : "下载原版课件"}
@@ -70,15 +88,24 @@ export function MaterialsView() {
             </CardFooter>
           </Card>
           <Card>
-            <CardHeader>
-              <CardTitle>题目 PDF</CardTitle>
-              <CardDescription>第六章题库，以及受扭、变形、裂缝的补充题。</CardDescription>
+            <CardHeader className="flex-row items-start gap-3 space-y-0">
+              <img
+                src="/api/materials/preview"
+                alt="题目 PDF 第一页"
+                className={`${thumbClass} h-24 w-auto`}
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="min-w-0 space-y-1.5">
+                <CardTitle>题目 PDF</CardTitle>
+                <CardDescription>第六章题库，以及受扭、变形、裂缝的补充题。</CardDescription>
+              </div>
             </CardHeader>
             <CardFooter className="justify-end">
               <Button
                 type="button"
                 disabled={downloading !== null}
-                onClick={() => downloadMaterial("questions", "/api/materials?kind=questions", "第六章-题目.pdf")}
+                onClick={() => downloadMaterial("questions", versioned("/api/materials?kind=questions"), "第六章-题目.pdf")}
               >
                 <Download />
                 {downloading === "questions" ? "正在生成…" : "下载题目"}
@@ -93,9 +120,18 @@ export function MaterialsView() {
             <CardContent className="grid gap-3 sm:grid-cols-2">
               {materialSections.map((section) => (
                 <Card key={section.id} className="flex h-full flex-col shadow-none">
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-sm leading-snug">{section.label}</CardTitle>
-                    <CardDescription>{section.pages} 页</CardDescription>
+                  <CardHeader className="flex-row items-start gap-3 space-y-0 p-4">
+                    <img
+                      src={slideThumb(section.firstPage)}
+                      alt={`${section.label} 第一页`}
+                      className={`${thumbClass} h-12 w-auto`}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div className="min-w-0 space-y-1">
+                      <CardTitle className="text-sm leading-snug">{section.label}</CardTitle>
+                      <CardDescription>{section.pages} 页</CardDescription>
+                    </div>
                   </CardHeader>
                   <CardFooter className="mt-auto justify-end p-4 pt-0">
                     <Button
@@ -106,7 +142,7 @@ export function MaterialsView() {
                       onClick={() =>
                         downloadMaterial(
                           section.id,
-                          `/api/materials?kind=explain&section=${encodeURIComponent(section.id)}`,
+                          versioned(`/api/materials?kind=explain&section=${encodeURIComponent(section.id)}`),
                           `第六章-讲解版-${section.label}.pdf`,
                         )
                       }
