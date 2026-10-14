@@ -4,4 +4,4 @@
  * 改过 PDF 的排版、字体或内容之后把它 +1：服务端缓存的旧文件会作废，
  * 下载地址也跟着变，浏览器里存下来的旧文件不会再被拿出来用。
  */
-export const MATERIAL_PDF_VERSION = "v4";
+export const MATERIAL_PDF_VERSION = "v10";

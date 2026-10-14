@@ -6,13 +6,18 @@ import slidesJson from "@/content/slides.json";
 import notesJson from "@/content/slide-notes.json";
 import questionsJson from "@/content/questions.json";
 import extraQuestionsJson from "@/content/k12-14-questions.json";
+import { normalizeFlatMath } from "@/lib/flat-math";
 import { layoutMath, type MathBox } from "@/lib/math-typeset";
+import { decodePng, downscale, type RasterImage } from "@/lib/png";
 import { loadPdfFont, type PdfFont, type SubsetFont } from "@/lib/ttf-font";
 
 const PAGE_W = 595;
 const PAGE_H = 842;
 const MARGIN = 40;
 const CONTENT_W = PAGE_W - MARGIN * 2;
+/** 正文上下边界，给页眉页脚留出位置 */
+const TOP = 58;
+const BOTTOM = 58;
 const IMAGE_W = 1300;
 const IMAGE_H = 975;
 
@@ -29,13 +34,25 @@ type Question = {
 type PageOp =
   | { kind: "text"; text: string; x: number; y: number; size: number; color: string; italic?: boolean }
   | { kind: "rect"; x: number; y: number; width: number; height: number; color: string }
-  | { kind: "image"; name: string; x: number; y: number; width: number; height: number; bytes: Buffer };
+  | { kind: "image"; name: string; x: number; y: number; width: number; height: number; bytes: Buffer; dict?: string };
 type PdfPage = { ops: PageOp[] };
 type TextOp = Extract<PageOp, { kind: "text" }>;
 type ObjectValue = Buffer | string;
 
 const INK = "0.10 0.10 0.09";
 const HIGHLIGHT = "0.99 0.90 0.53";
+
+/**
+ * 题干里的编辑注、复核标记不该落到给同学的 PDF 上，和应用里 stripEditorialMarks 保持一致。
+ * `**重点**` 的星号在这里去掉，改由排版阶段涂黄（和页面上的表现一致）。
+ */
+function cleanInline(value: string) {
+  return normalizeFlatMath(value)
+    .replace(/\s*-\s*\*注：[\s\S]*?\*/g, "")
+    .replace(/[ \t]*`?\*{0,2}[ \t]*[\[［]\s*(?:推断\d*|待补|待核|规范值)\s*[\]］][ \t]*`?\*{0,2}/g, " ")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
 const slides = slidesJson as Slide[];
 const notes = notesJson as Record<string, Note>;
 
@@ -127,7 +144,9 @@ function addPages(objects: ObjectValue[], pages: { content: number; resources: s
   return addObject(objects, `<< /Type /Catalog /Pages ${treeId} 0 R >>`);
 }
 
-const imageCache = new Map<number, Promise<Buffer>>();
+type SlideImage = { bytes: Buffer; dict: string };
+
+const imageCache = new Map<number, Promise<SlideImage>>();
 
 function readSlideImage(page: number) {
   let pending = imageCache.get(page);
@@ -161,10 +180,16 @@ function readSlideImage(page: number) {
         }
         offset = end;
       }
-      if (width !== IMAGE_W || height !== IMAGE_H || bitDepth !== 8 || colorType !== 2 || interlace !== 0) {
-        throw new Error(`第 ${page} 页课件图格式不受支持`);
+      // 真彩 PNG 的 IDAT 已经带 predictor，能直接塞进 PDF，省一次解压再压缩
+      if (width === IMAGE_W && height === IMAGE_H && bitDepth === 8 && colorType === 2 && interlace === 0) {
+        return { bytes: Buffer.concat(data), dict: SLIDE_IMAGE_DICT };
       }
-      return Buffer.concat(data);
+      // 调色板等其它写法：解成 RGB 再嵌
+      const image = decodePng(png);
+      return {
+        bytes: deflateSync(image.rgb),
+        dict: `/Type /XObject /Subtype /Image /Width ${image.width} /Height ${image.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode`,
+      };
     })();
     imageCache.set(page, pending);
   }
@@ -172,11 +197,8 @@ function readSlideImage(page: number) {
 }
 
 async function addPngImage(objects: ObjectValue[], page: number) {
-  return addStream(
-    objects,
-    `/Type /XObject /Subtype /Image /Width ${IMAGE_W} /Height ${IMAGE_H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode /DecodeParms << /Predictor 15 /Colors 3 /BitsPerComponent 8 /Columns ${IMAGE_W} >>`,
-    await readSlideImage(page),
-  );
+  const image = await readSlideImage(page);
+  return addStream(objects, image.dict, image.bytes);
 }
 
 async function buildOriginal() {
@@ -244,6 +266,7 @@ function buildAtoms(font: PdfFont, value: string, size: number, color: string, k
   const atoms: Atom[] = [];
   let buffer = "";
   let highlighted = false;
+  let emphasis = false;
   const flush = () => {
     if (!buffer) return;
     const shaped = shapeLine(font, buffer, missing);
@@ -253,6 +276,13 @@ function buildAtoms(font: PdfFont, value: string, size: number, color: string, k
   let index = 0;
   while (index < value.length) {
     const char = value[index];
+    // **重点** 在页面上是黄色高亮，这里同样处理
+    if (char === "*" && value[index + 1] === "*") {
+      flush();
+      emphasis = !emphasis;
+      index += 2;
+      continue;
+    }
     if (char === "$") {
       const end = value.indexOf("$", index + 1);
       if (end > index) {
@@ -268,7 +298,7 @@ function buildAtoms(font: PdfFont, value: string, size: number, color: string, k
       index += 1;
       continue;
     }
-    const hi = mask ? !!mask[index] : false;
+    const hi = emphasis || (mask ? !!mask[index] : false);
     if (hi !== highlighted) {
       flush();
       highlighted = hi;
@@ -318,22 +348,22 @@ class Writer {
   readonly pages: PdfPage[] = [];
   readonly missingChars = new Set<string>();
   private page: PdfPage | null = null;
-  private y = MARGIN;
+  private y = TOP;
 
   constructor(private readonly font: PdfFont) {}
 
   private newPage() {
     this.page = { ops: [] };
     this.pages.push(this.page);
-    this.y = MARGIN;
+    this.y = TOP;
   }
 
   private need(height: number) {
-    if (!this.page || this.y + height > PAGE_H - MARGIN) this.newPage();
+    if (!this.page || this.y + height > PAGE_H - BOTTOM) this.newPage();
   }
 
   remaining() {
-    return PAGE_H - MARGIN - this.y;
+    return PAGE_H - BOTTOM - this.y;
   }
 
   ensureSpace(height: number) {
@@ -398,7 +428,8 @@ class Writer {
     }
     this.need(height);
     const x = MARGIN + (CONTENT_W - width) / 2;
-    this.page!.ops.push({ kind: "image", name: `Im${page}`, x, y: PAGE_H - this.y - height, width, height, bytes: await readSlideImage(page) });
+    const image = await readSlideImage(page);
+    this.page!.ops.push({ kind: "image", name: `Im${page}`, x, y: PAGE_H - this.y - height, width, height, bytes: image.bytes, dict: image.dict });
     this.y += height;
   }
 }
@@ -447,6 +478,81 @@ function toUnicodeCMap(subset: SubsetFont) {
   return lines.join("\n");
 }
 
+const SLIDE_IMAGE_DICT = `/Type /XObject /Subtype /Image /Width ${IMAGE_W} /Height ${IMAGE_H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode /DecodeParms << /Predictor 15 /Colors 3 /BitsPerComponent 8 /Columns ${IMAGE_W} >>`;
+
+let logoPromise: Promise<RasterImage | null> | null = null;
+
+/** 校徽只读一次；读不到就退化成没有校徽的页眉，不让整份 PDF 生成失败 */
+function loadLogo(): Promise<RasterImage | null> {
+  if (!logoPromise) {
+    logoPromise = readFile(path.join(process.cwd(), "public", "seu-logo.png"))
+      .then((png) => downscale(decodePng(png), 160))
+      .catch(() => null);
+  }
+  return logoPromise;
+}
+
+/** 给每页加页眉（校徽 + 标题 + 右侧标注）和页脚（页码） */
+async function decoratePages(writer: Writer, font: PdfFont, right: string) {
+  const logo = await loadLogo();
+  const total = writer.pages.length;
+  const ruleColor = "0.80 0.80 0.78";
+  const softColor = "0.42 0.42 0.40";
+  const faintColor = "0.52 0.52 0.50";
+  const headerSize = 10.5;
+  const footerSize = 9.5;
+
+  writer.pages.forEach((page, index) => {
+    const headerBaseline = PAGE_H - 34;
+    const head: PageOp[] = [];
+    let textLeft = MARGIN;
+    if (logo) {
+      const height = 19;
+      const width = (logo.width / logo.height) * height;
+      head.push({
+        kind: "image",
+        name: "logo",
+        x: MARGIN,
+        y: headerBaseline - 4,
+        width,
+        height,
+        bytes: deflateSync(logo.rgb),
+        dict: `/Type /XObject /Subtype /Image /Width ${logo.width} /Height ${logo.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode`,
+      });
+      textLeft = MARGIN + width + 8;
+    }
+    head.push({ kind: "text", text: "东南大学", x: textLeft, y: headerBaseline, size: headerSize, color: softColor });
+    if (right) {
+      head.push({
+        kind: "text",
+        text: right,
+        x: PAGE_W - MARGIN - textWidth(font, right, headerSize),
+        y: headerBaseline,
+        size: headerSize,
+        color: softColor,
+      });
+    }
+    head.push({ kind: "rect", x: MARGIN, y: headerBaseline - 12, width: CONTENT_W, height: 0.6, color: ruleColor });
+
+    const footerBaseline = 38;
+    const pageLabel = `第 ${index + 1} 页 / 共 ${total} 页`;
+    const foot: PageOp[] = [
+      { kind: "rect", x: MARGIN, y: footerBaseline + 14, width: CONTENT_W, height: 0.6, color: ruleColor },
+      { kind: "text", text: "第六章　钢筋混凝土梁承载力计算原理", x: MARGIN, y: footerBaseline, size: footerSize, color: faintColor },
+      {
+        kind: "text",
+        text: pageLabel,
+        x: PAGE_W - MARGIN - textWidth(font, pageLabel, footerSize),
+        y: footerBaseline,
+        size: footerSize,
+        color: faintColor,
+      },
+    ];
+    page.ops.unshift(...head);
+    page.ops.push(...foot);
+  });
+}
+
 function renderWriterPdf(writer: Writer, font: PdfFont) {
   const used = writer.pages
     .flatMap((page) => page.ops)
@@ -473,6 +579,8 @@ function renderWriterPdf(writer: Writer, font: PdfFont) {
     `<< /Type /Font /Subtype /Type0 /BaseFont /${subset.name} /Encoding /Identity-H /DescendantFonts [${cidFontId} 0 R] /ToUnicode ${toUnicodeId} 0 R >>`,
   );
   const pages = [];
+  // 页眉校徽每页都要画，但只需要在文件里存一份
+  const sharedImages = new Map<string, number>();
   for (const page of writer.pages) {
     const imageIds = new Map<string, number>();
     const ops: string[] = [];
@@ -485,19 +593,20 @@ function renderWriterPdf(writer: Writer, font: PdfFont) {
       } else if (op.kind === "rect") {
         ops.push(`${op.color} rg ${pdfNumber(op.x)} ${pdfNumber(op.y)} ${pdfNumber(op.width)} ${pdfNumber(op.height)} re f`);
       } else {
-        let imageId = imageIds.get(op.name);
+        let imageId = imageIds.get(op.name) ?? (op.dict ? sharedImages.get(op.name) : undefined);
         if (!imageId) {
           imageId = addStream(
             objects,
-            `/Type /XObject /Subtype /Image /Width ${IMAGE_W} /Height ${IMAGE_H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode /DecodeParms << /Predictor 15 /Colors 3 /BitsPerComponent 8 /Columns ${IMAGE_W} >>`,
+            op.dict ?? SLIDE_IMAGE_DICT,
             op.bytes,
           );
-          imageIds.set(op.name, imageId);
+          if (op.dict) sharedImages.set(op.name, imageId);
         }
+        imageIds.set(op.name, imageId);
         ops.push(`q ${pdfNumber(op.width)} 0 0 ${pdfNumber(op.height)} ${pdfNumber(op.x)} ${pdfNumber(op.y)} cm /${op.name} Do Q`);
       }
     }
-    const contentId = addStream(objects, "", Buffer.from(`${ops.join("\n")}\n`, "ascii"));
+    const contentId = addStream(objects, "/Filter /FlateDecode", deflateSync(Buffer.from(`${ops.join("\n")}\n`, "ascii")));
     const imageResources = [...imageIds].map(([name, id]) => `/${name} ${id} 0 R`).join(" ");
     pages.push({
       content: contentId,
@@ -513,17 +622,17 @@ function answerText(question: Question) {
   if (question.answer == null || !String(question.answer).trim()) return "暂无";
   const answer = String(question.answer).trim();
   const option = question.options?.find((item) => item.id === answer);
-  const label = option?.text?.trim() ?? "";
+  const label = cleanInline(option?.text ?? "");
   return label ? `${answer}　${label}` : answer;
 }
 
 function writeQuestion(writer: Writer, index: number, question: Question) {
   const label = ({ choice: "选择题", judge: "判断题", fill: "填空题" } as Record<string, string>)[question.type ?? ""] ?? "题目";
   writer.text(`${index}. ${question.id || index}　${label}`, 12, 4, INK);
-  writer.text((question.prompt ?? "").trim(), 11, 3);
-  for (const option of question.options ?? []) writer.text(`${option.id ?? ""}. ${(option.text ?? "").trim()}`, 11, 2);
+  writer.text(cleanInline(question.prompt ?? ""), 11, 3);
+  for (const option of question.options ?? []) writer.text(`${option.id ?? ""}. ${cleanInline(option.text ?? "")}`, 11, 2);
   writer.text(`答案：${answerText(question)}`, 11, 3);
-  const analysis = (question.analysis ?? "").trim();
+  const analysis = cleanInline(question.analysis ?? "");
   if (analysis) writer.text(`解析：${analysis}`, 10.5, 2, "0.25 0.25 0.23");
   writer.gap(12);
 }
@@ -545,6 +654,7 @@ async function buildQuestions() {
   const font = await loadPdfFont();
   const writer = new Writer(font);
   fillQuestions(writer);
+  await decoratePages(writer, font, "第六章　题库");
   return renderWriterPdf(writer, font);
 }
 
@@ -599,17 +709,17 @@ async function buildExplain(section: string) {
     // 少数 note 的关键词是没套 $ 的裸 LaTeX，这里补上定界符
     const keys = (note.keys ?? [])
       .map((key) => {
-        const trimmed = key.trim();
+        const trimmed = cleanInline(key);
         return trimmed && !trimmed.includes("$") && trimmed.includes("\\") ? `$${trimmed}$` : trimmed;
       })
       .filter(Boolean);
-    const points = (note.points ?? []).map((point) => point.trim()).filter(Boolean);
+    const points = (note.points ?? []).map((point) => cleanInline(point)).filter(Boolean);
     // 页标题 + 课件图尽量和要点同页，剩得太少就先翻页
     if (writer.pages.length && writer.remaining() < 470) writer.ensureSpace(PAGE_H);
     writer.ensureSpace(430);
     writer.text(`${section}  ·  第 ${slide.page} 页`, 11.5, 2, "0.34 0.34 0.32");
     writer.gap(2);
-    writer.text(note.title?.trim() || slide.title?.trim() || section, 13.5, 4, INK, keys);
+    writer.text(cleanInline(note.title ?? "") || slide.title?.trim() || section, 13.5, 4, INK, keys);
     writer.gap(6);
     await writer.image(slide.page, 380);
     writer.gap(12);
@@ -627,6 +737,7 @@ async function buildExplain(section: string) {
     }
     writer.gap(18);
   }
+  await decoratePages(writer, font, `讲解版　${section}`);
   return renderWriterPdf(writer, font);
 }
 
