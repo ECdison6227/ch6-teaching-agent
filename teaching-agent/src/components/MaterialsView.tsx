@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { materialSections } from "@/lib/material-catalog";
 
@@ -58,7 +58,7 @@ export function MaterialsView() {
               <CardTitle>原版课件 PDF</CardTitle>
               <CardDescription>课件原图，按页序排好，不含后加的要点。</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardFooter className="justify-end">
               <Button
                 type="button"
                 disabled={downloading !== null}
@@ -67,14 +67,14 @@ export function MaterialsView() {
                 <Download />
                 {downloading === "original" ? "正在生成…" : "下载原版课件"}
               </Button>
-            </CardContent>
+            </CardFooter>
           </Card>
           <Card>
             <CardHeader>
               <CardTitle>题目 PDF</CardTitle>
               <CardDescription>第六章题库，以及受扭、变形、裂缝的补充题。</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardFooter className="justify-end">
               <Button
                 type="button"
                 disabled={downloading !== null}
@@ -83,36 +83,39 @@ export function MaterialsView() {
                 <Download />
                 {downloading === "questions" ? "正在生成…" : "下载题目"}
               </Button>
-            </CardContent>
+            </CardFooter>
           </Card>
           <Card>
             <CardHeader>
               <CardTitle>讲解版</CardTitle>
               <CardDescription>按课件分节下载。每一页是课件原图，下面附上这一页的重点和要点。</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-2 sm:grid-cols-2">
+            <CardContent className="grid gap-3 sm:grid-cols-2">
               {materialSections.map((section) => (
-                <Button
-                  key={section.id}
-                  type="button"
-                  variant="outline"
-                  className="h-auto min-h-9 justify-start whitespace-normal px-3 py-2 text-left"
-                  title={section.label}
-                  disabled={downloading !== null}
-                  onClick={() =>
-                    downloadMaterial(
-                      section.id,
-                      `/api/materials?kind=explain&section=${encodeURIComponent(section.id)}`,
-                      `第六章-讲解版-${section.label}.pdf`,
-                    )
-                  }
-                >
-                  <Download />
-                  <span className="min-w-0 flex-1">
-                    {downloading === section.id ? "正在生成…" : section.label}
-                    <span className="ml-1 text-xs font-normal text-muted-foreground">{section.pages} 页</span>
-                  </span>
-                </Button>
+                <Card key={section.id} className="flex h-full flex-col shadow-none">
+                  <CardHeader className="p-4">
+                    <CardTitle className="text-sm leading-snug">{section.label}</CardTitle>
+                    <CardDescription>{section.pages} 页</CardDescription>
+                  </CardHeader>
+                  <CardFooter className="mt-auto justify-end p-4 pt-0">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      title={section.label}
+                      disabled={downloading !== null}
+                      onClick={() =>
+                        downloadMaterial(
+                          section.id,
+                          `/api/materials?kind=explain&section=${encodeURIComponent(section.id)}`,
+                          `第六章-讲解版-${section.label}.pdf`,
+                        )
+                      }
+                    >
+                      <Download />
+                      {downloading === section.id ? "正在生成…" : "下载"}
+                    </Button>
+                  </CardFooter>
+                </Card>
               ))}
             </CardContent>
           </Card>
