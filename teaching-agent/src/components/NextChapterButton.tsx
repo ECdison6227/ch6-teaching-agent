@@ -30,11 +30,6 @@ const sheen = {
   hover: { x: "240%", transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
-const arrow = {
-  rest: { x: 0 },
-  hover: { x: 6 },
-};
-
 /** 章末占位区里的「进入下一章」入口。样式集中在这里，StudyView 只负责文案和跳转。 */
 export function NextChapterButton({ label, onClick }: { label: string; onClick: () => void }) {
   const reduce = useReducedMotion();
@@ -42,7 +37,8 @@ export function NextChapterButton({ label, onClick }: { label: string; onClick: 
   return (
     <motion.div
       className="inline-flex max-w-full rounded-full"
-      initial={reduce ? false : { opacity: 0, y: 10 }}
+      // 不从全透明起步：截图或刚渲染的那一帧也要看得见按钮
+      initial={reduce ? false : { opacity: 1, y: 10 }}
       animate={reduce ? undefined : "rest"}
       whileHover={reduce ? undefined : "hover"}
       whileTap={reduce ? undefined : "tap"}
@@ -52,7 +48,7 @@ export function NextChapterButton({ label, onClick }: { label: string; onClick: 
       <Button
         type="button"
         onClick={onClick}
-        className="relative h-11 max-w-full overflow-hidden rounded-full px-6 text-[15px] shadow-none hover:bg-primary hover:shadow-none"
+        className="group relative h-12 max-w-full overflow-hidden rounded-xl border border-white/15 bg-gradient-to-r from-ink via-ink to-slate-700 px-4 text-[14px] font-semibold text-primary-foreground shadow-[0_8px_22px_rgba(17,17,24,0.22)] hover:bg-ink hover:shadow-[0_12px_28px_rgba(17,17,24,0.3)] sm:gap-3 sm:px-5"
       >
         {reduce ? null : (
           <motion.span
@@ -62,13 +58,12 @@ export function NextChapterButton({ label, onClick }: { label: string; onClick: 
             className="pointer-events-none absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-transparent via-white/40 to-transparent"
           />
         )}
-        <span className="relative min-w-0 truncate">进入下一章 · {label}</span>
+        <span className="relative min-w-0 flex-1 truncate text-center">进入下一章 · {label}</span>
         <motion.span
           aria-hidden
-          className="relative inline-flex"
-          initial={{ x: 0 }}
-          variants={reduce ? undefined : arrow}
-          transition={{ type: "spring", stiffness: 520, damping: 20 }}
+          className="relative inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-ink shadow-sm"
+          animate={reduce ? undefined : { x: [0, 3, 0] }}
+          transition={reduce ? undefined : { duration: 1.7, repeat: Infinity, repeatDelay: 0.7, ease: "easeInOut" }}
         >
           <ArrowRight />
         </motion.span>

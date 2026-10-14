@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bookmark, ChevronLeft, ChevronRight, ListChecks, StickyNote } from "lucide-react";
+import { Bookmark, BookmarkX, ChevronLeft, ChevronRight, ListChecks, StickyNote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAiDrawer } from "@/components/AiDrawer";
@@ -29,6 +29,8 @@ const questions = questionsData as Question[];
 
 const slideArrow =
   "absolute top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-black/30 text-white shadow-sm hover:bg-black/45 hover:text-white disabled:opacity-25";
+const slideArrowOutside =
+  "h-9 w-9 shrink-0 rounded-full bg-black/30 text-white shadow-sm hover:bg-black/45 hover:text-white disabled:opacity-25";
 
 /** 第 37 页讲的是配筋率。Beta 打开时，这一页（以及刚插在它后面的随堂题）之后是可拖的截面。 */
 const LAB_AFTER = 37;
@@ -334,6 +336,16 @@ export function StudyView() {
             同学
           </Button>
         ) : null}
+        {nextLabel ? (
+          <button
+            type="button"
+            onClick={goNextChapter}
+            title={`下一章：${nextLabel}`}
+            className="shrink-0 rounded-lg border border-paper-line px-2.5 py-1 text-[12.5px] text-ink-soft hover:bg-paper-soft"
+          >
+            下一章
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={() => (open ? close() : ask({ context: pageCtx }))}
@@ -432,7 +444,19 @@ export function StudyView() {
                 这页没看懂
               </button>
             </div>
-            <div className="relative" ref={notesRef}>
+            <div className="mx-[-0.5rem] flex items-center gap-1 md:mx-[-2.5rem] md:gap-0">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label="上一页"
+                disabled={idx <= 0}
+                onClick={goPrev}
+                className={slideArrowOutside}
+              >
+                <ChevronLeft />
+              </Button>
+              <div className="relative min-w-0 flex-1" ref={notesRef}>
               {onLab ? (
                 <ReinforcementLab />
               ) : onQuiz ? (
@@ -456,9 +480,9 @@ export function StudyView() {
                   type="button"
                   size="icon"
                   variant="outline"
-                  aria-label={pageSaved ? "已收藏这一页" : "收藏这一页"}
+                  aria-label={pageSaved ? "取消收藏这一页" : "收藏这一页"}
                   aria-pressed={pageSaved}
-                  title={pageSaved ? "已收藏这一页" : "收藏这一页"}
+                  title={pageSaved ? "取消收藏这一页" : "收藏这一页"}
                   className={`h-7 w-7 bg-white/85 shadow-sm ${
                     pageSaved
                       ? "border-red-200 text-red-600 hover:bg-white/85 hover:text-red-600"
@@ -478,7 +502,7 @@ export function StudyView() {
                     });
                   }}
                 >
-                  <Bookmark className={pageSaved ? "fill-current" : undefined} />
+                  {pageSaved ? <BookmarkX /> : <Bookmark />}
                 </Button>
                 <button
                   type="button"
@@ -495,17 +519,7 @@ export function StudyView() {
                   <StudyNotes title={noteBlock.title} points={noteBlock.points} keys={noteBlock.keys} />
                 </div>
               ) : null}
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                aria-label="上一页"
-                disabled={idx <= 0}
-                onClick={goPrev}
-                className={`${slideArrow} left-2`}
-              >
-                <ChevronLeft />
-              </Button>
+              </div>
               <Button
                 type="button"
                 size="icon"
@@ -513,7 +527,7 @@ export function StudyView() {
                 aria-label="下一页"
                 disabled={atLast && !nextLabel}
                 onClick={goNext}
-                className={`${slideArrow} right-2`}
+                className={slideArrowOutside}
               >
                 <ChevronRight />
               </Button>

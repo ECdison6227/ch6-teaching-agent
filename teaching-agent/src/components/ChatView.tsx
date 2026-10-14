@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { Bookmark, BookmarkCheck, Check, Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AnswerCard } from "./AnswerCard";
 import { Composer } from "./Composer";
@@ -11,6 +13,83 @@ import { Thinking, StreamingCaret } from "./Typing";
 import type { useChat } from "@/lib/useChat";
 
 type Chat = ReturnType<typeof useChat>;
+
+/** 复制到剪贴板。内网 http 下没有剪贴板权限，退回选中复制的老办法。 */
+async function copyText(text: string) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    /* 继续走下面的兜底 */
+  }
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "-1000px";
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+/** 收藏时用的标题：取第一行有效文字，去掉 Markdown 记号 */
+function answerTitle(text: string) {
+  const line = text.split("\n").map((s) => s.trim()).find((s) => s && !s.startsWith("```")) ?? "";
+  return line.replace(/^[#>\-*\d.\s]+/, "").replace(/\*\*/g, "").slice(0, 28).trim();
+}
+
+/** 老师一条回答下面的动作：复制、收藏到笔记 */
+function AnswerActions({ text }: { text: string }) {
+  const { add } = useNotes();
+  const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const actionClass =
+    "h-8 gap-1.5 px-2 text-[11.5px] font-normal text-ink-faint hover:bg-paper-soft hover:text-ink";
+
+  return (
+    <div className="mt-1 flex items-center gap-0.5">
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className={actionClass}
+        onClick={() => {
+          void copyText(text).then((ok) => {
+            if (!ok) return;
+            setCopied(true);
+            window.setTimeout(() => setCopied(false), 1600);
+          });
+        }}
+      >
+        {copied ? <Check /> : <Copy />}
+        {copied ? "已复制" : "复制"}
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className={actionClass}
+        onClick={() => {
+          add({ kind: "text", title: answerTitle(text), text });
+          setSaved(true);
+          window.setTimeout(() => setSaved(false), 1600);
+        }}
+      >
+        {saved ? <BookmarkCheck /> : <Bookmark />}
+        {saved ? "已收藏" : "收藏到笔记"}
+      </Button>
+    </div>
+  );
+}
 
 /** Beta 同学：把一轮回复拆成老师和同学。标记没写全时先只显示老师。 */
 function splitTalk(raw: string): { teacher: string; classmate: string | null } {
@@ -53,6 +132,7 @@ function Talk({
           {streaming && !classmate ? <StreamingCaret /> : null}
         </div>
       ) : null}
+      {teacher && !streaming ? <AnswerActions text={teacher} /> : null}
       {classmate ? (
         <Card className="mt-3 shadow-none">
           <CardContent className="p-3 text-[13px] leading-6">

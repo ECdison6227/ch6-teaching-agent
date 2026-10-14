@@ -266,7 +266,7 @@ export function PracticePanel({
                 </>
               ) : (
                 <>
-                  <span className="text-[11.5px] font-medium">
+                  <span className={`text-[11.5px] font-medium ${s.correct ? "text-emerald-600" : "text-red-600"}`}>
                     {s.correct ? "答对了" : "答错了"}
                   </span>
                   <Button
@@ -311,27 +311,28 @@ export function PracticePanel({
             {/* 答案区：答错或主动点开才显示 */}
             {s.showAnswer && hasAnswer ? (
               <div className="mt-2 rounded-lg bg-paper-soft px-2.5 py-2">
-                <Markdown text={`答案：${answerLabel(q)}`} className="md-inline text-[12px] leading-5 text-ink" />
+                <Markdown text={`答案：${answerLabel(q)}`} className="md-inline text-[12px] leading-5 text-blue-900" />
                 {q.analysis ? (
                   <Markdown text={q.analysis} className="md-inline mt-1 text-[12px] leading-5 text-ink-soft" />
                 ) : null}
                 {q.verified === false ? (
                   <div className="mt-1 text-[11px] text-ink-faint">该题答案未经复核，仅供参考。</div>
                 ) : null}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    ask({
-                      question: `我不太懂这道题：${q.prompt}\n答案是 ${answerLabel(q)}，但我没看懂，能不能一步步讲？`,
-                      context,
-                    })
-                  }
-                  className="mt-2 border-paper-line bg-paper text-ink-soft shadow-none hover:border-ink-faint hover:bg-paper hover:text-ink"
-                >
-                  还是不懂，问 AI
-                </Button>
+                <div className="mt-2 flex justify-end">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() =>
+                      ask({
+                        question: `我不太懂这道题：${q.prompt}\n答案是 ${answerLabel(q)}，但我没看懂，能不能一步步讲？`,
+                        context,
+                      })
+                    }
+                    className="bg-ink text-paper shadow-none hover:bg-ink/90"
+                  >
+                    还是不懂，问 AI
+                  </Button>
+                </div>
               </div>
             ) : null}
           </Card>

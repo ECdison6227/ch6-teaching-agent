@@ -18,20 +18,13 @@ function brandOf(model?: Pick<ChatModelOption, "provider" | "model" | "label"> |
 }
 
 function StepfunMark() {
-  const id = useId();
   return (
     <svg viewBox="0 0 24 24" className="size-4 shrink-0" aria-hidden>
       <path
-        d="M22.012 0h1.032v.927H24v.968h-.956V3.78h-1.032V1.896h-1.878v-.97h1.878V0zM2.6 12.371V1.87h.969v10.502h-.97zm10.423.66h10.95v.918h-6.208v9.579h-4.742V13.03zM5.629 3.333v12.356H0v4.51h10.386V8L20.859 8l-.003-4.668-15.227.001z"
-        fill={`url(#${id})`}
+        d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM8.762 19.614H4.376v-4.386h4.386v4.386zm5.423 0H9.798v-4.386h4.387v4.386zm0-5.42H9.798V9.81h4.387v4.386zm0-5.418H9.798V4.39h4.387v4.386zm5.422-.004h-4.386V4.386h4.386v4.386z"
+        fill="#005AFF"
         fillRule="evenodd"
       />
-      <defs>
-        <linearGradient id={id} gradientUnits="userSpaceOnUse" x1="1.646" x2="18.342" y1="1.916" y2="22.091">
-          <stop stopColor="#01A9FF" />
-          <stop offset="1" stopColor="#0160FF" />
-        </linearGradient>
-      </defs>
     </svg>
   );
 }
@@ -190,7 +183,7 @@ export function Composer({
             rows={1}
             disabled={blocked || busy}
             placeholder={blocked ? "先回答上面的卡片，才能继续" : ""}
-            className="max-h-40 min-h-[36px] min-w-0 flex-1 resize-none bg-transparent text-[14px] leading-7 outline-none placeholder:text-ink-faint disabled:cursor-not-allowed"
+            className="max-h-40 min-h-[36px] min-w-0 flex-1 resize-none bg-transparent py-1 text-[14px] leading-7 outline-none placeholder:text-ink-faint disabled:cursor-not-allowed"
           />
           <Select
             value={selected ? selected.id : undefined}
