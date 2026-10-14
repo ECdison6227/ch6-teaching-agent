@@ -10,6 +10,9 @@ import {
   type ReactNode,
 } from "react";
 import { motion } from "motion/react";
+import { PanelRightClose } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { ChatView } from "./ChatView";
 import { useChat, type PageCtx } from "@/lib/useChat";
 
@@ -126,17 +129,31 @@ export function AiDrawerProvider({ children }: { children: ReactNode }) {
 
 /** 放进自学天地那一栏的右侧，和课件并排 */
 export function AiSidePanel() {
-  const { open } = useAiDrawer();
+  const { open, close } = useAiDrawer();
+  const isMobile = useIsMobile();
   const panel = useContext(PanelCtx);
   if (!open || !panel) return null;
   return (
     <motion.aside
       initial={{ width: 0, opacity: 0 }}
-      animate={{ width: 400, opacity: 1 }}
+      animate={{ width: isMobile ? "100%" : 400, opacity: 1 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
       className="flex h-full shrink-0 flex-col overflow-hidden border-l bg-background"
     >
-      <div className="min-h-0 w-[400px] flex-1">
+      {/* 面板自己的收起入口：手机上面板占了大半屏，从里面也能退回去 */}
+      <div className="flex w-full shrink-0 items-center border-b border-paper-line px-2 py-1.5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 px-2 text-[12px] font-normal text-ink-soft hover:bg-paper-soft hover:text-ink"
+          onClick={close}
+        >
+          <PanelRightClose />
+          收起
+        </Button>
+      </div>
+      <div className="min-h-0 w-full flex-1">
         <ChatView chat={panel.chat} compact />
       </div>
     </motion.aside>

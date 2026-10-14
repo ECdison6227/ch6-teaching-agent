@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bookmark, BookOpen, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, StickyNote, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
@@ -158,7 +158,7 @@ function HelpDetail({ id }: { id: HelpId }) {
   if (id === "slides") {
     return (
       <p>
-        点侧栏「自学天地」。页眉是「1 / n · 第 x 页」。课件左右两侧各有一个半透明圆箭头，左边上一页，右边下一页。这一章最后一页再点右边，中间是「进入下一章」。
+        点侧栏「自学天地」。页眉是「1 / n · 第 x 页」。课件外侧左右各有一个半透明圆箭头，左边上一页，右边下一页。这一章最后一页再点右边，中间是「进入下一章」。
       </p>
     );
   }
@@ -232,7 +232,7 @@ export function Sidebar({
   view: AppView;
   onView: (v: AppView) => void;
 }) {
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const { notes, remove } = useNotes();
   const [openNote, setOpenNote] = useState<Note | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -245,6 +245,17 @@ export function Sidebar({
     { id: "materials", label: "资料下载", icon: Download },
   ];
   const help = HELP.find((item) => item.id === helpId) ?? null;
+
+  /** 手机上的侧栏是抽屉，切换视图后要收起来，不然一直盖着内容 */
+  const goView = (next: AppView) => {
+    onView(next);
+    setOpenMobile(false);
+  };
+
+  /** 手机上从首页进来时，不要沿用上一次留下的抽屉状态 */
+  useEffect(() => {
+    setOpenMobile(false);
+  }, [view, setOpenMobile]);
 
   const exportPdf = () => {
     setExporting(true);
@@ -279,6 +290,21 @@ export function Sidebar({
                   variant="ghost"
                   size="icon"
                   className="ml-auto h-7 w-7 shrink-0 group-data-[collapsible=icon]:ml-0"
+                  aria-label="返回首页"
+                  onClick={() => goView("home")}
+                >
+                  <Home />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side={isMobile || state === "expanded" ? "bottom" : "right"}>返回首页</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="ml-auto h-7 w-7 shrink-0 group-data-[collapsible=icon]:ml-0"
                   aria-label="用法说明"
                   onClick={() => setHelpOpen(true)}
                 >
@@ -287,22 +313,6 @@ export function Sidebar({
               </TooltipTrigger>
               <TooltipContent side={isMobile || state === "expanded" ? "bottom" : "right"}>用法说明</TooltipContent>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 shrink-0 gap-1 px-2 text-xs group-data-[collapsible=icon]:size-7 group-data-[collapsible=icon]:px-0"
-                  aria-label="返回首页"
-                  onClick={() => onView("home")}
-                >
-                  <Home />
-                  <span className="group-data-[collapsible=icon]:hidden">返回首页</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right">返回首页</TooltipContent>
-            </Tooltip>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -310,7 +320,7 @@ export function Sidebar({
             <SidebarMenu>
               {nav.map((n) => (
                 <SidebarMenuItem key={n.id}>
-                  <SidebarMenuButton isActive={view === n.id} tooltip={n.label} onClick={() => onView(n.id)}>
+                  <SidebarMenuButton isActive={view === n.id} tooltip={n.label} onClick={() => goView(n.id)}>
                     <n.icon />
                     <span>{n.label}</span>
                   </SidebarMenuButton>

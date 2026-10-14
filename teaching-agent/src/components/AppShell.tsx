@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { motion } from "motion/react";
+import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { KNOWLEDGE_SECTIONS } from "@/lib/sections";
 import { ChatView } from "./ChatView";
 import { useChat } from "@/lib/useChat";
-import { AiDrawerProvider, AiSidePanel } from "./AiDrawer";
+import { AiDrawerProvider, AiSidePanel, useAiDrawer } from "./AiDrawer";
 import { NotesProvider } from "./notes";
 import { MaterialsView } from "./MaterialsView";
 import { Sidebar, type AppView } from "./Sidebar";
@@ -20,6 +20,18 @@ const SUGGESTIONS = [
   "讲讲适筋梁受弯的三个受力阶段",
   "斜截面受剪有哪几种破坏形态",
 ];
+
+/** 落地页「进入学习」的动效，和章末的「进入下一章」用同一套手感 */
+const enterLift = {
+  rest: { y: 0, scale: 1, boxShadow: "0 8px 20px rgba(17, 17, 24, 0.18)" },
+  hover: { y: -3, scale: 1.02, boxShadow: "0 16px 32px rgba(17, 17, 24, 0.28)" },
+  tap: { y: 0, scale: 0.97, boxShadow: "0 6px 14px rgba(17, 17, 24, 0.2)" },
+};
+
+const enterSheen = {
+  rest: { x: "-140%" },
+  hover: { x: "240%", transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
+};
 
 function ChatPane() {
   const chat = useChat(null);
@@ -52,8 +64,22 @@ function ChatPane() {
 
 const PREVIEW_SECTION_COUNT = 3;
 
+/** 自学天地 + 右侧 AI 面板：手机上面板打开时课件先让位，免得两边都被挤扁 */
+function StudyPane() {
+  const { open } = useAiDrawer();
+  return (
+    <>
+      <div className={`min-h-0 min-w-0 flex-1 ${open ? "hidden md:block" : ""}`}>
+        <StudyView />
+      </div>
+      <AiSidePanel />
+    </>
+  );
+}
+
 function Landing({ onEnter }: { onEnter: () => void }) {
   const [sectionsOpen, setSectionsOpen] = useState(false);
+  const reduce = useReducedMotion();
   const visibleSections = sectionsOpen ? KNOWLEDGE_SECTIONS : KNOWLEDGE_SECTIONS.slice(0, PREVIEW_SECTION_COUNT);
 
   return (
@@ -112,9 +138,46 @@ function Landing({ onEnter }: { onEnter: () => void }) {
             </div>
           </Card>
         </motion.div>
-        <Button type="button" className="mt-10" onClick={onEnter}>
-          进入学习
-        </Button>
+        <motion.div
+          className="mt-10 inline-flex rounded-full"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.12 }}
+        >
+          <motion.div
+            className="inline-flex rounded-full"
+            initial={reduce ? false : "rest"}
+            whileHover={reduce ? undefined : "hover"}
+            whileTap={reduce ? undefined : "tap"}
+            variants={enterLift}
+            transition={{ type: "spring", stiffness: 420, damping: 28 }}
+          >
+            <Button
+              type="button"
+              size="lg"
+              onClick={onEnter}
+              className="relative h-11 overflow-hidden rounded-full px-7 text-[15px] font-semibold shadow-none hover:bg-primary"
+            >
+              {reduce ? null : (
+                <motion.span
+                  aria-hidden
+                  initial={{ x: "-140%" }}
+                  variants={enterSheen}
+                  className="pointer-events-none absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                />
+              )}
+              <span className="relative">进入学习</span>
+              <motion.span
+                aria-hidden
+                className="relative inline-flex"
+                animate={reduce ? undefined : { x: [0, 3, 0] }}
+                transition={reduce ? undefined : { duration: 1.7, repeat: Infinity, repeatDelay: 0.7, ease: "easeInOut" }}
+              >
+                <ArrowRight />
+              </motion.span>
+            </Button>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );
@@ -162,10 +225,7 @@ export function AppShell() {
                   visibility: view === "study" ? "visible" : "hidden",
                 }}
               >
-                <div className="min-h-0 min-w-0 flex-1">
-                  <StudyView />
-                </div>
-                <AiSidePanel />
+                <StudyPane />
               </motion.div>
               <motion.div
                 className="absolute inset-0 flex min-h-0 flex-col"
