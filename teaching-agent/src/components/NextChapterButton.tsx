@@ -48,7 +48,8 @@ export function NextChapterButton({ label, onClick }: { label: string; onClick: 
       <Button
         type="button"
         onClick={onClick}
-        className="group relative h-12 max-w-full overflow-hidden rounded-xl border border-white/15 bg-gradient-to-r from-ink via-ink to-slate-700 px-4 text-[14px] font-semibold text-primary-foreground shadow-[0_8px_22px_rgba(17,17,24,0.22)] hover:bg-ink hover:shadow-[0_12px_28px_rgba(17,17,24,0.3)] sm:gap-3 sm:px-5"
+        title={label ? `进入下一章：${label}` : undefined}
+        className="group relative min-h-12 max-w-full overflow-hidden rounded-xl border border-white/15 bg-gradient-to-r from-ink via-ink to-slate-700 px-4 py-2.5 text-[13.5px] font-semibold leading-snug text-primary-foreground shadow-[0_8px_22px_rgba(17,17,24,0.22)] hover:bg-ink hover:shadow-[0_12px_28px_rgba(17,17,24,0.3)] sm:gap-3 sm:px-5"
       >
         {reduce ? null : (
           <motion.span
@@ -58,7 +59,8 @@ export function NextChapterButton({ label, onClick }: { label: string; onClick: 
             className="pointer-events-none absolute inset-y-0 left-0 w-2/5 bg-gradient-to-r from-transparent via-white/40 to-transparent"
           />
         )}
-        <span className="relative min-w-0 flex-1 truncate text-center">进入下一章 · {label}</span>
+        {/* 只写「进入下一章」，章节名放在悬停提示里 */}
+        <span className="relative min-w-0 flex-1 text-center">进入下一章</span>
         <motion.span
           aria-hidden
           className="relative inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-ink shadow-sm"

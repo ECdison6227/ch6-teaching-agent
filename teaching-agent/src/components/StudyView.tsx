@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bookmark, BookmarkX, ChevronLeft, ChevronRight, ListChecks, StickyNote } from "lucide-react";
+import { Bookmark, BookmarkX, ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAiDrawer } from "@/components/AiDrawer";
@@ -428,14 +428,13 @@ export function StudyView() {
           </div>
         ) : slide ? (
           <>
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <span className="text-[12px] tabular-nums text-ink-faint">
-                {onLab
-                  ? `第 ${LAB_AFTER} 页之后 · 配筋率示意`
-                  : onQuiz
-                    ? `${idx + 1} / ${deck.length} · 第 ${anchorPage} 页之后 · ${quizQuestions[0]?.id ?? "随堂题"}`
-                    : `${idx + 1} / ${deck.length} · 第 ${slide.page} 页`}
-              </span>
+            <div className={`mb-3 flex items-center gap-3 ${onQuiz ? "justify-end" : "justify-between"}`}>
+              {/* 随堂题页不再显示位置说明，只留右上的「这页没看懂」 */}
+              {onQuiz ? null : (
+                <span className="text-[12px] tabular-nums text-ink-faint">
+                  {onLab ? `第 ${LAB_AFTER} 页之后 · 配筋率示意` : `${idx + 1} / ${deck.length} · 第 ${slide.page} 页`}
+                </span>
+              )}
               <button
                 type="button"
                 onClick={askPage}
@@ -461,10 +460,6 @@ export function StudyView() {
                 <ReinforcementLab />
               ) : onQuiz ? (
                 <div className="flex min-h-[24rem] flex-col justify-center rounded-2xl border border-paper-line bg-paper px-12 py-6 sm:px-16">
-                  <div className="mb-3 flex items-center gap-2 text-[13px] text-ink-soft">
-                    <ListChecks className="size-4 shrink-0" />
-                    <span>第 {anchorPage} 页已经讲过，这一页直接做</span>
-                  </div>
                   <PracticePanel
                     key={`quiz:${anchorPage}:${quizQuestions[0]?.id ?? ""}`}
                     questions={quizQuestions}
