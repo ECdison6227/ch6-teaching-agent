@@ -12,7 +12,13 @@ export function Markdown({ text, className = "" }: { text: string; className?: s
   return (
     <div className={`md-body ${className}`}>
       <ReactMarkdown
-        remarkPlugins={[remarkMath, remarkGfm]}
+        /**
+         * singleTilde:false 关掉 GFM 的「单个波浪号」删除线。
+         * 页码索引按「第 64~75 页」这种格式给模型，模型会照抄进正文；
+         * 开着单波浪号时，「第17~46页…第47~63页」中间的正文会被整段划掉、
+         * 两端波浪号也被吃掉。现在只有 ~~ 才会渲染删除线。
+         */
+        remarkPlugins={[remarkMath, [remarkGfm, { singleTilde: false }]]}
         rehypePlugins={[
           [rehypeKatex, { throwOnError: false, strict: false, output: "html" }],
           rehypeDemoteKatexErrors,

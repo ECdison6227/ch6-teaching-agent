@@ -10,6 +10,7 @@ import { Markdown } from "./Markdown";
 import { FigureChip, FigureModal, SlideGallery, SlideStrip, type Figure } from "./FigureModal";
 import { useNotes } from "./notes";
 import { Thinking, StreamingCaret } from "./Typing";
+import { tidySelection } from "@/lib/selection-text";
 import type { useChat } from "@/lib/useChat";
 
 type Chat = ReturnType<typeof useChat>;
@@ -116,7 +117,7 @@ function Talk({
   const { teacher, classmate } = splitTalk(text);
   const pick = (e: MouseEvent<HTMLDivElement>) => {
     const sel = window.getSelection();
-    const quote = sel?.toString().trim() ?? "";
+    const quote = tidySelection(sel?.toString() ?? "");
     if (!quote || !sel?.anchorNode || !e.currentTarget.contains(sel.anchorNode)) {
       onClear();
       return;

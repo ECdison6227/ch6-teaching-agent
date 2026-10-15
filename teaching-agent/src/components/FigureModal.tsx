@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export type Figure =
   | { kind: "diagram"; html: string; caption?: string }
@@ -13,6 +15,12 @@ export const slidePath = (page: number) => `/slides/slide-${String(page).padStar
 export function slideFileName(page: number) {
   return `slide-${String(page).padStart(3, "0")}.png`;
 }
+
+/** 翻页按钮：自学天地和对话里的翻页弹窗共用同一套，样式别各写一份 */
+export const slideArrow =
+  "absolute top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-black/30 text-white shadow-sm hover:bg-black/45 hover:text-white disabled:opacity-25";
+export const slideArrowOutside =
+  "h-9 w-9 shrink-0 rounded-full bg-black/30 text-white shadow-sm hover:bg-black/45 hover:text-white disabled:opacity-25";
 
 /** 流程图 / PPT 页面图的大图查看弹窗 */
 export function FigureModal({ figure, onClose }: { figure: Figure | null; onClose: () => void }) {
@@ -224,14 +232,17 @@ export function SlideGallery({
             </button>
           </div>
           <div className="flex min-h-0 min-w-0 flex-1 items-stretch gap-1 bg-paper-soft p-2 sm:gap-2 sm:p-4">
-            <button
+            <Button
               type="button"
+              size="icon"
+              variant="ghost"
+              aria-label="上一页"
               disabled={index <= 0}
               onClick={() => onIndex(index - 1)}
-              className="shrink-0 self-center whitespace-nowrap rounded-lg px-1.5 py-2 text-[13px] text-ink-soft hover:bg-paper disabled:opacity-30 sm:px-2 sm:py-6"
+              className={`self-center ${slideArrowOutside}`}
             >
-              上一页
-            </button>
+              <ChevronLeft />
+            </Button>
             <div ref={frameRef} className="relative min-h-0 min-w-0 flex-1 overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -253,14 +264,17 @@ export function SlideGallery({
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white object-contain shadow ring-1 ring-paper-line"
               />
             </div>
-            <button
+            <Button
               type="button"
+              size="icon"
+              variant="ghost"
+              aria-label="下一页"
               disabled={index >= pages.length - 1}
               onClick={() => onIndex(index + 1)}
-              className="shrink-0 self-center whitespace-nowrap rounded-lg px-1.5 py-2 text-[13px] text-ink-soft hover:bg-paper disabled:opacity-30 sm:px-2 sm:py-6"
+              className={`self-center ${slideArrowOutside}`}
             >
-              下一页
-            </button>
+              <ChevronRight />
+            </Button>
           </div>
         </div>
       </div>

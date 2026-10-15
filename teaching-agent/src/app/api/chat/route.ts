@@ -98,9 +98,15 @@ const FENCES: [FenceKind, string][] = [
 async function pump(
   provider: ReturnType<typeof getProvider>,
   messages: ChatMessage[],
-  send: (e: StreamEvent) => void,
+  emitRaw: (e: StreamEvent) => void,
   model?: string,
 ) {
+  /** 推理模型有可能把额度全用在思考上，一个字正文都不吐；这种空回复要让学生看见 */
+  let spoke = false;
+  const send = (e: StreamEvent) => {
+    spoke = true;
+    emitRaw(e);
+  };
   let buf = "";
   let mode: "text" | "fence" = "text";
   let fenceKind: FenceKind | null = null;
@@ -175,6 +181,13 @@ async function pump(
       buf = "";
     }
     if (buf.trim()) send({ type: "text", delta: buf });
+  }
+
+  if (!spoke) {
+    emitRaw({
+      type: "error",
+      message: "模型这次没有返回内容，换一种问法再说一次，或者换个模型试试。",
+    });
   }
 }
 

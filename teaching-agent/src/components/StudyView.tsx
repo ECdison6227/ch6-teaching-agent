@@ -18,6 +18,7 @@ import { PracticePanel, pickQuestions, type Question } from "@/components/Practi
 import { questionsAfterSlide } from "@/lib/covered-questions";
 import { NextChapterButton } from "@/components/NextChapterButton";
 import { SlideStage } from "@/components/SlideStage";
+import { slideArrow, slideArrowOutside } from "@/components/FigureModal";
 import { ReinforcementLab } from "@/components/ReinforcementLab";
 import slidesData from "@/content/slides.json";
 import questionsData from "@/content/questions.json";
@@ -26,11 +27,6 @@ type Slide = { page: number; section: string; title: string; bullets: string[]; 
 
 const slides = slidesData as Slide[];
 const questions = questionsData as Question[];
-
-const slideArrow =
-  "absolute top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full bg-black/30 text-white shadow-sm hover:bg-black/45 hover:text-white disabled:opacity-25";
-const slideArrowOutside =
-  "h-9 w-9 shrink-0 rounded-full bg-black/30 text-white shadow-sm hover:bg-black/45 hover:text-white disabled:opacity-25";
 
 /** 第 37 页讲的是配筋率。Beta 打开时，这一页（以及刚插在它后面的随堂题）之后是可拖的截面。 */
 const LAB_AFTER = 37;
