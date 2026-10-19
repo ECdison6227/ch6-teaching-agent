@@ -21,12 +21,11 @@ import { SlideStage } from "@/components/SlideStage";
 import { slideArrow, slideArrowOutside } from "@/components/FigureModal";
 import { ReinforcementLab } from "@/components/ReinforcementLab";
 import slidesData from "@/content/slides.json";
-import questionsData from "@/content/questions.json";
+import { questions } from "@/lib/questions";
 
 type Slide = { page: number; section: string; title: string; bullets: string[]; image: string };
 
 const slides = slidesData as Slide[];
-const questions = questionsData as Question[];
 
 /** 第 37 页讲的是配筋率。Beta 打开时，这一页（以及刚插在它后面的随堂题）之后是可拖的截面。 */
 const LAB_AFTER = 37;

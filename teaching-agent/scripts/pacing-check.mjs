@@ -207,6 +207,7 @@ const aOk = resA.cards.length === 0 && resA.figures.length > 0 && !asksToPractic
 const a2Ok = resA2.cards.length === 1 && !asksToPractice(resA2.text);
 const b1Ok = firstSolve.cards.length === 0 && firstSolve.figures.length > 0 && !asksToPractice(firstSolve.text);
 const b2Ok = cardsB >= 1 && cardsB <= 3;
+if (!aOk || !a2Ok || !b1Ok || !b2Ok) process.exitCode = 1;
 console.log(`A 讲解先发资料且不出卡 ${aOk ? "✓" : "✗"}（卡片 ${resA.cards.length}，附图 ${resA.figures.length}）`);
 console.log(`A2 讲完直接出题 ${a2Ok ? "✓" : "✗"}（卡片 ${resA2.cards.length}）`);
 console.log(`B 求解第一轮只发资料 ${b1Ok ? "✓" : "✗"}（卡片 ${firstSolve.cards.length}，附图 ${firstSolve.figures.length}）`);

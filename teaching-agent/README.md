@@ -12,6 +12,22 @@ npm install
 npm run dev                    # http://localhost:3000
 ```
 
+## 本地验证
+
+```bash
+npm run typecheck
+npm test
+npm run test:math
+node scripts/qa-slide-notes.mjs
+npm run build
+```
+
+`npm test` 不需要真实模型凭证，包含本地 HTTP 模拟模型、流式分块、连接取消、判题、笔记保存失败与重试的回归检查。真实模型的教学输出仍需配置通道后手工验证。
+
+笔记优先使用 IndexedDB 保存，兼容读取旧版 localStorage 数据；首次保存成功后迁移旧副本。保存失败会在侧栏提示，当前页面里的笔记仍然保留，可点「重试保存」。纯图片收藏可以直接导出；未接入模型时，文字笔记按原文导出。
+
+对话支持停止生成和失败重试，总等待时限为 120 秒。单张上传图片上限为 3 MB，支持 PNG、JPEG、WebP、GIF。未复核题或无法可靠匹配的描述性答案显示「待核对」。
+
 ## 两个页面
 
 | 页面 | 作用 |

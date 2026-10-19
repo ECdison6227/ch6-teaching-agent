@@ -9,87 +9,13 @@ import { useAiDrawer } from "./AiDrawer";
 import { useNotes } from "./notes";
 import type { PageCtx } from "@/lib/useChat";
 
-export type Question = {
-  id: string;
-  type: "choice" | "fill" | "judge";
-  prompt: string;
-  options?: { id: string; text: string }[];
-  answer?: string | null;
-  analysis?: string | null;
-  verified?: boolean;
-};
+export { grade } from "@/lib/grading";
+export { pickQuestions } from "@/lib/questions";
+export type { Question } from "@/lib/questions";
+import { grade, normLetter } from "@/lib/grading";
+import type { Question } from "@/lib/questions";
 
 const TYPE_LABEL: Record<Question["type"], string> = { choice: "选择", judge: "判断", fill: "填空" };
-
-/* ------------------------------ 判定 ------------------------------ */
-
-/** 全角→半角 */
-function toHalfWidth(s: string): string {
-  return s
-    .replace(/[\uFF01-\uFF5E]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
-    .replace(/\u3000/g, " ");
-}
-
-/** 归一化：去空白、统一括号、去句末/句读标点、转小写 */
-function norm(s: string): string {
-  return toHalfWidth(String(s ?? ""))
-    .replace(/\s+/g, "")
-    .replace(/[()]/g, "")
-    .replace(/[。，、；：？！"'“”‘’~～]/g, "")
-    .toLowerCase();
-}
-
-/** 选项字母 / T-F 归一化 */
-function normLetter(v: string): string {
-  const t = norm(v);
-  if (/^(t|true|正确|对|√|是)$/.test(t)) return "T";
-  if (/^(f|false|错误|错|×|否)$/.test(t)) return "F";
-  const m = t.match(/^[a-z]/);
-  return m ? m[0].toUpperCase() : t.slice(0, 1).toUpperCase();
-}
-
-/** 取出第一个数字，用来比较 0.518 / .518 / 518mm 这类等价写法 */
-function numOf(s: string): number | null {
-  const m = s.match(/[-+]?\d*\.?\d+/);
-  if (!m) return null;
-  const v = Number.parseFloat(m[0]);
-  return Number.isFinite(v) ? v : null;
-}
-
-export function grade(q: Question, value: string): boolean {
-  const ans = (q.answer ?? "").trim();
-  const v = (value ?? "").trim();
-  if (!ans || !v) return false;
-
-  if (q.type === "choice" || q.type === "judge") {
-    const a = normLetter(ans);
-    const b = normLetter(v);
-    return a !== "" && a === b;
-  }
-
-  // 填空：多空按 ； 拆分，逐空做归一化比较 / 数值比较 / 包含匹配
-  const parts = ans
-    .split(/[;；]/)
-    .map(norm)
-    .filter(Boolean);
-  const input = norm(v);
-  const vn = numOf(input);
-
-  const matchOne = (p: string) => {
-    if (input === p) return true;
-    const pn = numOf(p);
-    if (vn !== null && pn !== null && Math.abs(vn - pn) < 1e-6) return true;
-    if (p.length >= 2 && input.includes(p)) return true;
-    if (input.length >= 2 && p.includes(input) && input.length >= p.length * 0.5) return true;
-    return false;
-  };
-
-  return parts.every((p) => {
-    // 答案里带「或」的是等价写法，命中任意一种就算对
-    const alts = p.split(/或|\//).filter((x) => x.length >= 2);
-    return alts.length > 1 ? alts.some(matchOne) : matchOne(p);
-  });
-}
 
 /** 正确答案的可读形式 */
 function answerLabel(q: Question): string {
@@ -101,35 +27,6 @@ function answerLabel(q: Question): string {
   }
   if (q.type === "judge") return normLetter(a) === "T" ? "正确" : normLetter(a) === "F" ? "错误" : a;
   return a;
-}
-
-/* --------------------------- 选题 --------------------------- */
-
-/**
- * 题目没有 section 字段，用当前节名（去掉 K 编号）的中文词元去匹配题干/解析。
- * 优先取「有答案 + verified」的题；本节匹配不到就退回其余题。
- */
-export function pickQuestions(questions: Question[], section: string, n = 3): Question[] {
-  const name = section.replace(/^K\d+\s*/, "");
-  const toks = new Set<string>();
-  for (const m of name.matchAll(/[\u4e00-\u9fff]{2,3}/g)) toks.add(m[0]);
-
-  const usable = questions.filter(
-    (q) => q.answer && (q.type !== "choice" || (q.options?.length ?? 0) > 0),
-  );
-  const verified = usable.filter((q) => q.verified === true);
-  const base = verified.length >= n ? verified : usable;
-
-  const score = (q: Question) => {
-    const hay = `${q.prompt} ${q.analysis ?? ""} ${(q.options ?? []).map((o) => o.text).join(" ")}`;
-    let s = 0;
-    for (const t of toks) if (hay.includes(t)) s += t.length;
-    return s;
-  };
-  const scored = base.map((q) => ({ q, s: score(q) })).sort((a, b) => b.s - a.s);
-  const hits = scored.filter((x) => x.s > 0).map((x) => x.q);
-  const rest = scored.filter((x) => x.s === 0).map((x) => x.q);
-  return [...hits, ...rest].slice(0, n);
 }
 
 /* --------------------------- 面板 --------------------------- */
@@ -266,8 +163,8 @@ export function PracticePanel({
                 </>
               ) : (
                 <>
-                  <span className={`text-[11.5px] font-medium ${s.correct ? "text-emerald-600" : "text-red-600"}`}>
-                    {s.correct ? "答对了" : "答错了"}
+                  <span className={`text-[11.5px] font-medium ${s.correct === null ? "text-ink-soft" : s.correct ? "text-emerald-600" : "text-red-600"}`}>
+                    {s.correct === null ? "待核对，请对照答案与解析" : s.correct ? "答对了" : "答错了"}
                   </span>
                   <Button
                     type="button"
@@ -287,7 +184,7 @@ export function PracticePanel({
                   >
                     再做一次
                   </Button>
-                  {!s.correct ? (
+                  {s.correct === false ? (
                     <Button
                       type="button"
                       variant="ghost"

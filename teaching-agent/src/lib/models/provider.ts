@@ -1,5 +1,6 @@
 import "server-only";
 import type { ChatModelOption } from "@/lib/models/options";
+import { readSseData } from "@/lib/sse";
 
 /** 多模态内容：文字，或学生直接上传的图片（data URL） */
 export type ContentPart =
@@ -169,31 +170,14 @@ class OpenAICompatProvider implements ModelProvider {
       throw new Error(`对话模型调用失败（${res.status}）：${detail.slice(0, 300)}`);
     }
 
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buf = "";
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      const chunks = buf.split("\n\n");
-      buf = chunks.pop() ?? "";
-      for (const chunk of chunks) {
-        for (const line of chunk.split("\n")) {
-          const t = line.trim();
-          if (!t.startsWith("data:")) continue;
-          const data = t.slice(5).trim();
-          if (!data || data === "[DONE]") continue;
-          try {
-            const json = JSON.parse(data);
-            const delta =
-              json?.choices?.[0]?.delta?.content ?? json?.choices?.[0]?.message?.content ?? "";
-            if (typeof delta === "string" && delta) yield delta;
-          } catch {
-            // 忽略无法解析的片段
-          }
-        }
-      }
+    for await (const data of readSseData(res.body, signal)) {
+      if (data === "[DONE]") break;
+      let json;
+      try { json = JSON.parse(data); }
+      catch { throw new Error("模型返回的流式数据格式错误，请重试"); }
+      if (json?.error) throw new Error("模型服务返回错误，请稍后重试");
+      const delta = json?.choices?.[0]?.delta?.content ?? json?.choices?.[0]?.message?.content ?? "";
+      if (typeof delta === "string" && delta) yield delta;
     }
   }
 

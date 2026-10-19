@@ -18,9 +18,11 @@ const KIND_LABEL: Record<Card["kind"], string> = {
 export function AnswerCard({
   card,
   onSubmit,
+  disabled = false,
 }: {
   card: Card;
   onSubmit: (a: CardAnswer) => void;
+  disabled?: boolean;
 }) {
   const [choice, setChoice] = useState<string | null>(null);
   const [tf, setTf] = useState<boolean | null>(null);
@@ -36,7 +38,7 @@ export function AnswerCard({
         : card.fields.every((f) => (values[f.key] ?? "").trim() !== "");
 
   const submit = () => {
-    if (!ready) return;
+    if (!ready || disabled) return;
     if (card.kind === "choice") onSubmit({ kind: "choice", choiceId: choice! });
     else if (card.kind === "truefalse") onSubmit({ kind: "truefalse", value: tf === true });
     else if (card.kind === "data") onSubmit({ kind: "data", values });
@@ -71,6 +73,7 @@ export function AnswerCard({
               <button
                 key={o.id}
                 onClick={() => setChoice(o.id)}
+                  disabled={disabled}
                 className={`flex w-full gap-2.5 rounded-xl border px-3 py-2.5 text-left text-[13px] leading-6 transition-colors ${
                   on
                     ? "border-ink bg-paper-soft"
@@ -96,6 +99,7 @@ export function AnswerCard({
             <button
               key={o.t}
               onClick={() => setTf(o.v)}
+              disabled={disabled}
               className={`flex-1 rounded-xl border px-3 py-2.5 text-[13px] transition-colors ${
                 tf === o.v ? "border-ink bg-paper-soft" : "border-paper-line hover:bg-paper-soft"
               }`}
@@ -116,6 +120,7 @@ export function AnswerCard({
               </span>
               <input
                 value={values[f.key] ?? ""}
+                disabled={disabled}
                 onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
                 placeholder={f.placeholder || "请输入"}
                 className="w-full rounded-xl border border-paper-line bg-paper px-3 py-2 text-[13px] outline-none focus:border-ink-soft"
@@ -126,7 +131,7 @@ export function AnswerCard({
       ) : null}
 
       <div className="mt-4 flex items-center gap-3">
-        <Button onClick={submit} disabled={!ready} size="sm">
+        <Button onClick={submit} disabled={!ready || disabled} size="sm">
           提交作答
         </Button>
         {card.hint ? (

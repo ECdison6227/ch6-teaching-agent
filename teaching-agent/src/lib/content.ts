@@ -2,8 +2,10 @@ import "server-only";
 import fs from "node:fs/promises";
 import path from "node:path";
 import slidesJson from "@/content/slides.json";
-import questionsJson from "@/content/questions.json";
-import k12QuestionsJson from "@/content/k12-14-questions.json";
+import { questions, k12Questions } from "@/lib/questions";
+export { questions, k12Questions };
+export type { Question } from "@/lib/questions";
+import type { Question } from "@/lib/questions";
 
 export type Slide = {
   page: number;
@@ -13,26 +15,7 @@ export type Slide = {
   image: string;
 };
 
-export type Question = {
-  id: string;
-  type: "choice" | "fill" | "judge";
-  prompt: string;
-  options: { id: string; text: string }[];
-  answer: string | null;
-  analysis: string | null;
-  confidence?: string;
-  verified?: boolean;
-  reviewAnswer?: string;
-  source: string;
-};
-
 export const slides = slidesJson as Slide[];
-
-/** K12~K14（受扭 / 挠度 / 裂缝）没有 PPT 页，题目来自 k12-14.md 整理的自测题 */
-export const k12Questions = k12QuestionsJson as Question[];
-
-/** 全量题库：PPT 章节题 + K12~K14 补充题（也用于生成给模型的答案表） */
-export const questions = [...(questionsJson as Question[]), ...k12Questions];
 
 /** key 为 ""（通用）或 K12 / K13 / K14 */
 const knowledgeCache = new Map<string, string>();

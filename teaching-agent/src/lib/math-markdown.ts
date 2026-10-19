@@ -1,5 +1,4 @@
 import katex from "katex";
-import { normalizeFlatMath } from "@/lib/flat-math";
 
 /**
  * 把模型回答里的公式整理成 remark-math / KaTeX 能排的样子。
@@ -1203,8 +1202,7 @@ export function prepareMathMarkdown(text: string): string {
   const fence = t.search(/```(card|diagram|slide|verdict)/);
   if (fence >= 0) t = t.slice(0, fence);
   t = stripEditorialMarks(t);
-  // 题库里的公式是早年从 .doc 拍平的（εs、h0、a_s′），先补成 LaTeX 再走后面的流程
-  t = normalizeFlatMath(t);
+  // 先保护代码，再一次性识别完整公式。提前逐符号加 $ 会拆断表达式并产生嵌套定界符。
   const masked = maskCode(t);
   const promoted = promotePlainFormulas(masked.text);
   let out = "";

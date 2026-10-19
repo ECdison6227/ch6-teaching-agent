@@ -46,6 +46,7 @@ async function run(c) {
   });
   if (!res.ok || !res.body) {
     console.log(`✗ ${c.name} → HTTP ${res.status}`);
+    process.exitCode = 1;
     return;
   }
   const reader = res.body.getReader();
@@ -79,6 +80,7 @@ async function run(c) {
   const ok =
     c.expect.every((k) => kinds.includes(k)) &&
     !(c.forbid || []).some((k) => kinds.includes(k));
+  if (!ok || events.some(event => event.type === "error")) process.exitCode = 1;
   const verdict = events.find((e) => e.type === "verdict");
   const card = events.find((e) => e.type === "card");
   const figs = events.filter((e) => e.type === "figure");
@@ -104,5 +106,6 @@ for (const c of CASES) {
     await run(c);
   } catch (e) {
     console.log(`✗ ${c.name} → ${e?.message || e}`);
+    process.exitCode = 1;
   }
 }

@@ -12,6 +12,7 @@ import { useNotes } from "./notes";
 import { Thinking, StreamingCaret } from "./Typing";
 import { tidySelection } from "@/lib/selection-text";
 import type { useChat } from "@/lib/useChat";
+import { MAX_MESSAGE_CHARS } from "@/lib/request-limits";
 
 type Chat = ReturnType<typeof useChat>;
 
@@ -274,7 +275,7 @@ export function ChatView({
                 )}
 
                 {m.card && !m.answered ? (
-                  <AnswerCard card={m.card} onSubmit={(a) => void answerCard(m.card!, a, m.id)} />
+                  <AnswerCard card={m.card} disabled={busy} onSubmit={(a) => void answerCard(m.card!, a, m.id)} />
                 ) : null}
                 {m.card && m.answered ? (
                   <div className="my-3 rounded-2xl border border-dashed border-paper-line px-4 py-2.5 text-[13px] text-ink-faint">
@@ -290,6 +291,7 @@ export function ChatView({
           {error ? (
             <div className="mt-2 rounded-xl border border-paper-line bg-paper px-3 py-2 text-[13px] leading-6 text-ink-soft">
               {error}
+              {!busy ? <Button type="button" variant="ghost" size="sm" className="ml-2" onClick={() => void chat.retry()}>重试这一轮</Button> : null}
             </div>
           ) : null}
 
@@ -302,6 +304,7 @@ export function ChatView({
         onChange={setInput}
         onSend={() => {
           const text = quote ? `【针对这段追问】\n${quote}${input.trim() ? `\n\n${input.trim()}` : ""}` : input;
+          if (text.trim().length > MAX_MESSAGE_CHARS) { chat.setError("引用和消息合计不能超过 20000 字，请缩短后发送"); return; }
           setInput("");
           setQuote(null);
           void send(text);
@@ -309,6 +312,7 @@ export function ChatView({
         onImage={(f) => void onImage(f)}
         blocked={blocked}
         busy={busy}
+        onStop={chat.stop}
         pendingImages={pendingImages}
         onRemoveImage={removePendingImage}
         quote={quote}

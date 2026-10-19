@@ -233,7 +233,7 @@ export function Sidebar({
   onView: (v: AppView) => void;
 }) {
   const { state, isMobile, setOpenMobile } = useSidebar();
-  const { notes, remove } = useNotes();
+  const { notes, remove, storageError, retrySave } = useNotes();
   const [openNote, setOpenNote] = useState<Note | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [helpId, setHelpId] = useState<HelpId | null>(null);
@@ -344,6 +344,12 @@ export function Sidebar({
             </div>
             {exportError ? (
               <p className="px-2 text-[11px] leading-4 text-muted-foreground group-data-[collapsible=icon]:hidden">{exportError}</p>
+            ) : null}
+            {storageError ? (
+              <div role="alert" className="px-2 text-xs leading-5 text-destructive group-data-[collapsible=icon]:hidden">
+                {storageError}
+                <Button type="button" variant="ghost" size="sm" onClick={retrySave}>重试保存</Button>
+              </div>
             ) : null}
             {notes.length === 0 ? (
               <p className="px-2 text-xs leading-5 text-muted-foreground group-data-[collapsible=icon]:hidden">

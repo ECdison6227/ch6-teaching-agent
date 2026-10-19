@@ -1,10 +1,11 @@
 "use client";
 
 import { useId, useRef } from "react";
-import { ArrowUp, ImagePlus, Sparkles } from "lucide-react";
+import { ArrowUp, ImagePlus, Sparkles, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ChatModelOption } from "@/lib/models/options";
+import { MAX_MESSAGE_CHARS } from "@/lib/request-limits";
 
 type Brand = "stepfun" | "deepseek" | "qwen";
 
@@ -71,6 +72,7 @@ export function Composer({
   value,
   onChange,
   onSend,
+  onStop,
   onImage,
   blocked,
   busy,
@@ -85,6 +87,7 @@ export function Composer({
   value: string;
   onChange: (v: string) => void;
   onSend: () => void;
+  onStop?: () => void;
   onImage: (file: File) => void;
   blocked: boolean;
   busy: boolean;
@@ -166,6 +169,7 @@ export function Composer({
             }}
           />
           <textarea
+            maxLength={MAX_MESSAGE_CHARS}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onPaste={(e) => {
@@ -175,7 +179,7 @@ export function Composer({
               takeImages(files);
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault();
                 if (canSend) onSend();
               }
@@ -208,9 +212,15 @@ export function Composer({
               ))}
             </SelectContent>
           </Select>
-          <Button type="button" size="icon" className="shrink-0 rounded-full" onClick={onSend} disabled={!canSend}>
-            <ArrowUp />
-          </Button>
+          {busy ? (
+            <Button type="button" size="icon" className="shrink-0 rounded-full" onClick={onStop} aria-label="停止生成" title="停止生成">
+              <Square />
+            </Button>
+          ) : (
+            <Button type="button" size="icon" className="shrink-0 rounded-full" onClick={onSend} disabled={!canSend} aria-label="发送">
+              <ArrowUp />
+            </Button>
+          )}
         </div>
 
         {blocked ? (

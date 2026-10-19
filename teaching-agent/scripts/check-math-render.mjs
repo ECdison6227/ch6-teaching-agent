@@ -1,6 +1,6 @@
 /**
  * 用截图里的坏公式过一遍 Markdown 预处理 + KaTeX，确认 \text 不再以源码出现。
- * 运行：node --experimental-strip-types scripts/check-math-render.mjs
+ * 运行：npm run test:math
  */
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";

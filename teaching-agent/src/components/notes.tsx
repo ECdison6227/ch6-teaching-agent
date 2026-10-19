@@ -1,21 +1,14 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import elementsJson from "@/content/slide-elements.json";
 import slidesJson from "@/content/slides.json";
+import { Markdown } from "./Markdown";
+import { noteImagesHtml, rawNotesMarkdown } from "@/lib/note-export";
+import { requestScope } from "@/lib/request-lifecycle";
 
-export type NoteKind = "text" | "page" | "element" | "question";
-
-export type Note = {
-  id: string;
-  kind: NoteKind;
-  title: string;
-  text: string;
-  image?: string;
-  at: number;
-};
-
-const KEY = "ch6-notes-v2";
+import { browserNoteStorage, createNotesStore, type NoteDraft, type Note } from "@/lib/notes-store";
+export type { Note, NoteKind } from "@/lib/notes-store";
 
 type SlideMeta = { page: number; section?: string; title?: string };
 type ElementMeta = { text?: string };
@@ -86,105 +79,30 @@ export function displayNoteText(note: { kind?: string; title: string; text: stri
   return isAutoNoteText(note) ? "" : note.text;
 }
 
-function uid() {
-  return Math.random().toString(36).slice(2, 10);
-}
-
-function normalize(raw: unknown): Note[] {
-  if (!Array.isArray(raw)) return [];
-  const out: Note[] = [];
-  for (const item of raw) {
-    const n = item as Partial<Note>;
-    const text = String(n.text ?? "").trim();
-    if (!text && !n.image) continue;
-    out.push({
-      id: n.id || uid(),
-      kind: n.kind ?? "text",
-      title: n.title || text.slice(0, 28) || "笔记",
-      text,
-      image: n.image,
-      at: n.at || Date.now(),
-    });
-  }
-  return out;
-}
-
-function load(): Note[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const next = localStorage.getItem(KEY);
-    if (next) return normalize(JSON.parse(next));
-    const old = localStorage.getItem("ch6-notes-v1");
-    return old ? normalize(JSON.parse(old)) : [];
-  } catch {
-    return [];
-  }
-}
-
-type Draft = { kind?: NoteKind; title?: string; text: string; image?: string };
-
 const NotesCtx = createContext<{
   notes: Note[];
-  add: (input: string | Draft) => void;
+  storageError: string | null;
+  retrySave: () => void;
+  add: (input: string | NoteDraft) => void;
   update: (id: string, patch: Partial<Pick<Note, "title" | "text">>) => void;
   remove: (id: string) => void;
-}>({ notes: [], add: () => {}, update: () => {}, remove: () => {} });
+}>({ notes: [], storageError: null, retrySave: () => {}, add: () => {}, update: () => {}, remove: () => {} });
 
 export function NotesProvider({ children }: { children: ReactNode }) {
-  const [notes, setNotes] = useState<Note[]>([]);
-
+  const storeRef = useRef<ReturnType<typeof createNotesStore> | null>(null);
+  if (!storeRef.current) storeRef.current = createNotesStore(browserNoteStorage);
+  const store = storeRef.current;
+  const [snapshot, setSnapshot] = useState(store.getSnapshot());
   useEffect(() => {
-    setNotes(load());
-  }, []);
-
-  const write = useCallback((next: Note[]) => {
-    setNotes(next);
-    try {
-      localStorage.setItem(KEY, JSON.stringify(next));
-    } catch {
-      // 图片太多时只留在这次会话
-    }
-  }, []);
-
-  const add = useCallback(
-    (input: string | Draft) => {
-      const draft: Draft = typeof input === "string" ? { text: input, kind: "text" } : input;
-      const text = draft.text.trim();
-      if (!text && !draft.image) return;
-      const note: Note = {
-        id: uid(),
-        kind: draft.kind ?? "text",
-        title: (draft.title || text.slice(0, 28) || "笔记").trim(),
-        text,
-        image: draft.image,
-        at: Date.now(),
-      };
-      write([note, ...load()].slice(0, 80));
-    },
-    [write],
-  );
-
-  const update = useCallback(
-    (id: string, patch: Partial<Pick<Note, "title" | "text">>) => {
-      write(
-        load().map((n) =>
-          n.id === id
-            ? { ...n, ...patch, title: (patch.title ?? n.title).trim() || n.title, text: patch.text ?? n.text }
-            : n,
-        ),
-      );
-    },
-    [write],
-  );
-
-  const remove = useCallback(
-    (id: string) => {
-      write(load().filter((n) => n.id !== id));
-    },
-    [write],
-  );
-
-  const value = useMemo(() => ({ notes, add, update, remove }), [notes, add, update, remove]);
+    const unsubscribe = store.subscribe(() => setSnapshot(store.getSnapshot()));
+    void store.initialize();
+    return unsubscribe;
+  }, [store]);
+  const add = useCallback((input: string | NoteDraft) => { void store.add(input); }, [store]);
+  const update = useCallback((id: string, patch: Partial<Pick<Note, "title" | "text">>) => { void store.update(id, patch); }, [store]);
+  const remove = useCallback((id: string) => { void store.remove(id); }, [store]);
+  const retrySave = useCallback(() => { void store.retry(); }, [store]);
+  const value = useMemo(() => ({ notes: snapshot.notes, storageError: snapshot.error, retrySave, add, update, remove }), [snapshot, retrySave, add, update, remove]);
   return <NotesCtx.Provider value={value}>{children}</NotesCtx.Provider>;
 }
 
@@ -257,43 +175,48 @@ export function NoteEditor({
   );
 }
 
-function esc(s: string) {
-  return s.replace(/[&<>]/g, (c) => (c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;"));
-}
-
-/** 模型把收藏汇总成一篇笔记，再打开打印窗口，让学生存成 PDF */
+/** 先在用户点击时打开窗口，图片笔记不依赖模型；文字保留公式渲染。 */
 export async function exportNotePdf(notes: Note[]) {
-  const res = await fetch("/api/digest", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      notes: notes.map((n) => ({ title: n.title, kind: n.kind, text: n.text })),
-    }),
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json?.error || "汇总失败");
-  const markdown = esc(String(json.markdown || ""))
-    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
-    .replace(/\n{2,}/g, "</p><p>");
-  const imgs = notes
-    .filter((n) => n.image)
-    .map(
-      (n) =>
-        `<figure><img src="${n.image}" alt=""><figcaption>${esc(n.title)}</figcaption></figure>`,
-    )
-    .join("");
-  const w = window.open("", "_blank");
-  if (!w) throw new Error("浏览器拦住了导出窗口，请允许弹出窗口后再试");
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>我的第六章笔记</title>
-    <style>
-      body{font-family:"Songti SC","PingFang SC",serif;max-width:720px;margin:32px auto;line-height:1.75;color:#1a1a18}
-      img{max-width:100%} figcaption{font-size:12px;color:#666}
-      h1{font-size:22px} h2{font-size:18px;margin-top:1.4em}
-    </style></head><body>
-    <h1>我的第六章笔记</h1><p>${markdown}</p>${imgs}
-    <script>window.onload=function(){window.print()}<\/script>
-    </body></html>`);
-  w.document.close();
+  if (!notes.length) throw new Error("还没有可导出的笔记");
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) throw new Error("浏览器拦住了导出窗口，请允许弹出窗口后再试");
+  printWindow.document.body.textContent = "正在整理笔记…";
+  const scope = requestScope(undefined, 130_000);
+  try {
+    let markdown = rawNotesMarkdown(notes);
+    let summarized = false;
+    if (markdown) {
+      const response = await fetch("/api/digest", {
+        method: "POST", headers: { "Content-Type": "application/json" }, signal: scope.signal,
+        body: JSON.stringify({ notes: notes.map(note => ({ title: note.title, kind: note.kind, text: note.text, hasImage: !!note.image })) }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result?.error || "整理笔记失败");
+      markdown = String(result.markdown ?? markdown);
+      summarized = result.summarized === true;
+    }
+    if (printWindow.closed) return;
+    const styles = [...document.querySelectorAll('link[rel="stylesheet"], style')].map(element => {
+      const clone = element.cloneNode(true) as HTMLElement;
+      if (clone instanceof HTMLLinkElement) clone.href = (element as HTMLLinkElement).href;
+      return clone.outerHTML;
+    }).join("");
+    const { renderToStaticMarkup } = await import("react-dom/server");
+    const body = renderToStaticMarkup(<Markdown text={markdown} />);
+    printWindow.addEventListener("load", () => {
+      void (async () => {
+        await printWindow.document.fonts.ready;
+        await Promise.allSettled([...printWindow.document.images].map(image => image.decode()));
+        if (!printWindow.closed) printWindow.print();
+      })();
+    }, { once: true });
+    printWindow.document.open();
+    printWindow.document.write('<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>我的第六章笔记</title>' + styles +
+      '<style>body{font-family:"Microsoft YaHei",sans-serif;max-width:720px;margin:32px auto;padding:16px;line-height:1.75;background:white;color:#1a1a18}img{max-width:100%}figure{break-inside:avoid}figcaption{font-size:12px;color:#666}h1{font-size:22px}h2{font-size:18px;margin-top:1.4em}.md-body{font-size:14px}.katex{color:inherit}</style></head><body><h1>我的第六章笔记</h1>' +
+      (markdown ? '<p>' + (summarized ? '已根据收藏汇总。' : '以下按收藏原文整理。') + '</p>' : '') + body + noteImagesHtml(notes) + '</body></html>');
+    printWindow.document.close();
+  } catch (error) {
+    if (!printWindow.closed) printWindow.close();
+    throw error;
+  } finally { scope.dispose(); }
 }

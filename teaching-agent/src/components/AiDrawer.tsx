@@ -52,7 +52,7 @@ export function useAiDrawer() {
 
 async function urlToDataUrl(src: string): Promise<string | null> {
   try {
-    const res = await fetch(src);
+    const res = await fetch(src, { signal: AbortSignal.timeout(10_000) });
     if (!res.ok) return null;
     const blob = await res.blob();
     return await new Promise((resolve) => {
@@ -87,16 +87,19 @@ export function AiDrawerProvider({ children }: { children: ReactNode }) {
   sendRef.current = chat.send;
   const quoteRef = useRef(chat.setQuote);
   quoteRef.current = chat.setQuote;
+  const askSequence = useRef(0);
 
   const ask = useCallback((p: AskPayload = {}) => {
+    const sequence = ++askSequence.current;
     setCtx(p.context ?? null);
     setOpen(true);
     const slide = slideRef.current;
     const question = p.question?.trim() || "";
     void (async () => {
       const image = slide ? await urlToDataUrl(slide.src) : null;
+      if (sequence !== askSequence.current) return;
       if (question) {
-        await sendRef.current(question, image ? [image] : undefined);
+        await sendRef.current(question, image ? [image] : undefined, p.context ?? null);
         return;
       }
       if (image) queueRef.current([image]);
@@ -110,7 +113,7 @@ export function AiDrawerProvider({ children }: { children: ReactNode }) {
     if (p.image) queueRef.current([p.image]);
   }, []);
 
-  const close = useCallback(() => setOpen(false), []);
+  const close = useCallback(() => { askSequence.current++; setOpen(false); }, []);
 
   const value = useMemo(
     () => ({ ask, attach, close, open, bindSlide }),

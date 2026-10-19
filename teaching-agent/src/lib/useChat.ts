@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatAnswer, type Card, type CardAnswer, type Figure } from "@/lib/cards";
 import type { ChatModelOption } from "@/lib/models/options";
+import { readSseData } from "@/lib/sse";
+import { requestScope, requestError, MODEL_TIMEOUT_MS } from "@/lib/request-lifecycle";
+import { MAX_IMAGE_BYTES, MAX_REQUEST_BYTES, MAX_MESSAGE_CHARS, MAX_HISTORY_CHARS } from "@/lib/request-limits";
 
 export type Msg = {
   id: string;
@@ -14,6 +17,7 @@ export type Msg = {
   figures?: Figure[];
   /** 学生上传的原图（data URL），会随这条消息一起交给多模态模型 */
   images?: string[];
+  status?: "streaming" | "complete" | "failed" | "stopped";
 };
 
 export type PageCtx = {
@@ -42,6 +46,11 @@ export function useChat(context?: PageCtx | null) {
   const msgsRef = useRef<Msg[]>([]);
   const ctxRef = useRef<PageCtx | null>(context ?? null);
   const modelRef = useRef<string | null>(null);
+  const requestRef = useRef<AbortController | null>(null);
+  const lastRequestRef = useRef<{ history: ReturnType<typeof toHistory>; context: PageCtx | null; assistantId: string } | null>(null);
+
+  const stop = useCallback(() => requestRef.current?.abort(new DOMException("请求已停止", "AbortError")), []);
+  useEffect(() => () => { requestRef.current?.abort(); }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -87,7 +96,8 @@ export function useChat(context?: PageCtx | null) {
   /** 助手消息要带上自己发出的卡片，否则模型看不到上一轮问了什么 */
   const toHistory = (list: Msg[]) =>
     list
-      .filter((m) => m.role === "user" || m.content.trim() || m.card || m.images?.length)
+      .filter((m) => m.status !== "failed" && (m.role === "user" || m.content.trim() || m.card || m.images?.length))
+      .slice(-24)
       .map((m) => {
         const text =
           m.role === "assistant" && m.card
@@ -138,59 +148,68 @@ export function useChat(context?: PageCtx | null) {
   );
 
   const callApi = useCallback(
-    async (history: ReturnType<typeof toHistory>) => {
+    async (history: ReturnType<typeof toHistory>, pageContext?: PageCtx | null): Promise<boolean> => {
+      if (requestRef.current) return false;
+      const controller = new AbortController();
+      requestRef.current = controller;
+      const scope = requestScope(controller.signal, MODEL_TIMEOUT_MS + 10_000);
       setBusy(true);
       setError(null);
       const id = uid();
-      commit((p) => [...p, { id, role: "assistant" as const, content: "" }]);
+      const ctx = pageContext === undefined ? ctxRef.current : pageContext;
+      lastRequestRef.current = { history, context: ctx, assistantId: id };
+      commit((p) => [...p, { id, role: "assistant" as const, content: "", status: "streaming" }]);
       try {
+        const packed = { messages: history, pageContext: ctx, model: modelRef.current };
+        const textLength = () => packed.messages.reduce((total, message) => total + (typeof message.content === "string"
+          ? message.content.length : message.content.reduce((size, part) => size + (part.type === "text" ? part.text.length : 0), 0)), 0);
+        // 只丢弃最早的历史；当前消息始终保留，避免图片历史使后续每轮都超限。
+        while (packed.messages.length > 1 && (textLength() > MAX_HISTORY_CHARS || new TextEncoder().encode(JSON.stringify(packed)).length > MAX_REQUEST_BYTES)) {
+          packed.messages = packed.messages.slice(1);
+        }
+        const body = JSON.stringify(packed);
+        if (new TextEncoder().encode(body).length > MAX_REQUEST_BYTES) throw new Error("图片总量过大，请减少图片后重试");
         const res = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: history,
-            pageContext: ctxRef.current,
-            model: modelRef.current,
-          }),
+          body,
+          signal: scope.signal,
         });
-        if (!res.ok || !res.body) throw new Error(`请求失败（${res.status}）`);
-        const reader = res.body.getReader();
-        const dec = new TextDecoder();
-        let buf = "";
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buf += dec.decode(value, { stream: true });
-          const chunks = buf.split("\n\n");
-          buf = chunks.pop() ?? "";
-          for (const c of chunks) {
-            for (const line of c.split("\n")) {
-              const t = line.trim();
-              if (!t.startsWith("data:")) continue;
-              const d = t.slice(5).trim();
-              if (!d) continue;
-              try {
-                handleEvent(JSON.parse(d), id);
-              } catch {
-                // 忽略解析异常
-              }
-            }
-          }
+        if (!res.ok) {
+          const detail = await res.json().catch(() => null);
+          throw new Error(detail?.error || `请求失败（${res.status}）`);
         }
+        if (!res.body) throw new Error("没有收到响应内容，请重试");
+        let completed = false;
+        for await (const data of readSseData(res.body, scope.signal)) {
+          const event = JSON.parse(data) as Record<string, unknown>;
+          if (event.type === "error") throw new Error(String(event.message || "模型调用失败"));
+          if (event.type === "done") { completed = true; break; }
+          handleEvent(event, id);
+        }
+        scope.signal.throwIfAborted();
+        if (!completed) throw new Error("连接中断，回复尚未完成，请重试这一轮");
+        commit(p => p.map(m => m.id === id ? { ...m, status: "complete" } : m));
+        return true;
       } catch (e) {
-        setError((e as Error).message || "模型调用失败，稍后再试一次");
+        const stopped = controller.signal.aborted;
+        setError(stopped ? null : requestError(e, scope.signal));
+        commit(p => p.map(m => m.id === id ? { ...m, status: stopped ? "stopped" : "failed", card: undefined } : m));
+        return false;
       } finally {
-        setBusy(false);
+        scope.dispose();
+        if (requestRef.current === controller) { requestRef.current = null; setBusy(false); }
       }
     },
     [commit, handleEvent],
   );
 
   const send = useCallback(
-    async (raw: string, extraImages?: string[]) => {
+    async (raw: string, extraImages?: string[], pageContext?: PageCtx | null) => {
       const text = raw.trim();
+      if (text.length > MAX_MESSAGE_CHARS) { setError("单条消息不能超过 20000 字，请分段发送"); return false; }
       const images = extraImages?.length ? extraImages : pendingImages;
-      if ((!text && !images.length) || busy) return;
+      if ((!text && !images.length) || requestRef.current) return false;
       setPendingImages([]);
       setQuote(null);
       const next = commit((p) => [
@@ -202,9 +221,9 @@ export function useChat(context?: PageCtx | null) {
           ...(images.length ? { images } : {}),
         },
       ]);
-      await callApi(toHistory(next));
+      return callApi(toHistory(next), pageContext);
     },
-    [busy, pendingImages, commit, callApi],
+    [pendingImages, commit, callApi],
   );
 
   const queueImages = useCallback((urls: string[]) => {
@@ -223,6 +242,8 @@ export function useChat(context?: PageCtx | null) {
 
   const answerCard = useCallback(
     async (card: Card, answer: CardAnswer, msgId: string) => {
+      const message = msgsRef.current.find(m => m.id === msgId);
+      if (requestRef.current || !message?.card || message.answered) return;
       const text = formatAnswer(card, answer);
       const next = commit((p) => [
         ...p.map((m) => (m.id === msgId ? { ...m, answered: true } : m)),
@@ -234,8 +255,12 @@ export function useChat(context?: PageCtx | null) {
   );
 
   const onImage = useCallback(async (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      setError("请上传图片");
+    if (!["image/png", "image/jpeg", "image/webp", "image/gif"].includes(file.type)) {
+      setError("请上传 PNG、JPEG、WebP 或 GIF 图片");
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      setError("单张图片不能超过 3 MB，请压缩后上传");
       return;
     }
     setError(null);
@@ -259,9 +284,18 @@ export function useChat(context?: PageCtx | null) {
     [commit],
   );
 
+  const retry = useCallback(async () => {
+    const previous = lastRequestRef.current;
+    if (!previous || requestRef.current) return;
+    commit(messages => messages.filter(message => message.id !== previous.assistantId));
+    await callApi(previous.history, previous.context);
+  }, [commit, callApi]);
+
   return {
     msgs,
     busy,
+    stop,
+    retry,
     error,
     pendingImages,
     quote,
