@@ -7,8 +7,8 @@ export type StreamEvent =
   | { type: "figure"; figure: Figure }
   | { type: "error"; message: string }
   | { type: "done" };
-type FenceKind = "verdict" | "card" | "diagram" | "slides" | "slide";
-const OPENERS = ["verdict", "card", "diagram", "slides", "slide"].map(kind => "```" + kind);
+type FenceKind = "verdict" | "card" | "diagram" | "slides" | "slide" | "auto" | "raw";
+const OPENERS = ["verdict", "card", "diagram", "slides", "slide", "json"].map(kind => "```" + kind);
 const VERDICT_RE = /^\[判定\]\s*([^·|｜:：,，\s]+)\s*[·|｜:：,，]?\s*(K\d+)?\s*[·|｜:：,，]?\s*(.*)$/;
 
 function emitVerdict(raw: string, emit: (event: StreamEvent) => void): boolean {
@@ -38,7 +38,20 @@ export function parseSlidePages(raw: string): number[] {
   return [...pages].sort((a, b) => a - b);
 }
 
-function handleFence(kind: FenceKind, raw: string, emit: (event: StreamEvent) => void) {
+function handleFence(kind: FenceKind, raw: string, emit: (event: StreamEvent) => void, opening = "", closed = true) {
+  if (kind === "auto" || kind === "raw") {
+    if (kind === "auto") {
+      try {
+        const object: unknown = JSON.parse(raw);
+        const card = CardSchema.safeParse(object);
+        if (card.success) { emit({ type: "card", card: card.data }); return; }
+        const verdict = VerdictSchema.safeParse(object);
+        if (verdict.success) { emit({ type: "verdict", ...verdict.data }); return; }
+      } catch { /* 普通代码块原样显示，不把示例误当作交互协议 */ }
+    }
+    emit({ type: "text", delta: opening + raw + (closed ? "```" : "") });
+    return;
+  }
   if (kind === "diagram") {
     if (raw.trim()) emit({ type: "figure", figure: { kind: "diagram", html: raw.trim() } });
     return;
@@ -76,6 +89,7 @@ function handleFence(kind: FenceKind, raw: string, emit: (event: StreamEvent) =>
 export function createChatParser(emitRaw: (event: StreamEvent) => void) {
   let buffer = "";
   let fence: FenceKind | null = null;
+  let fenceOpening = "";
   let verdictChecked = false;
   let spoke = false;
   let ended = false;
@@ -96,25 +110,30 @@ export function createChatParser(emitRaw: (event: StreamEvent) => void) {
       if (fence) {
         const end = buffer.indexOf("```");
         if (end < 0) {
-          if (final) { handleFence(fence, buffer, emit); buffer = ""; fence = null; }
+          if (final) { handleFence(fence, buffer, emit, fenceOpening, false); buffer = ""; fence = null; }
           return;
         }
-        handleFence(fence, buffer.slice(0, end), emit);
+        handleFence(fence, buffer.slice(0, end), emit, fenceOpening);
         buffer = buffer.slice(end + 3);
         fence = null;
         continue;
       }
       // 等标签后的空白，避免把被切开的 slides 提前识别成 slide。
-      const match = /```(verdict|card|diagram|slides|slide)(?=\s)/.exec(buffer);
+      const match = /```(?:(verdict|card|diagram|slides|slide)(?=\s)|([A-Za-z0-9_-]*)[ \t]*\r?\n)/.exec(buffer);
       if (match) {
         if (match.index) emit({ type: "text", delta: buffer.slice(0, match.index) });
         buffer = buffer.slice(match.index + match[0].length);
-        fence = match[1] as FenceKind;
+        fenceOpening = match[0];
+        fence = match[1] ? match[1] as FenceKind : !match[2] || match[2].toLowerCase() === "json" ? "auto" : "raw";
         continue;
       }
       let keep = 0;
       if (!final) for (const opener of OPENERS) for (let size = 1; size <= opener.length; size++) {
         if (buffer.endsWith(opener.slice(0, size))) keep = Math.max(keep, size);
+      }
+      if (!final) {
+        const partial = /```[A-Za-z0-9_-]{0,100}[ \t]*\r?$/.exec(buffer);
+        if (partial) keep = Math.max(keep, buffer.length - partial.index);
       }
       const text = buffer.slice(0, buffer.length - keep);
       if (text) emit({ type: "text", delta: text });

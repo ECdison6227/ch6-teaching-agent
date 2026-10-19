@@ -1,6 +1,7 @@
 import "server-only";
 import type { ChatModelOption } from "@/lib/models/options";
 import { readSseData } from "@/lib/sse";
+type ProviderId = ChatModelOption["provider"];
 
 /** 多模态内容：文字，或学生直接上传的图片（data URL） */
 export type ContentPart =
@@ -24,7 +25,7 @@ export interface ProviderConfig {
 }
 
 export interface ModelProvider {
-  readonly id: "school" | "stepfun";
+  readonly id: ProviderId;
   readonly chatModel: string;
   chat(messages: ChatMessage[], signal?: AbortSignal, model?: string): AsyncIterable<string>;
 }
@@ -37,10 +38,22 @@ const SCHOOL_MISSING =
   "未配置 SCHOOL_CHAT_BASE_URL（学校内网模型接口地址）。" +
   "若仅做本地测试，可在 .env.local 中设置 MODEL_PROVIDER=stepfun 并填入 StepFun API Key。";
 
-type ProviderBundle = { id: "school" | "stepfun"; cfg: ProviderConfig };
+type ProviderBundle = { id: ProviderId; cfg: ProviderConfig };
 
-function preferredProviderId(): "school" | "stepfun" {
-  return (process.env.MODEL_PROVIDER || "school").toLowerCase() === "stepfun" ? "stepfun" : "school";
+function preferredProviderId(): ProviderId {
+  const id = (process.env.MODEL_PROVIDER || "school").toLowerCase();
+  return id === "agnes" ? "agnes" : id === "stepfun" ? "stepfun" : "school";
+}
+
+function readAgnes(): ProviderBundle | null {
+  const key = process.env.AGNES_API_KEY;
+  if (!key) return null;
+  const base = trim(process.env.AGNES_BASE_URL || "https://apihub.agnes-ai.com/v1");
+  const model = process.env.AGNES_CHAT_MODEL || "agnes-3.0-flash";
+  return { id: "agnes", cfg: {
+    baseUrl: base, chatModel: model, chatApiKey: key,
+    visionBaseUrl: base, visionModel: process.env.AGNES_VISION_MODEL || model, visionApiKey: key,
+  } };
 }
 
 /** 凭证齐了才返回。缺配置时返回 null，不把没接上的模型放进可选列表。 */
@@ -78,15 +91,15 @@ function readSchool(): ProviderBundle | null {
   };
 }
 
-function readProvider(id: "school" | "stepfun"): ProviderBundle | null {
-  return id === "stepfun" ? readStepfun() : readSchool();
+function readProvider(id: ProviderId): ProviderBundle | null {
+  return id === "agnes" ? readAgnes() : id === "stepfun" ? readStepfun() : readSchool();
 }
 
 /** 按环境变量解析出当前使用的模型通道 */
 export function resolveProviderConfig(): ProviderBundle {
   const id = preferredProviderId();
   const found = readProvider(id);
-  if (!found) throw new ModelConfigError(id === "stepfun" ? STEPFUN_MISSING : SCHOOL_MISSING);
+  if (!found) throw new ModelConfigError(id === "agnes" ? "未配置 AGNES_API_KEY。" : id === "stepfun" ? STEPFUN_MISSING : SCHOOL_MISSING);
   return found;
 }
 
@@ -96,8 +109,7 @@ export function resolveProviderConfig(): ProviderBundle {
  */
 export function listChatModels(): { models: ChatModelOption[]; defaultId: string } {
   const preferred = preferredProviderId();
-  const order: Array<"school" | "stepfun"> =
-    preferred === "stepfun" ? ["stepfun", "school"] : ["school", "stepfun"];
+  const order: ProviderId[] = [preferred, ...(["school", "stepfun", "agnes"] as const).filter(id => id !== preferred)];
   const models: ChatModelOption[] = [];
   for (const id of order) {
     const found = readProvider(id);
@@ -123,7 +135,7 @@ export function resolveChatModel(requested?: string | null): ChatModelOption | n
 /** OpenAI 兼容接口的实现：school（学校内网）与 stepfun（测试）共用 */
 class OpenAICompatProvider implements ModelProvider {
   constructor(
-    readonly id: "school" | "stepfun",
+    readonly id: ProviderId,
     private cfg: ProviderConfig,
   ) {}
 
@@ -141,7 +153,7 @@ class OpenAICompatProvider implements ModelProvider {
     if (withImage) {
       if (!this.cfg.visionModel) {
         throw new ModelConfigError(
-          "这条消息带了图片，但没有配置视觉模型。请设置 STEPFUN_VISION_MODEL 或 SCHOOL_VISION_MODEL。文字模型不能看图。",
+          "这条消息带了图片，但没有配置视觉模型。请设置当前通道的 VISION_MODEL。文字模型不能看图。",
         );
       }
       model = this.cfg.visionModel;
@@ -183,14 +195,14 @@ class OpenAICompatProvider implements ModelProvider {
 
 }
 
-export function getProvider(providerId?: "school" | "stepfun"): ModelProvider {
+export function getProvider(providerId?: ProviderId): ModelProvider {
   if (!providerId) {
     const { id, cfg } = resolveProviderConfig();
     return new OpenAICompatProvider(id, cfg);
   }
   const found = readProvider(providerId);
   if (!found) {
-    throw new ModelConfigError(providerId === "stepfun" ? STEPFUN_MISSING : SCHOOL_MISSING);
+    throw new ModelConfigError(providerId === "agnes" ? "未配置 AGNES_API_KEY。" : providerId === "stepfun" ? STEPFUN_MISSING : SCHOOL_MISSING);
   }
   return new OpenAICompatProvider(found.id, found.cfg);
 }

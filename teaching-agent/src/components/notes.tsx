@@ -4,8 +4,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import elementsJson from "@/content/slide-elements.json";
 import slidesJson from "@/content/slides.json";
 import { Markdown } from "./Markdown";
-import { noteImagesHtml, rawNotesMarkdown } from "@/lib/note-export";
+import { noteImagesHtml, noteImageSource, rawNotesMarkdown } from "@/lib/note-export";
 import { requestScope } from "@/lib/request-lifecycle";
+import { appPath } from "@/lib/app-path";
 
 import { browserNoteStorage, createNotesStore, type NoteDraft, type Note } from "@/lib/notes-store";
 export type { Note, NoteKind } from "@/lib/notes-store";
@@ -143,7 +144,7 @@ export function NoteEditor({
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
           {note.image ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={note.image} alt="" className="w-full rounded-lg ring-1 ring-paper-line" />
+            <img src={noteImageSource(note.image) ?? undefined} alt="" className="w-full rounded-lg ring-1 ring-paper-line" />
           ) : null}
           <input
             value={title}
@@ -186,7 +187,7 @@ export async function exportNotePdf(notes: Note[]) {
     let markdown = rawNotesMarkdown(notes);
     let summarized = false;
     if (markdown) {
-      const response = await fetch("/api/digest", {
+      const response = await fetch(appPath("/api/digest"), {
         method: "POST", headers: { "Content-Type": "application/json" }, signal: scope.signal,
         body: JSON.stringify({ notes: notes.map(note => ({ title: note.title, kind: note.kind, text: note.text, hasImage: !!note.image })) }),
       });

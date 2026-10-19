@@ -11,7 +11,8 @@ import { noteImagesHtml } from "../src/lib/note-export.ts";
 import { requestScope } from "../src/lib/request-lifecycle.ts";
 import { POST as chatRoute } from "../src/app/api/chat/route.ts";
 import { POST as digestRoute } from "../src/app/api/digest/route.ts";
-import { getProvider } from "../src/lib/models/provider.ts";
+import { getProvider, listChatModels } from "../src/lib/models/provider.ts";
+import { withBasePath } from "../src/lib/app-path.ts";
 const { loadHook, hooks } = createRequire(import.meta.url)("./hook-harness.cjs");
 
 const card = { kind: "truefalse", prompt: "请选择", topic: "K5" };
@@ -28,6 +29,15 @@ function bytes(text, chunkSize=1) {
 const note=(id,text=id)=>({id,kind:'text',title:id,text,at:1});
 const request=(endpoint,body,signal)=>new Request('http://local/api/'+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
 
+test('子路径用于接口、课件、首页，避免重复前缀及站外资源',()=>{
+  assert.equal(withBasePath('/api/chat','/teachdemo'),'/teachdemo/api/chat');
+  assert.equal(withBasePath('/slides/slide-001.png','/teachdemo/'),'/teachdemo/slides/slide-001.png');
+  assert.equal(withBasePath('/teachdemo/api/chat','/teachdemo'),'/teachdemo/api/chat');
+  assert.equal(withBasePath('/','/teachdemo'),'/teachdemo/');
+  assert.equal(withBasePath('/api/chat',''),'/api/chat');
+  assert.throws(()=>withBasePath('//external.example/file','/teachdemo'));
+});
+
 test('协议在全部二段切分、逐字和单块输出下保持一致',()=>{
   const reply='[判定] 对·K5·思路正确\n先看课件。\n'+fence('slides','64-75')+'再做这一步。\n'+fence('card',JSON.stringify(card))+'完成。';
   const expected=parse([reply]);assert.equal(expected.events.filter(e=>e.type==='card').length,1);
@@ -42,6 +52,17 @@ test('协议处理截断 JSON、无换行判定、空回复和范围空格',()=>
   assert.equal(parse([]).events[0].type,'error');
   assert.deepEqual(parseSlidePages('64 - 66，148, 149, 0'),[64,65,66,148]);
   assert.deepEqual(parseSlidePages('42abc'),[]);
+});
+test('模型漏标记时兼容普通和 json 卡片围栏，普通代码原样保留',()=>{
+  for(const label of ['', 'json']){
+    const reply='讲解。\n'+fence(label,JSON.stringify(card));const expected=parse([reply]);
+    assert.equal(expected.events.filter(e=>e.type==='card').length,1);
+    for(let i=1;i<reply.length;i++)assert.deepEqual(parse([reply.slice(0,i),reply.slice(i)]),expected,'boundary '+label+i);
+    assert.deepEqual(parse([...reply]),expected);
+  }
+  const reply=fence('typescript','const x = 1;')+fence('json','{"example":true}')+fence('card',JSON.stringify(card));
+  const expected=parse([reply]);assert.ok(expected.text.includes('```typescript\nconst x = 1;\n```'));assert.ok(expected.text.includes('"example":true'));assert.equal(expected.events.filter(e=>e.type==='card').length,1);
+  assert.deepEqual(parse([...reply]),expected);
 });
 test('SSE 解码支持所有换行、UTF8 字节拆分、多 data 行和末尾 flush',async()=>{
   for(const newline of ['\n','\r\n','\r']){
@@ -112,6 +133,17 @@ test('错误结构返回 400，图片笔记不需要模型即可导出',async()=
 test('请求范围传递取消与超时',async()=>{
   const parent=new AbortController(),scope=requestScope(parent.signal,1000);parent.abort();assert.equal(scope.signal.aborted,true);scope.dispose();
   const timeout=requestScope(undefined,5);await new Promise(resolve=>setTimeout(resolve,15));assert.equal(timeout.signal.reason.name,'TimeoutError');timeout.dispose();
+});
+test('Agnes 通道使用独立配置，图文共用模型，模型列表不暴露凭证',async()=>{
+  const keys=['MODEL_PROVIDER','AGNES_API_KEY','AGNES_BASE_URL','AGNES_CHAT_MODEL','AGNES_VISION_MODEL'];
+  const old=Object.fromEntries(keys.map(key=>[key,process.env[key]]));const original=globalThis.fetch;let captured;
+  process.env.MODEL_PROVIDER='agnes';process.env.AGNES_API_KEY='test-only-key';process.env.AGNES_BASE_URL='https://apihub.agnes-ai.com/v1/';delete process.env.AGNES_CHAT_MODEL;delete process.env.AGNES_VISION_MODEL;
+  globalThis.fetch=async(url,options)=>{captured={url,body:JSON.parse(options.body)};return new Response('data: '+JSON.stringify({choices:[{delta:{content:'ok'}}]})+'\n\ndata: [DONE]\n\n');};
+  try{
+    const listed=listChatModels();assert.equal(listed.defaultId,'agnes:agnes-3.0-flash');assert.ok(!JSON.stringify(listed).includes('test-only-key'));
+    let output='';for await(const delta of getProvider('agnes').chat([{role:'user',content:[{type:'text',text:'image'},{type:'image_url',image_url:{url:'data:image/png;base64,YQ=='}}]}]))output+=delta;
+    assert.equal(output,'ok');assert.equal(captured.url,'https://apihub.agnes-ai.com/v1/chat/completions');assert.equal(captured.body.model,'agnes-3.0-flash');
+  }finally{globalThis.fetch=original;keys.forEach(key=>old[key]===undefined?delete process.env[key]:process.env[key]=old[key]);}
 });
 test('实际 HTTP 模型适配：CRLF、协议解析、断开连接和超时释放',async()=>{
   const keys=['MODEL_PROVIDER','SCHOOL_CHAT_BASE_URL','SCHOOL_CHAT_MODEL'];const old=Object.fromEntries(keys.map(key=>[key,process.env[key]]));

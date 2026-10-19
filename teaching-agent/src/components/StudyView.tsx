@@ -22,6 +22,7 @@ import { slideArrow, slideArrowOutside } from "@/components/FigureModal";
 import { ReinforcementLab } from "@/components/ReinforcementLab";
 import slidesData from "@/content/slides.json";
 import { questions } from "@/lib/questions";
+import { appPath } from "@/lib/app-path";
 
 type Slide = { page: number; section: string; title: string; bullets: string[]; image: string };
 
@@ -270,7 +271,7 @@ export function StudyView() {
     }
     bindSlide({
       page: slide.page,
-      src: `/slides/slide-${String(slide.page).padStart(3, "0")}.png`,
+      src: appPath(`/slides/slide-${String(slide.page).padStart(3, "0")}.png`),
     });
   }, [slide, bookSel, bindSlide]);
 

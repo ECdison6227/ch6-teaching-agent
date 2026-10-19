@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { appPath } from "@/lib/app-path";
 
 export type Figure =
   | { kind: "diagram"; html: string; caption?: string }
@@ -10,7 +11,7 @@ export type Figure =
   | { kind: "slides"; pages: number[]; caption?: string }
   | { kind: "image"; src: string; caption?: string };
 
-export const slidePath = (page: number) => `/slides/slide-${String(page).padStart(3, "0")}.png`;
+export const slidePath = (page: number) => appPath(`/slides/slide-${String(page).padStart(3, "0")}.png`);
 
 export function slideFileName(page: number) {
   return `slide-${String(page).padStart(3, "0")}.png`;

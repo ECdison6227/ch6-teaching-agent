@@ -14,6 +14,7 @@ import { NotesProvider } from "./notes";
 import { MaterialsView } from "./MaterialsView";
 import { Sidebar, type AppView } from "./Sidebar";
 import { StudyView } from "./StudyView";
+import { appPath } from "@/lib/app-path";
 
 const SUGGESTIONS = [
   "帮我判断这个梁截面会不会超筋",
@@ -92,7 +93,7 @@ function Landing({ onEnter }: { onEnter: () => void }) {
           transition={{ duration: 0.28 }}
         >
           <img
-            src="/seu-logo.png"
+            src={appPath("/seu-logo.png")}
             alt="东南大学"
             width={72}
             height={72}

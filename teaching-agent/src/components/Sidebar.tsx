@@ -34,6 +34,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import type { Card as AnswerCardData } from "@/lib/cards";
 import { AnswerCard } from "./AnswerCard";
 import { NoteEditor, exportNotePdf, useNotes, type Note } from "./notes";
+import { appPath } from "@/lib/app-path";
 
 /** 第 2 页课件上真实的文字框（slide-elements p2-2），用来示意点选后的亮框 */
 const PICK_BOX = { x: 0.05, y: 0.1, w: 0.925, h: 0.6896 };
@@ -88,7 +89,7 @@ function PickShot({ compact }: { compact?: boolean }) {
   return (
     <div className={compact ? "relative w-24 shrink-0 overflow-hidden rounded-md border border-paper-line" : "relative overflow-hidden rounded-xl border border-paper-line"}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/slides/slide-002.png" alt="课件上亮着的选框" className="block w-full" />
+      <img src={appPath("/slides/slide-002.png")} alt="课件上亮着的选框" className="block w-full" />
       <div
         className="pointer-events-none absolute rounded-sm border border-amber-400 bg-amber-100/30 shadow-[0_0_0_2px_rgba(251,191,36,0.95),0_0_16px_rgba(245,158,11,0.7)]"
         style={{
@@ -272,7 +273,7 @@ export function Sidebar({
         <SidebarHeader className="group-data-[collapsible=icon]:px-0">
           <div className="flex min-w-0 items-center gap-2 px-1 py-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-1 group-data-[collapsible=icon]:px-0">
             <img
-              src="/seu-logo.png"
+              src={appPath("/seu-logo.png")}
               alt="东南大学"
               width={32}
               height={32}

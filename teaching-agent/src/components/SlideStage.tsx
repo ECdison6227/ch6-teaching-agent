@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAiDrawer } from "./AiDrawer";
 import { pageNoteTitle, useNotes } from "./notes";
+import { appPath } from "@/lib/app-path";
 
 type Box = { id: string; kind: string; x: number; y: number; w: number; h: number; text: string };
 
 const elements = elementsJson as Record<string, Box[]>;
 
-const slideSrc = (page: number) => `/slides/slide-${String(page).padStart(3, "0")}.png`;
+const slideSrc = (page: number) => appPath(`/slides/slide-${String(page).padStart(3, "0")}.png`);
 
 /** 整页导出的背景图会盖住所有内容，不能当作可选区域 */
 function isWholePage(box: Box) {

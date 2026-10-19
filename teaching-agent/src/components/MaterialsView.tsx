@@ -7,12 +7,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { coverPage, materialSections } from "@/lib/material-catalog";
 import { MATERIAL_PDF_VERSION } from "@/lib/material-version";
+import { appPath } from "@/lib/app-path";
 
 /** 带上版本号，免得浏览器把上一版生成的旧 PDF 直接拿出来用 */
-const versioned = (path: string) => `${path}${path.includes("?") ? "&" : "?"}v=${MATERIAL_PDF_VERSION}`;
+const versioned = (path: string) => appPath(`${path}${path.includes("?") ? "&" : "?"}v=${MATERIAL_PDF_VERSION}`);
 
 /** 课件页图的地址，下载页拿去当缩略图 */
-const slideThumb = (page: number) => `/slides/slide-${String(page).padStart(3, "0")}.png`;
+const slideThumb = (page: number) => appPath(`/slides/slide-${String(page).padStart(3, "0")}.png`);
 
 const thumbClass = "shrink-0 rounded-md bg-white object-cover object-top ring-1 ring-paper-line";
 
@@ -90,7 +91,7 @@ export function MaterialsView() {
           <Card>
             <CardHeader className="flex-row items-start gap-3 space-y-0">
               <img
-                src="/api/materials/preview"
+                src={appPath("/api/materials/preview")}
                 alt="题目 PDF 第一页"
                 className={`${thumbClass} h-24 w-auto`}
                 loading="lazy"

@@ -6,6 +6,7 @@ import type { ChatModelOption } from "@/lib/models/options";
 import { readSseData } from "@/lib/sse";
 import { requestScope, requestError, MODEL_TIMEOUT_MS } from "@/lib/request-lifecycle";
 import { MAX_IMAGE_BYTES, MAX_REQUEST_BYTES, MAX_MESSAGE_CHARS, MAX_HISTORY_CHARS } from "@/lib/request-limits";
+import { appPath } from "@/lib/app-path";
 
 export type Msg = {
   id: string;
@@ -54,7 +55,7 @@ export function useChat(context?: PageCtx | null) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/models")
+    fetch(appPath("/api/models"))
       .then((r) => {
         if (!r.ok) throw new Error("models");
         return r.json() as Promise<{ models?: ChatModelOption[]; defaultId?: string }>;
@@ -169,7 +170,7 @@ export function useChat(context?: PageCtx | null) {
         }
         const body = JSON.stringify(packed);
         if (new TextEncoder().encode(body).length > MAX_REQUEST_BYTES) throw new Error("图片总量过大，请减少图片后重试");
-        const res = await fetch("/api/chat", {
+        const res = await fetch(appPath("/api/chat"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body,
