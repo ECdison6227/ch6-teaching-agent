@@ -1,6 +1,6 @@
 **edsionc.top/teachdemo 部署**
 
-Node.js 20.20 或更高版本。域名已有 Nginx/TLS，应用独立监听 `127.0.0.1:3327`，由 `teachdemo.service` 守护。服务器安装运行依赖；生产构建在本机完成，避免占用服务器有限内存。
+本服务器使用已安装的 `/opt/node-v24.19.0/bin/node`，与其他站点使用的系统默认 Node.js 隔离。依赖中包含要求 Node.js 22.12 以上版本的工具，因此此处固定为 Node.js 24。域名已有 Nginx/TLS，应用独立监听 `127.0.0.1:3327`，由 `teachdemo.service` 守护。服务器安装运行依赖；生产构建在本机完成，避免占用服务器有限内存。
 
 构建前设置 `NEXT_PUBLIC_BASE_PATH=/teachdemo`。该值会写入浏览器产物，运行时也需保持一致。根路径开发可以留空。
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+test -x /opt/node-v24.19.0/bin/node
+export PATH="/opt/node-v24.19.0/bin:$PATH"
 release_id="$1"
 archive="$2"
 runtime_env="$3"
