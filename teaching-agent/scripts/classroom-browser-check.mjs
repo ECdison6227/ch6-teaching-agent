@@ -87,8 +87,10 @@ export async function classroomBrowserCheck({ context, page, origin, basePath, o
     await student.bringToFront();
     await student.getByText("标准答案：", { exact: false }).last().waitFor();
   }
+  await page.bringToFront();
   await page.locator("main").evaluate(main => { main.scrollTop = 0; });
   await page.screenshot({ path: path.join(output, "classroom-teacher.png"), fullPage: true });
+  await student.bringToFront();
   await student.screenshot({ path: path.join(output, "classroom-student.png"), fullPage: true });
   await page.bringToFront();
   await page.getByRole("button", { name: "结束课堂", exact: true }).click();
