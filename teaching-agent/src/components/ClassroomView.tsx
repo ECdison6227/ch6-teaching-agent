@@ -12,6 +12,8 @@ import { appPath } from "@/lib/app-path";
 import { ClassroomApiError, classroomFetch, classroomRequestId, useClassroom } from "@/hooks/use-classroom";
 import type { ClassroomSummary, PublicQuestion, TeacherSnapshot } from "@/lib/classroom/types";
 
+const difficultyLabel: Record<string, string> = { easy: "简单", medium: "中等", hard: "困难" };
+
 export function ClassroomView({ active = true }: { active?: boolean }) {
   const [auth, setAuth] = useState<"checking" | "anonymous" | "ready">("checking");
   const [configured, setConfigured] = useState(true);
@@ -117,7 +119,7 @@ export function ClassroomView({ active = true }: { active?: boolean }) {
               </CardContent></Card>
               {c.status === "active" ? <Card><CardHeader><CardTitle className="text-base">从题库发题</CardTitle></CardHeader><CardContent className="space-y-4">
                 <div className="flex flex-wrap gap-2"><Select value={type} onValueChange={v => { setType(v); setQuestionId(""); }}><SelectTrigger className="w-32" aria-label="题型筛选"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">全部题型</SelectItem><SelectItem value="choice">选择</SelectItem><SelectItem value="judge">判断</SelectItem><SelectItem value="fill">填空</SelectItem></SelectContent></Select>
-                  <Select value={difficulty} onValueChange={v => { setDifficulty(v); setQuestionId(""); }}><SelectTrigger className="w-32" aria-label="难度筛选"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">全部难度</SelectItem>{[...new Set(catalog.map(q => q.difficulty).filter((d): d is string => Boolean(d)))].map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent></Select></div>
+                  <Select value={difficulty} onValueChange={v => { setDifficulty(v); setQuestionId(""); }}><SelectTrigger className="w-32" aria-label="难度筛选"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">全部难度</SelectItem>{[...new Set(catalog.map(q => q.difficulty).filter((d): d is string => Boolean(d)))].map(d => <SelectItem key={d} value={d}>{difficultyLabel[d] ?? d}</SelectItem>)}</SelectContent></Select></div>
                 <Select value={questionId} onValueChange={setQuestionId}><SelectTrigger aria-label="选择课堂题目"><SelectValue placeholder={`选择已复核题目（${filtered.length}）`} /></SelectTrigger><SelectContent>{filtered.map(q => <SelectItem key={q.id} value={q.id}>{q.id} · {q.prompt.slice(0, 70)}</SelectItem>)}</SelectContent></Select>
                 {question ? <Markdown text={question.prompt} /> : null}
                 <Button disabled={busy || !questionId || current?.status === "open"} onClick={() => command("rounds", { questionId })}>发布题目</Button>{current?.status === "open" ? <p className="text-sm text-muted-foreground">当前题目收题后可发布下一题。</p> : null}

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import path from "node:path";
 
 /** Uses real HTTPS so production HttpOnly/Secure cookies are exercised in each target browser. */
-export async function classroomBrowserCheck({ context, page, origin, basePath, output }) {
+export async function classroomBrowserCheck({ context, page, origin, basePath, output, assertTeacherStreams }) {
   const endpoint = origin + basePath;
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
@@ -88,6 +88,32 @@ export async function classroomBrowserCheck({ context, page, origin, basePath, o
     await student.getByText("标准答案：", { exact: false }).last().waitFor();
   }
   await page.bringToFront();
+  await page.goto(endpoint + "/", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "进入学习", exact: true }).click();
+  const chatDraft = page.locator("textarea:visible").first();
+  await chatDraft.fill("切换页面后保留的对话草稿");
+  const shellUrl = page.url();
+  async function navigate(label) {
+    let button = page.getByRole("button", { name: label, exact: true });
+    if (!(await button.isVisible())) {
+      await page.getByRole("button", { name: "Toggle Sidebar", exact: true }).filter({ visible: true }).first().click();
+      button = page.getByRole("button", { name: label, exact: true });
+    }
+    await button.click();
+  }
+  await navigate("题库自测");
+  await page.getByRole("heading", { name: "题库自测", exact: true }).waitFor();
+  await navigate("实时课堂");
+  await page.getByRole("textbox", { name: "学生入课链接", exact: true }).waitFor();
+  await assertTeacherStreams(1);
+  await navigate("引导对话");
+  assert.equal(await chatDraft.inputValue(), "切换页面后保留的对话草稿");
+  await assertTeacherStreams(0);
+  assert.equal(page.url(), shellUrl, "Navigation must preserve the mounted chat pane");
+  await navigate("实时课堂");
+  await page.getByRole("textbox", { name: "学生入课链接", exact: true }).waitFor();
+  await assertTeacherStreams(1);
+  await page.bringToFront();
   await page.locator("main").evaluate(main => { main.scrollTop = 0; });
   await page.screenshot({ path: path.join(output, "classroom-teacher.png"), fullPage: true });
   await student.bringToFront();
@@ -99,5 +125,5 @@ export async function classroomBrowserCheck({ context, page, origin, basePath, o
   await student.getByText("课堂已结束，感谢参与。", { exact: true }).waitFor();
   assert.deepEqual(errors, []);
   await student.close();
-  console.log("PASS classroom: HTTPS/Secure cookies, real QR, code join, 3 question types, refresh, statistics, close/reveal/end");
+  console.log("PASS classroom: HTTPS/Secure cookies, QR, join, 3 types, retry, refresh, close/reveal/end, integrated navigation, preserved chat, subscription cleanup");
 }

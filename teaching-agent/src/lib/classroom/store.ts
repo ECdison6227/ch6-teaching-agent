@@ -25,8 +25,9 @@ const ownSubmission = (s: Row, reveal: boolean): OwnSubmission => ({
   answer: String(s.answer), revision: Number(s.revision), submittedAt: Number(s.submitted_at),
   ...(reveal ? { grade: s.grade === null ? null : Boolean(s.grade) } : {}),
 });
-export function publicQuestion(q: Question): PublicQuestion {
-  return { id: q.id, type: q.type, prompt: q.prompt, options: (q.options ?? []).map(o => ({ id: o.id, text: o.text })) };
+export function publicQuestion(q: Question & { difficulty?: string }): PublicQuestion {
+  return { id: q.id, type: q.type, prompt: q.prompt, options: (q.options ?? []).map(o => ({ id: o.id, text: o.text })),
+    ...(q.difficulty ? { difficulty: q.difficulty } : {}) };
 }
 
 /** All durable state and stream leases live in SQLite; route bundles need no shared bus. */

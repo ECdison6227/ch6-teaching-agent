@@ -16,6 +16,8 @@ import { MaterialsView } from "./MaterialsView";
 import { Sidebar, type AppView } from "./Sidebar";
 import { StudyView } from "./StudyView";
 import { appPath } from "@/lib/app-path";
+import { SelfTestView } from "./SelfTestView";
+import { ClassroomView } from "./ClassroomView";
 
 const SUGGESTIONS = [
   "帮我判断这个梁截面会不会超筋",
@@ -240,6 +242,20 @@ export function AppShell() {
               >
                 <MaterialsView />
               </motion.div>
+              {(["self-test", "classroom"] as const).map(pane => (
+                <motion.div
+                  key={pane}
+                  className="absolute inset-0 flex min-h-0 flex-col"
+                  animate={{ opacity: view === pane ? 1 : 0 }}
+                  transition={{ duration: 0.18 }}
+                  style={{ pointerEvents: view === pane ? "auto" : "none", visibility: view === pane ? "visible" : "hidden" }}
+                >
+                  <div className="shrink-0 px-3 pt-2"><SidebarTrigger /></div>
+                  <div className="min-h-0 flex-1 overflow-y-auto">
+                    {pane === "self-test" ? <SelfTestView /> : <ClassroomView active={view === "classroom"} />}
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </SidebarInset>
         </SidebarProvider>
