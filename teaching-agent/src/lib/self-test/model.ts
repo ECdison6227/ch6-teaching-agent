@@ -68,7 +68,7 @@ export function answerLabel(question: Question, raw = question.answer ?? ""): st
   }
   return raw;
 }
-/** 只隐藏原题导入备注；原题快照仍完整保存，避免备注给出作答提示。 */
+/** 保留题干中的必要纠正与适用条件，只移除推断标记的排版噪声。 */
 export function displayPrompt(question: Question): string {
-  return question.prompt.replace(/\s*-?\s*\*注：[\s\S]*?\*/g, "").replace(/\s*`\[推断\d*\]`/g, "").replace(/_{2,}/g, "＿＿＿＿").trim();
+  return question.prompt.replace(/\s*`\[推断\d*\]`/g, "").replace(/_{2,}/g, "＿＿＿＿").trim();
 }

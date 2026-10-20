@@ -53,7 +53,9 @@ export function SelfTestView() {
   const filteredRecords = book.value.records.filter(r => (bookType === "all" || r.question.type === bookType) && (bookLevel === "all" || r.question.difficulty === bookLevel));
   const thisWrong = useMemo(() => sessionWrongRecords(session), [session]);
   const exportRecords = selectExportRecords(scope === "session" ? thisWrong : book.value.records, scope, selected, thisWrong.map(r => r.questionId), limit === "all" ? null : Number(limit) as 10 | 20);
+  const canReplace = session?.status !== "submitted" || book.writable && !book.dirty && book.value.appliedSessionIds.includes(session.id);
   const replace = (next: TestSession) => {
+    if (!canReplace) { setMessage("最近结果尚未完整保存到错题本，请先重试读取或保存错题本，再开始新自测。"); return; }
     if (session?.status === "answering") setConfirmation({ kind: "replace", next });
     else { void sessionStore.update(() => next); setShowSettings(false); setTab("test"); }
   };
@@ -87,6 +89,7 @@ export function SelfTestView() {
     {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
     {!saved.ready || !book.ready ? <p role="status">正在读取本设备数据…</p> : <>
       <p className="text-xs text-muted-foreground" role="status">{saved.dirty || book.dirty ? "存在尚未保存的数据，请勿关闭当前页面。" : "本设备数据已保存"}</p>
+      {!canReplace ? <p role="status" className="text-sm">最近结果尚未完整保存到错题本，请先重试读取或保存；完成后即可开始新自测。</p> : null}
       {tab === "test" ? <>
         {!session || showSettings ? <Card><CardHeader><CardTitle>组卷设置</CardTitle></CardHeader><CardContent className="space-y-5">
           <div className="space-y-2"><p className="text-sm font-medium">题量</p><div className="flex flex-wrap gap-2">{[5, 10, 20, 30].map(value => <Button key={value} variant={countText === String(value) ? "default" : "outline"} size="sm" aria-pressed={countText === String(value)} onClick={() => setCountText(String(value))}>{value} 题</Button>)}</div><label className="block max-w-xs space-y-1 text-sm">自定义题量<Input aria-label="自定义题量" inputMode="numeric" value={countText} onChange={event => setCountText(event.target.value)} /></label></div>
