@@ -125,9 +125,62 @@ try {
   await page.getByRole("button", { name: "下载原版课件", exact: true }).waitFor();
   await navigate("引导对话");
   await page.getByText("先看资料，再做题。", { exact: true }).waitFor();
+
+  // Independent self-test entry exercises the same page on real Android Chrome,
+  // macOS WebKit and Windows Chromium; it never needs an AI model.
+  const aiRequests = [];
+  page.on("request", request => { if (/\/api\/(chat|digest)(?:\?|$)/.test(request.url())) aiRequests.push(request.url()); });
+  await page.goto(`${origin}${basePath}/self-test`, { waitUntil: "networkidle" });
+  await page.getByRole("heading", { name: "题库自测", exact: true }).waitFor();
+  assert.equal(await page.getByRole("textbox", { name: "自定义题量", exact: true }).inputValue(), "10");
+  await page.getByRole("button", { name: "开始自测", exact: true }).click();
+  await page.getByRole("button", { name: "交卷", exact: true }).waitFor();
+  assert.equal(await page.getByText("标准答案", { exact: true }).count(), 0, "Standard answer must be hidden before submission");
+  assert.equal(await page.getByText("解析", { exact: true }).count(), 0, "Analysis must be hidden before submission");
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("ch6-self-test-v1") || "null")?.questions.length === 10);
+  const originalSession = await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-self-test-v1")));
+  const firstQuestion = originalSession.questions[0];
+  let wrongAnswer;
+  if (firstQuestion.type === "fill") {
+    wrongAnswer = "故意错误的作答";
+    await page.getByRole("textbox", { name: "我的答案", exact: true }).fill(wrongAnswer);
+  } else {
+    const options = firstQuestion.type === "judge" ? [{ id: "T" }, { id: "F" }] : firstQuestion.options;
+    const wrongIndex = options.findIndex(option => option.id !== firstQuestion.answer);
+    wrongAnswer = options[wrongIndex].id;
+    await page.getByRole("group", { name: "答案选项", exact: true }).getByRole("button").nth(wrongIndex).click();
+  }
+  await page.waitForFunction(({ id, answer }) => JSON.parse(localStorage.getItem("ch6-self-test-v1"))?.answers[id] === answer, { id: firstQuestion.id, answer: wrongAnswer });
+  await page.getByRole("button", { name: "下一题", exact: true }).click();
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("ch6-self-test-v1"))?.cursor === 1);
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "交卷", exact: true }).waitFor();
+  const restored = await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-self-test-v1")));
+  assert.deepEqual(restored.questions, originalSession.questions, "Reload must preserve exact question snapshots and order");
+  assert.equal(restored.answers[firstQuestion.id], wrongAnswer);
+  assert.equal(restored.cursor, 1);
+  assert.equal(await page.getByText("标准答案", { exact: true }).count(), 0);
+  await page.getByRole("button", { name: "交卷", exact: true }).click();
+  const submitDialog = page.getByRole("dialog");
+  await submitDialog.getByRole("heading", { name: "还有未答题，确认交卷？", exact: true }).waitFor();
+  await submitDialog.getByRole("button", { name: "确认交卷", exact: true }).click();
+  await page.getByText("自测结果", { exact: true }).waitFor();
+  await page.getByText("标准答案", { exact: true }).first().waitFor();
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("ch6-wrongbook-v1") || "null")?.records.length === 1);
+  const wrongbook = await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-wrongbook-v1")));
+  assert.equal(wrongbook.records[0].questionId, firstQuestion.id);
+  assert.equal(wrongbook.records[0].wrongCount, 1);
+  await page.reload({ waitUntil: "networkidle" });
+  await page.getByText("自测结果", { exact: true }).waitFor();
+  assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-wrongbook-v1")).records[0].wrongCount), 1, "Reloading results must not apply the same error twice");
+  await page.getByRole("button", { name: "错题本（1）", exact: true }).click();
+  await page.getByText("独立错题本", { exact: true }).waitFor();
+  await page.getByRole("button", { name: "重练此题（保存版本）", exact: true }).waitFor();
+  assert.deepEqual(aiRequests, [], "Self-test must work without calling model or digest APIs");
+  await page.screenshot({ path: path.join(output, "self-test-passed.png"), fullPage: true });
   assert.deepEqual(errors, [], "Browser must not report uncaught runtime or hydration errors");
   await page.screenshot({ path: path.join(output, "passed.png"), fullPage: true });
-  console.log(`PASS ${platform}: production health, landing, navigation, slides, IndexedDB persistence (${basePath || "/"})`);
+  console.log(`PASS ${platform}: production health, navigation, slides, notes persistence, self-test snapshots, unanswered dialog, results and wrongbook (${basePath || "/"})`);
 } catch (error) {
   if (page) await page.screenshot({ path: path.join(output, "failed.png"), fullPage: true }).catch(() => {});
   throw error;
