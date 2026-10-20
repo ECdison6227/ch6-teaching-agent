@@ -210,6 +210,7 @@ test("课堂 HTTP：访问码配置、来源/大小/参数校验、凭证隔离�
   const body = { title: "HTTP课堂", requestId: randomUUID() };
   const created = await api(false, [], "POST", body, "t"); assert.equal(created.status, 201);
   const c = (await created.json()).classroom;
+  assert.equal((await api(true, ["join"], "POST", { code: c.code, name: "无设备会话" })).status, 401);
   assert.equal((await (await api(false, [], "POST", body, "t")).json()).classroom.id, c.id);
   const invite = await (await api(false, [c.id, "invite"], "GET", undefined, "t")).json();
   assert.equal(invite.url, joinUrl(c.code)); assert.match(invite.svg, /<svg/); assert.match(invite.svg, /shape-rendering="crispEdges"/);
