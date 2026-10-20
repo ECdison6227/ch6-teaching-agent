@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { spawn, execFileSync } from "node:child_process";
 import { once } from "node:events";
+import { createRequire } from "node:module";
 import { ClassroomStore, ClassroomError, digest } from "../src/lib/classroom/store.ts";
 import { classroomQuestion, classroomCatalog } from "../src/lib/classroom/catalog.ts";
 import { classroomEvents } from "../src/lib/classroom/stream.ts";
@@ -19,6 +20,7 @@ process.env.CLASSROOM_PUBLIC_ORIGIN = "https://classroom.example";
 process.env.CLASSROOM_DB_PATH = join(directory, "http.sqlite");
 const { classroomHttp, joinUrl, publicOrigin, TEACHER_COOKIE, STUDENT_COOKIE } = await import("../src/lib/classroom/http.ts");
 const { classroomStore } = await import("../src/lib/classroom/store.ts");
+const { loadHook, hooks } = createRequire(import.meta.url)("./hook-harness.cjs");
 const q = type => questions.find(q => q.type === type && classroomCatalog().some(c => c.id === q.id));
 const stores = [];
 const joinClass = (store, code, name, studentNo = "", previous) => store.join(code, name, studentNo, store.deviceSession(previous));
@@ -256,4 +258,20 @@ test("课堂 URL 根路径/子路径、配置拒绝 localhost；学生代码与 
     const source = readFileSync(file, "utf8");
     assert.doesNotMatch(source, /from\s+["'][^"']*(?:questions|question-catalog|classroom\/store|classroom\/catalog)["']/);
   }
+});
+
+test("课堂 Hook：旧版本和切换课堂后才完成的旧命令不能覆盖当前快照", () => {
+  const h = hooks();
+  const { useClassroom } = loadHook("src/hooks/use-classroom.ts", { react: h.react, "@/lib/app-path": { appPath: value => value } });
+  const state = (id, version) => ({ classroom: { id, version }, rounds: [] });
+  let live = h.render(() => useClassroom("first", false, false));
+  live.accept(state("first", 2));
+  live = h.render(() => useClassroom("first", false, false));
+  live.accept(state("first", 1));
+  live = h.render(() => useClassroom("first", false, false)); assert.equal(live.state.classroom.version, 2);
+  const oldCommandCallback = live.accept;
+  live = h.render(() => useClassroom("second", false, false)); live.accept(state("second", 3));
+  oldCommandCallback(state("first", 999));
+  live = h.render(() => useClassroom("second", false, false));
+  assert.equal(live.state.classroom.id, "second"); assert.equal(live.state.classroom.version, 3);
 });

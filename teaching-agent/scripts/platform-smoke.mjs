@@ -13,11 +13,12 @@ import { classroomBrowserCheck } from "./classroom-browser-check.mjs";
 const platform = process.env.CI_BROWSER || "chromium";
 if (!["chromium", "webkit", "android"].includes(platform)) throw new Error(`Unknown browser: ${platform}`);
 const basePath = (process.env.NEXT_PUBLIC_BASE_PATH || "").replace(/\/+$/, "");
-const port = 3100;
+const port = Number(process.env.CI_SMOKE_PORT || 3100);
+assert.ok(Number.isInteger(port) && port >= 1024 && port < 65535, "Invalid smoke port");
 const origin = `http://127.0.0.1:${port}`;
 const address = Object.values(networkInterfaces()).flat().find(entry => entry?.family === "IPv4" && !entry.internal)?.address;
 assert.ok(address, "Classroom HTTPS smoke needs a LAN interface");
-const classroomOrigin = `https://${platform === "android" ? "10.0.2.2" : address}:3101`;
+const classroomOrigin = `https://${platform === "android" ? "10.0.2.2" : address}:${port + 1}`;
 const classroomDirectory = fs.mkdtempSync(path.join(tmpdir(), "classroom-browser-"));
 const output = path.resolve("test-results", platform);
 fs.mkdirSync(output, { recursive: true });
@@ -49,7 +50,7 @@ const httpsProxy = createHttpsServer({ key: fs.readFileSync("tests/fixtures/tls/
   response.on("close", () => upstream.destroy());
 });
 try {
-  httpsProxy.listen(3101, "0.0.0.0"); await once(httpsProxy, "listening");
+  httpsProxy.listen(port + 1, "0.0.0.0"); await once(httpsProxy, "listening");
   let ready = false;
   for (let attempt = 0; attempt < 120; attempt++) {
     if (startupError) throw startupError;

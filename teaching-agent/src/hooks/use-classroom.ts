@@ -26,11 +26,16 @@ export function useClassroom<T extends Snapshot>(id: string | null, student: boo
   const [connection, setConnection] = useState("连接中");
   const [error, setError] = useState("");
   const [expired, setExpired] = useState(false);
+  const currentId = useRef(id);
+  currentId.current = id;
   const refreshRef = useRef<() => void>(() => {});
   const accept = useCallback((next: T) => {
-    if (next.classroom.id !== id) return;
-    setState(prior => !prior || prior.classroom.id !== id || next.classroom.version >= prior.classroom.version ? next : prior);
-  }, [id]);
+    if (next.classroom.id !== currentId.current) return;
+    setState(prior => {
+      if (next.classroom.id !== currentId.current) return prior;
+      return !prior || prior.classroom.id !== currentId.current || next.classroom.version >= prior.classroom.version ? next : prior;
+    });
+  }, []);
   useEffect(() => {
     setState(null); setError(""); setExpired(false);
   }, [id]);
@@ -56,12 +61,14 @@ export function useClassroom<T extends Snapshot>(id: string | null, student: boo
       lastConnect = Date.now();
       const next = new EventSource(appPath(path + "/events")); source = next;
       next.addEventListener("snapshot", event => {
+        if (disposed || source !== next) return;
         lastEvent = Date.now(); setConnection("实时同步");
         try { consume(JSON.parse((event as MessageEvent).data)); } catch { next.close(); source = undefined; }
       });
-      next.addEventListener("heartbeat", () => { lastEvent = Date.now(); setConnection("实时同步"); });
+      next.addEventListener("heartbeat", () => { if (!disposed && source === next) { lastEvent = Date.now(); setConnection("实时同步"); } });
       next.addEventListener("expired", () => { next.close(); source = undefined; void refresh(); });
       next.onerror = () => {
+        if (disposed || source !== next) return;
         next.close(); if (source === next) source = undefined;
         if (!disposed && !ended) setConnection("定时同步 · 正在重连");
       };

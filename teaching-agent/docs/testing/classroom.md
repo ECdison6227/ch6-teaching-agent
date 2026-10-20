@@ -18,6 +18,7 @@ node --import ./scripts/register-ts.mjs scripts/classroom-load.mjs
 
 根路径执行上述命令后，设置 `$env:NEXT_PUBLIC_BASE_PATH='/teachdemo'`，重新 build、test:browser 和 load。
 不能只在运行时切换前缀。数据库测试始终使用操作系统临时目录，不连接真实课堂库。
+多个 worktree 同时跑本地浏览器检查时，可设置 `CI_SMOKE_PORT=3150`；HTTPS 测试代理使用下一端口。
 
 `tests/classroom.test.mjs` 由既有 npm test 自动发现，在 Android、macOS、Windows 全部执行。
 覆盖参数/16 KiB 请求限制、来源检查、教师配置/所有权/会话过期、跨课堂隔离、同名不同人、
