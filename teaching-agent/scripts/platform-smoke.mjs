@@ -83,7 +83,7 @@ try {
     console.log(`Android device: ${device.model()} (${device.serial()})`);
   } else {
     browser = await (platform === "webkit" ? webkit : chromium).launch();
-    context = await browser.newContext({ viewport: { width: 1365, height: 900 }, reducedMotion: "reduce", ignoreHTTPSErrors: true });
+    context = await browser.newContext({ viewport: process.env.CI_MOBILE_VIEWPORT === "1" ? { width: 393, height: 851 } : { width: 1365, height: 900 }, reducedMotion: "reduce", ignoreHTTPSErrors: true });
   }
   context.setDefaultTimeout(30_000);
   await context.tracing.start({ screenshots: true, snapshots: true });

@@ -100,6 +100,9 @@ export async function classroomBrowserCheck({ context, page, origin, basePath, o
       button = page.getByRole("button", { name: label, exact: true });
     }
     await button.click();
+    // A closing mobile Sheet remains visible during its exit animation. Wait for
+    // removal before the next navigation can decide whether to reopen it.
+    await page.getByRole("dialog").waitFor({ state: "hidden" });
   }
   await navigate("题库自测");
   await page.getByRole("heading", { name: "题库自测", exact: true }).waitFor();
