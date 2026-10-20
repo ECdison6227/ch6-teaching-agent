@@ -27,8 +27,8 @@ export function getQuestionCatalog(): readonly CatalogQuestion[] { return catalo
 /** 难度不参与可用性判断；缺损题不靠标记已复核或猜测选项放行。 */
 export function isUsableQuestion(question: Question): boolean {
   if (question.verified !== true || !question.id?.trim() || !question.prompt?.trim() || !question.answer?.trim()) return false;
-  if (/待补|EMBED Equation|缺失/.test(question.prompt)) return false;
-  if (question.type === "fill") return true;
+  if (/待补|EMBED Equation/.test(question.prompt)) return false;
+  if (question.type === "fill") return question.answer.split(/[;；]/).every(part => !!part.trim());
   if (question.type === "judge") return ["T", "F"].includes(normLetter(question.answer)) && !/[（(]\s*[×√✓✕TF]\s*[）)]/.test(question.prompt);
   if (question.type !== "choice" || !Array.isArray(question.options) || question.options.length < 2) return false;
   const ids = new Set<string>();
