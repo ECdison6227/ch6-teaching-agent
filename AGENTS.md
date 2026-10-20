@@ -1,5 +1,13 @@
 # 工作区规则
 
+## 分支与合入规则
+
+1. `main` 仅通过 Pull Request 合入，禁止直接在 `main` 上修改、提交或推送；管理员和自动化同样遵守，不绕过 GitHub ruleset。
+2. 开工前确认当前分支。每个任务使用独立分支；多个线程使用独立 Git worktree，不共享工作目录切换分支。
+3. PR 合入前必须与最新 `main` 兼容，且 GitHub Actions 的 `Android`、`macOS`、`Windows` 三个检查全部成功，评审讨论已解决。禁止跳过、伪造检查或临时关闭规则合入。
+4. 禁止强推或删除 `main`。CI 配置调整也通过分支和 PR，保持三个必需检查名称与 `.github/rulesets/main.json` 一致。
+5. 本项目为网页应用：Android 检查在真实 Android 模拟器的 Chrome 中运行；macOS 使用 WebKit，Windows 使用 Chromium。不得以 Linux 构建或手机尺寸模拟代替 Android 检查。
+
 ## 界面组件：禁止手搓，必须用组件库
 
 适用目录：`teaching-agent`。做界面时按本节执行，不要用 div 和手写样式重造一套控件。

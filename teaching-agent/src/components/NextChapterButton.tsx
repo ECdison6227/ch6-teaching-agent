@@ -1,7 +1,8 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { useHydratedReducedMotion } from "@/hooks/use-hydrated-reduced-motion";
 import { Button } from "@/components/ui/button";
 
 const lift = {
@@ -32,7 +33,7 @@ const sheen = {
 
 /** 章末占位区里的「进入下一章」入口。样式集中在这里，StudyView 只负责文案和跳转。 */
 export function NextChapterButton({ label, onClick }: { label: string; onClick: () => void }) {
-  const reduce = useReducedMotion();
+  const reduce = useHydratedReducedMotion();
 
   return (
     <motion.div

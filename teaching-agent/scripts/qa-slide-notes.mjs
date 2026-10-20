@@ -488,6 +488,8 @@ line(`章节覆盖：${Object.entries(secDist).map(([k, v]) => `${k}(${v})`).joi
 // ---- 总体结论 ----
 head("总体结论");
 const failCount = fatals.length + res.oddDollar.length + res.ctrl.length + res.garbage.length + res.weakPoint.length + res.incomplete.length;
+// A printed failure must also fail CI; strict-only warnings remain advisory.
+if (failCount > 0) process.exitCode = 1;
 if (failCount === 0 && stricts.length === 0) {
   line("全部检查项通过：公式可渲染、定界符配对正确、无乱码无控制符、字段完整。");
   line("结论：可以直接给学生用。");
