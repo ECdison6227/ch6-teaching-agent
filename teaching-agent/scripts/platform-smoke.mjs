@@ -209,6 +209,24 @@ try {
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("ch6-self-test-v1"))?.status === "submitted");
   const fillResults = await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-self-test-v1")).results);
   assert.deepEqual(fillResults.map(result => result.status), ["correct", "wrong", "unanswered"]);
+
+  // The real popup must finish preparation and invoke print(). Stub only the
+  // native print dialog so CI can inspect the generated page without blocking.
+  await page.evaluate(() => {
+    const originalOpen = window.open;
+    window.open = function (...args) {
+      const popup = originalOpen.apply(this, args);
+      if (popup) popup.print = () => { popup.__selfTestPrintCalled = true; };
+      return popup;
+    };
+  });
+  const popupPromise = page.waitForEvent("popup");
+  await page.getByRole("button", { name: "浏览器打印 / 另存为 PDF", exact: true }).click();
+  const printPopup = await popupPromise;
+  await printPopup.waitForFunction(() => window.__selfTestPrintCalled === true);
+  await page.getByRole("button", { name: "浏览器打印 / 另存为 PDF", exact: true }).waitFor();
+  assert.match(await printPopup.locator("body").innerText(), /标准答案/);
+  await printPopup.close();
   assert.deepEqual(aiRequests, [], "Self-test must work without calling model or digest APIs");
   await page.screenshot({ path: path.join(output, "self-test-fill-passed.png"), fullPage: true });
   assert.deepEqual(errors, [], "Browser must not report uncaught runtime or hydration errors");
