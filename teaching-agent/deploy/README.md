@@ -12,6 +12,7 @@
 - `/srv/teachdemo/current`：当前发布的软链接。
 - `/srv/teachdemo/shared/cache`：跨发布的 PDF 缓存。
 - `/srv/teachdemo/shared/fonts`：Noto Sans SC TrueType 字体及 OFL 许可。
+- `/srv/teachdemo/shared/classroom/classroom.sqlite`：跨发布保留的课堂数据库（包括旁边的 WAL / SHM）。
 - `/etc/teachdemo/teachdemo.env`：服务器环境配置，仅 root 可读，不提交密钥。
 
 环境配置中的模型通道为 `MODEL_PROVIDER=agnes`，其余名称见 `.env.example`。字体需要带有 `glyf` 表的 TrueType 文件；服务器已有的 CFF 格式 Noto CJK TTC 无法用于当前 PDF 子集器。Google Fonts 的 Noto Sans SC 可用于此处，许可随包提供。
@@ -27,3 +28,5 @@ journalctl -u teachdemo -n 50 --no-pager
 ```
 
 更新时先解包、安装依赖并检查新发布，再切换 current；回滚时将 current 指回上一发布并 `systemctl restart teachdemo`。本项目的配置片段不包含现有其他站点配置。
+
+实时课堂的环境、SQLite 迁移、权限、在线备份和恢复步骤见 [classroom.md](classroom.md)。本功能 PR 不执行生产发布。

@@ -5,17 +5,25 @@ import { spawn, execFileSync } from "node:child_process";
 import { once } from "node:events";
 import { setTimeout as delay } from "node:timers/promises";
 import { chromium, webkit, _android } from "playwright";
+import { createServer as createHttpsServer } from "node:https";
+import { request as httpRequest } from "node:http";
+import { networkInterfaces, tmpdir } from "node:os";
+import { classroomBrowserCheck } from "./classroom-browser-check.mjs";
 
 const platform = process.env.CI_BROWSER || "chromium";
 if (!["chromium", "webkit", "android"].includes(platform)) throw new Error(`Unknown browser: ${platform}`);
 const basePath = (process.env.NEXT_PUBLIC_BASE_PATH || "").replace(/\/+$/, "");
 const port = 3100;
 const origin = `http://127.0.0.1:${port}`;
+const address = Object.values(networkInterfaces()).flat().find(entry => entry?.family === "IPv4" && !entry.internal)?.address;
+assert.ok(address, "Classroom HTTPS smoke needs a LAN interface");
+const classroomOrigin = `https://${platform === "android" ? "10.0.2.2" : address}:3101`;
+const classroomDirectory = fs.mkdtempSync(path.join(tmpdir(), "classroom-browser-"));
 const output = path.resolve("test-results", platform);
 fs.mkdirSync(output, { recursive: true });
 const log = fs.createWriteStream(path.join(output, "server.log"));
 const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)], {
-  env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" }, stdio: ["ignore", "pipe", "pipe"],
+  env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1", CLASSROOM_TEACHER_ACCESS_CODE: "classroom-browser-test-only", CLASSROOM_PUBLIC_ORIGIN: classroomOrigin, CLASSROOM_DB_PATH: path.join(classroomDirectory, "classroom.sqlite") }, stdio: ["ignore", "pipe", "pipe"],
 });
 server.stdout.pipe(log, { end: false });
 server.stderr.pipe(log, { end: false });
@@ -32,7 +40,16 @@ let device;
 let context;
 let page;
 let tracing = false;
+const httpsProxy = createHttpsServer({ key: fs.readFileSync("tests/fixtures/tls/key.pem"), cert: fs.readFileSync("tests/fixtures/tls/cert.pem") }, (request, response) => {
+  const upstream = httpRequest(origin + request.url, { method: request.method, headers: { ...request.headers, "x-real-ip": request.socket.remoteAddress || "test" } }, result => {
+    response.writeHead(result.statusCode, result.headers); result.pipe(response);
+  });
+  request.pipe(upstream);
+  upstream.on("error", () => { response.writeHead(502); response.end(); });
+  response.on("close", () => upstream.destroy());
+});
 try {
+  httpsProxy.listen(3101, "0.0.0.0"); await once(httpsProxy, "listening");
   let ready = false;
   for (let attempt = 0; attempt < 120; attempt++) {
     if (startupError) throw startupError;
@@ -60,11 +77,11 @@ try {
     const chrome = (await device.shell("pm list packages com.android.chrome")).toString();
     assert.ok(chrome.includes("package:com.android.chrome"), "Android system image must include Chrome");
     await device.shell("am force-stop com.android.chrome");
-    context = await device.launchBrowser({ viewport: { width: 393, height: 851 }, reducedMotion: "reduce" });
+    context = await device.launchBrowser({ viewport: { width: 393, height: 851 }, reducedMotion: "reduce", ignoreHTTPSErrors: true });
     console.log(`Android device: ${device.model()} (${device.serial()})`);
   } else {
     browser = await (platform === "webkit" ? webkit : chromium).launch();
-    context = await browser.newContext({ viewport: { width: 1365, height: 900 }, reducedMotion: "reduce" });
+    context = await browser.newContext({ viewport: { width: 1365, height: 900 }, reducedMotion: "reduce", ignoreHTTPSErrors: true });
   }
   context.setDefaultTimeout(30_000);
   await context.tracing.start({ screenshots: true, snapshots: true });
@@ -128,6 +145,7 @@ try {
   assert.deepEqual(errors, [], "Browser must not report uncaught runtime or hydration errors");
   await page.screenshot({ path: path.join(output, "passed.png"), fullPage: true });
   console.log(`PASS ${platform}: production health, landing, navigation, slides, IndexedDB persistence (${basePath || "/"})`);
+  await classroomBrowserCheck({ context, page, origin: classroomOrigin, basePath, output });
 } catch (error) {
   if (page) await page.screenshot({ path: path.join(output, "failed.png"), fullPage: true }).catch(() => {});
   throw error;
@@ -143,5 +161,7 @@ try {
     if (server.exitCode === null) server.kill("SIGKILL");
   }
   log.end();
+  httpsProxy.closeAllConnections(); httpsProxy.close();
+  fs.rmSync(classroomDirectory, { recursive: true, force: true });
   clearTimeout(deadline);
 }

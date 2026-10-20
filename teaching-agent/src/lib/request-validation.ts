@@ -42,9 +42,9 @@ export class RequestValidationError extends Error {
   constructor(message: string, readonly status = 400) { super(message); }
 }
 
-export async function readJson<T extends z.ZodTypeAny>(req: Request, schema: T): Promise<z.infer<T>> {
+export async function readJson<T extends z.ZodTypeAny>(req: Request, schema: T, maxBytes = MAX_REQUEST_BYTES): Promise<z.infer<T>> {
   const length = Number(req.headers.get("content-length") || 0);
-  if (length > MAX_REQUEST_BYTES) throw new RequestValidationError("请求过大，请减少图片或压缩后重试", 413);
+  if (length > maxBytes) throw new RequestValidationError("请求过大，请减少内容后重试", 413);
   const reader = req.body?.getReader();
   const chunks: Uint8Array[] = [];
   let size = 0;
@@ -54,7 +54,7 @@ export async function readJson<T extends z.ZodTypeAny>(req: Request, schema: T):
       const { done, value } = await reader.read();
       if (done) break;
       size += value.byteLength;
-      if (size > MAX_REQUEST_BYTES) throw new RequestValidationError("请求过大，请减少图片或压缩后重试", 413);
+      if (size > maxBytes) throw new RequestValidationError("请求过大，请减少内容后重试", 413);
       chunks.push(value);
     }
   } finally {

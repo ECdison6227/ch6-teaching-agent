@@ -9,3 +9,7 @@ out/
 next-env.d.ts
 dev.log
 test-results/
+.data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
