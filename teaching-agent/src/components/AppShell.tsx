@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { useHydratedReducedMotion } from "@/hooks/use-hydrated-reduced-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -80,7 +81,7 @@ function StudyPane() {
 
 function Landing({ onEnter }: { onEnter: () => void }) {
   const [sectionsOpen, setSectionsOpen] = useState(false);
-  const reduce = useReducedMotion();
+  const reduce = useHydratedReducedMotion();
   const visibleSections = sectionsOpen ? KNOWLEDGE_SECTIONS : KNOWLEDGE_SECTIONS.slice(0, PREVIEW_SECTION_COUNT);
 
   return (
