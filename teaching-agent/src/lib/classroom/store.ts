@@ -134,7 +134,7 @@ export class ClassroomStore {
     if (!row) throw new ClassroomError("入课会话已过期，请输入课堂码重新加入", 401);
     return row;
   }
-  list(owner: string) { return this.all("SELECT * FROM classrooms WHERE owner_id=? ORDER BY created_at DESC LIMIT 100", owner).map(summary); }
+  list(owner: string) { return this.all("SELECT * FROM classrooms WHERE owner_id=? ORDER BY (status='ended'),created_at DESC LIMIT 100", owner).map(summary); }
   create(owner: string, title: string, requestId: string) {
     return this.tx(() => {
       const prior = this.get("SELECT * FROM classrooms WHERE owner_id=? AND request_id=?", owner, requestId);

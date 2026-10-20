@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
-import { spawn } from "node:child_process";
+import { spawn, execFileSync } from "node:child_process";
 import { once } from "node:events";
 import { ClassroomStore, ClassroomError, digest } from "../src/lib/classroom/store.ts";
 import { classroomQuestion, classroomCatalog } from "../src/lib/classroom/catalog.ts";
@@ -123,6 +123,18 @@ test("课堂：长描述填空使用现有三态判题，未答与待核对独�
   store.join(c.code, "未答学生", "");
   const stats = store.teacherSnapshot(owner, c.id).rounds[0].stats;
   assert.equal(stats.pending, 1); assert.equal(stats.unanswered, 1); assert.equal(stats.incorrect, 0);
+});
+
+test("课堂：部署脚本的在线备份包含 WAL 中已提交的课堂与作答", () => {
+  const { store, owner, c, p, path } = fixture();
+  const question = q("choice"), round = store.publish(owner, c.id, question, randomUUID());
+  store.answer(p.token, c.id, round, question.options[0].id, randomUUID());
+  const backup = join(directory, randomUUID() + ".sqlite");
+  execFileSync(process.execPath, ["deploy/classroom-db.mjs", "backup", path, backup], { encoding: "utf8" });
+  const checked = JSON.parse(execFileSync(process.execPath, ["deploy/classroom-db.mjs", "check", backup], { encoding: "utf8" }));
+  assert.equal(checked.schema.user_version, 1); assert.deepEqual(checked.foreignKeys, []); assert.equal(checked.integrity[0].quick_check, "ok");
+  const restored = new ClassroomStore(backup); stores.push(restored);
+  assert.equal(restored.teacherSnapshot(owner, c.id).rounds[0].stats.submitted, 1);
 });
 
 test("课堂：真实独立进程并发收题/提交，由短事务顺序决定结果", async () => {

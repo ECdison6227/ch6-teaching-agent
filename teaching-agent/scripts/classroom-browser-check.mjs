@@ -30,13 +30,22 @@ export async function classroomBrowserCheck({ context, page, origin, basePath, o
   await student.getByLabel("姓名", { exact: true }).fill("浏览器学生");
   await student.getByRole("button", { name: "加入课堂", exact: true }).click();
   await student.getByText("已加入，等待老师开始上课。", { exact: true }).waitFor();
+  const cookies = await context.cookies(endpoint + "/");
+  for (const name of ["ch6_classroom_teacher", "ch6_classroom_student"]) {
+    const cookie = cookies.find(cookie => cookie.name === name); assert.ok(cookie, name);
+    assert.equal(cookie.httpOnly, true); assert.equal(cookie.secure, true); assert.equal(cookie.sameSite, "Lax");
+    assert.equal(cookie.path, (basePath || "") + "/");
+  }
   await page.bringToFront();
   await page.getByText("已加入 1 人", { exact: true }).waitFor();
   await page.getByRole("button", { name: "开始上课", exact: true }).click();
   await student.bringToFront();
   await student.getByText("等待老师发题。", { exact: true }).waitFor();
-  const catalogResponse = await context.request.get(endpoint + "/api/classrooms/catalog");
-  assert.ok(catalogResponse.ok()); const { questions } = await catalogResponse.json();
+  // Fetch inside Chrome: 10.0.2.2 is an emulator-only alias, not a host Node address.
+  const { questions } = await page.evaluate(async url => {
+    const response = await fetch(url); if (!response.ok) throw new Error("Teacher catalog failed");
+    return response.json();
+  }, endpoint + "/api/classrooms/catalog");
   for (const type of ["choice", "judge", "fill"]) {
     await page.bringToFront();
     const q = questions.find(q => q.type === type); assert.ok(q, type);
@@ -51,6 +60,15 @@ export async function classroomBrowserCheck({ context, page, origin, basePath, o
     else await student.getByRole("button", { name: type === "judge" ? /^T/ : new RegExp("^" + q.options[0].id) }).click();
     await answerButton.click();
     await student.getByRole("button", { name: "修改并提交", exact: true }).waitFor();
+    if (type === "choice") {
+      // A dropped HTTP request must retain the last successful answer and expose retry.
+      await student.route("**/api/classroom-participation/**/answer", route => route.abort("failed"));
+      await student.getByRole("button", { name: "修改并提交", exact: true }).click();
+      await student.getByRole("status").filter({ hasText: "提交失败，请重试" }).waitFor();
+      await student.unroute("**/api/classroom-participation/**/answer");
+      await student.getByRole("button", { name: "修改并提交", exact: true }).click();
+      await student.getByRole("status").filter({ hasText: /^已提交/ }).waitFor();
+    }
     await page.bringToFront();
     await page.getByText(/已答 1 · 未答 0/).waitFor();
     await student.bringToFront();
