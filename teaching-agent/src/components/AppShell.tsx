@@ -187,7 +187,7 @@ function Landing({ onEnter }: { onEnter: () => void }) {
   );
 }
 
-/** 引导对话、自学天地、资料下载留在同一页里切换，避免路由跳转把对话清掉 */
+/** 各业务视图保留挂载和本地状态；课堂订阅仅在激活时运行。 */
 export function AppShell() {
   const [view, setView] = useState<AppView>("home");
 

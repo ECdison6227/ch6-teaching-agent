@@ -2,6 +2,8 @@
 
 实现范围：教师验证与本人课堂恢复、真实入课二维码与手输码、三题型作答、修改/收题/公布/结束、
 SQLite 持久化、权限视图、SSE 心跳与快照恢复、断线定时同步、根路径和子路径。
+基于 #1 已合入的共用 catalog 判断可用题与难度，不再维护第二套可用性规则。
+侧栏同时接入题库自测和实时课堂，原视图保持挂载。
 部署与备份说明见 [deploy/classroom.md](../../deploy/classroom.md)。
 
 ## 自动化
@@ -25,29 +27,31 @@ node --import ./scripts/register-ts.mjs scripts/classroom-load.mjs
 重复加入/提交/迟到旧命令、首次加入响应丢失后重试不重计人数、三题型及三态判题、同题不同轮次、状态幂等、结束冻结、
 两个独立进程同时放行的收题/提交竞争、跨连接变更、SQLite 重开恢复、SSE 最新快照与取消清理。
 HTTP/SSE/重连的学生视图显式检查答案/解析/grade 的缺失，学生页面与 SSR 入口没有题库导入。
+整合 #1 后 npm test 包含 classroom.test.mjs 与 self-test.test.mjs，共 52 项，全部通过。
 
 三平台生产浏览器 smoke 复用 `scripts/classroom-browser-check.mjs`：HTTPS 代理使用公开测试证书，
 实际验证生产 Secure / HttpOnly Cookie；创建、二维码加载、手输入课、三题型发题/提交/收题/公布、
-刷新不重复人数、请求失败可重试、结束通知。Android 使用真实模拟器 Chrome，macOS WebKit，Windows Chromium。
+刷新不重复人数、请求失败可重试、结束通知；统一侧栏能进入两处新视图，对话草稿不丢失，
+退出课堂视图后数据库教师 SSE 租约归零，重新进入恢复一条连接。Android 使用真实模拟器 Chrome，macOS WebKit，Windows Chromium。
 截图、二维码和 trace 上传为 CI artifacts；测试证书私钥仅用于本地测试，绝不部署。
 
 ## 本机运行记录（2026-10-20）
 
-Windows 11 x64 (10.0.26200)，Intel Core i7-10700，Node.js v24.21.0。
+Windows 11 x64 (10.0.26200)，Intel Core i7-10700，先用 Node.js v24.21.0 验证，再用生产固定的 v24.19.0 复验。
 根路径生产构建、类型检查、全部回归、22 项数学检查、148 页课件质检和 Chromium HTTPS 闭环已通过。
 已下载校验官方 Node.js v24.19.0，与生产固定版本一致，全部测试、子路径构建与 HTTPS 浏览器闭环通过。
 二维码 PNG 使用独立 ZXing 解码器核对入课 URL，编码完全在本应用服务端进行，不请求外部图片服务。
 
 | 100 名模拟学生，同出口 IP | 根路径 | /teachdemo |
 | --- | --- | --- |
-| SSE 状态更新 p95 | 487 ms | 470 ms |
-| 提交响应 p95 | 1123 ms | 1300 ms |
+| SSE 状态更新 p95 | 514 ms | 489 ms |
+| 提交响应 p95 | 1469 ms | 1131 ms |
 | 成功持久提交 | 100 / 100 | 100 / 100 |
-| Next.js 进程峰值 RSS | 242 MiB | 242 MiB |
+| Next.js 进程峰值 RSS | 187 MiB | 186 MiB |
 | 20 秒空闲心跳 | 100 / 100 | 100 / 100 |
 | 杀进程再启动恢复名单和提交 | 通过 | 通过 |
 
-压测使用真实 Next.js production HTTP/SSE、100 个独立 cookie、临时 SQLite WAL。
+表中为 Node.js v24.19.0 的复验结果。压测使用真实 Next.js production HTTP/SSE、100 个独立 cookie、临时 SQLite WAL。
 报告记录运行环境、延迟、RSS，且对状态 p95 ≤ 2 秒、无丢提交和 RSS ≤ 512 MiB 设置失败断言。
 输出在 git 忽略的 `test-results/classroom-load-*`。
 

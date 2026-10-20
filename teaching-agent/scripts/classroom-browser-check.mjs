@@ -114,7 +114,7 @@ export async function classroomBrowserCheck({ context, page, origin, basePath, o
   await page.getByRole("textbox", { name: "学生入课链接", exact: true }).waitFor();
   await assertTeacherStreams(1);
   await page.bringToFront();
-  await page.locator("main").evaluate(main => { main.scrollTop = 0; });
+  await page.locator("main:visible").first().evaluate(main => { main.scrollTop = 0; });
   await page.screenshot({ path: path.join(output, "classroom-teacher.png"), fullPage: true });
   await student.bringToFront();
   await student.screenshot({ path: path.join(output, "classroom-student.png"), fullPage: true });

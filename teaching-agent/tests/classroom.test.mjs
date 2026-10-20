@@ -230,6 +230,7 @@ test("课堂 HTTP：访问码配置、来源/大小/参数校验、凭证隔离�
   assert.equal((await api(false, [c.id, "rounds"], "POST", { questionId: invalid.id, requestId: randomUUID() }, "t")).status, 400);
   const question = q("choice");
   const round = (await (await api(false, [c.id, "rounds"], "POST", { questionId: question.id, requestId: randomUUID() }, "t")).json()).rounds[0];
+  assert.equal(round.question.difficulty, classroomQuestion(question.id).difficulty);
   const submit = await api(true, [c.id, "rounds", round.id, "answer"], "POST", { answer: question.options[0].id, requestId: randomUUID() }, "s");
   assert.equal(submit.status, 200); assertRedacted(await submit.json(), question);
   await api(true, ["join"], "POST", { code: c.code, name: "另一学生" }, "otherStudent");
