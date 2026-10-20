@@ -5,12 +5,18 @@ export type PersistentSnapshot<T> = { value: T; ready: boolean; writable: boolea
 export function createPersistentStore<T>(storage: StorageAdapter<T>, initial: T, label: string) {
   let snapshot: PersistentSnapshot<T> = { value: initial, ready: false, writable: false, dirty: false, error: null };
   let initialization: Promise<void> | null = null;
+  let reading = false;
   let writing = Promise.resolve();
   let revision = 0;
   const listeners = new Set<() => void>();
   const publish = (patch: Partial<PersistentSnapshot<T>>) => { snapshot = { ...snapshot, ...patch }; listeners.forEach(listener => listener()); };
-  const initialize = () => initialization ??= storage.read().then(value => publish({ value, ready: true, writable: true, error: null }))
-    .catch(() => publish({ ready: true, writable: false, error: `读取${label}失败；原有数据未被覆盖，请重试读取。` }));
+  const initialize = () => {
+    if (initialization) return initialization;
+    reading = true;
+    return initialization = storage.read().then(value => publish({ value, ready: true, writable: true, error: null }))
+      .catch(() => publish({ ready: true, writable: false, error: `读取${label}失败；原有数据未被覆盖，请重试读取。` }))
+      .finally(() => { reading = false; });
+  };
   const persist = (value: T, savedRevision: number) => {
     writing = writing.then(async () => {
       try {
@@ -35,7 +41,7 @@ export function createPersistentStore<T>(storage: StorageAdapter<T>, initial: T,
       return true;
     },
     async retry() {
-      if (!snapshot.writable) { initialization = null; await initialize(); }
+      if (!snapshot.writable) { if (!reading) initialization = null; await initialize(); }
       else await persist(snapshot.value, revision);
     },
     settled: () => writing,

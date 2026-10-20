@@ -7,9 +7,12 @@ export function validQuestionSnapshot(raw: unknown): raw is CatalogQuestion {
   if (!raw || typeof raw !== "object") return false;
   const q = raw as CatalogQuestion;
   return typeof q.id === "string" && !!q.id && ["choice", "judge", "fill"].includes(q.type) && typeof q.prompt === "string"
-    && Array.isArray(q.options) && q.options.every(o => typeof o.id === "string" && typeof o.text === "string")
+    && Array.isArray(q.options) && q.options.every(o => !!o && typeof o.id === "string" && typeof o.text === "string")
     && (q.answer === null || typeof q.answer === "string") && (q.analysis === null || typeof q.analysis === "string")
-    && ["easy", "medium", "hard"].includes(q.difficulty);
+    && ["easy", "medium", "hard"].includes(q.difficulty)
+    && (q.acceptedAnswers === undefined || Array.isArray(q.acceptedAnswers) && q.acceptedAnswers.every(group => Array.isArray(group) && group.every(answer => typeof answer === "string")))
+    && (q.tolerance === undefined || typeof q.tolerance === "number" && Number.isFinite(q.tolerance) && q.tolerance >= 0)
+    && (q.verified === undefined || typeof q.verified === "boolean");
 }
 export function decodeSession(raw: unknown): TestSession | null {
   if (raw === null) return null;
