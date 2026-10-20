@@ -49,7 +49,8 @@ try {
   teacherCookie = (await request("/api/classrooms/teacher-session", { accessCode: "load-test-only" }, "")).cookie;
   const c = (await request("/api/classrooms", { title: "100 students load test", requestId: randomUUID() })).data.classroom;
   const students = await Promise.all(Array.from({ length: 100 }, async (_, i) => {
-    const joined = await request("/api/classroom-participation/join", { code: c.code, name: "Synthetic student " + i }, "");
+    const session = await request("/api/classroom-participation/session", {}, "");
+    const joined = await request("/api/classroom-participation/join", { code: c.code, name: "Synthetic student " + i }, session.cookie);
     return { cookie: joined.cookie, state: null, heartbeat: false, observedAt: 0 };
   }));
   await request(`/api/classrooms/${c.id}/start`, {});

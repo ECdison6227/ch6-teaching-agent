@@ -55,6 +55,12 @@ export async function classroomHttp(req: Request, paths: string[], student: bool
     const teacherToken = cookie(req, TEACHER_COOKIE), studentToken = cookie(req, STUDENT_COOKIE);
     // Only the trusted local Nginx may set X-Real-IP in production. Never reuse AI connection limits.
     const ip = digest(req.headers.get("x-real-ip") || "direct");
+    if (student && paths.join("/") === "session" && method === "POST") {
+      store.limit("device:" + ip, 600);
+      await body(req, emptyBody);
+      const raw = store.deviceSession(studentToken);
+      return json({ ready: true }, 200, { "Set-Cookie": setCookie(STUDENT_COOKIE, raw, STUDENT_AGE) });
+    }
     if (!student && paths.join("/") === "teacher-session" && method === "POST") {
       store.limit("login:" + ip, 20, 900_000);
       const { accessCode } = await body(req, authBody);

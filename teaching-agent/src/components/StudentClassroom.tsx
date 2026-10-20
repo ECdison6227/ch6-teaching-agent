@@ -27,6 +27,7 @@ export function StudentClassroom({ code: initialCode = "" }: { code?: string }) 
   const join = async (event: React.FormEvent) => {
     event.preventDefault(); setBusy(true); setError("");
     try {
+      await classroomFetch("/api/classroom-participation/session", {});
       const result = await classroomFetch<{ classroomId: string }>("/api/classroom-participation/join", { code, name, studentNo });
       try { localStorage.setItem(`ch6-classroom:${appPath("/")}:${code}`, result.classroomId); } catch { /* Persistence unavailable. */ }
       if (initialCode === code) setId(result.classroomId);

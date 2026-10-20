@@ -17,6 +17,9 @@ CLASSROOM_TEACHER_ACCESS_CODE=<管理员生成的高强度随机访问码>
 教师有效期 30 天，学生 7 天。刷新保留身份；有效会话内重新验证教师访问码会续期并保留所有权。
 更换设备或教师会话过期不提供自动找回（首版无账号系统）。共享教师访问码不会共享课堂所有权。
 
+学生先通过 `/api/classroom-participation/session` 确认设备 HttpOnly Cookie 已建立，再请求 `/join`。
+首次加入响应丢失后，重试仍使用同一设备 cookie，不能再次计入人数；设备会话本身不授予课堂权限。
+
 `CLASSROOM_PUBLIC_ORIGIN` 仅包含协议、域名和可选端口，不含 `/teachdemo`。
 生产要求 HTTPS，拒绝 localhost / 127.0.0.1；开发使用手机可访问的 LAN IP。
 basePath 在构建时确定，构建与运行必须一致。

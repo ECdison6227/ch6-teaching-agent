@@ -134,6 +134,12 @@ export class ClassroomStore {
     if (!row) throw new ClassroomError("入课会话已过期，请输入课堂码重新加入", 401);
     return row;
   }
+  deviceSession(previous?: string) {
+    if (previous && this.get("SELECT hash FROM student_sessions WHERE hash=? AND expires_at>?", digest(previous), Date.now())) return previous;
+    const raw = token();
+    this.run("INSERT INTO student_sessions VALUES (?,?)", digest(raw), Date.now() + STUDENT_AGE);
+    return raw;
+  }
   list(owner: string) { return this.all("SELECT * FROM classrooms WHERE owner_id=? ORDER BY (status='ended'),created_at DESC LIMIT 100", owner).map(summary); }
   create(owner: string, title: string, requestId: string) {
     return this.tx(() => {
@@ -156,10 +162,10 @@ export class ClassroomStore {
     return this.tx(() => {
       const classroom = this.get("SELECT * FROM classrooms WHERE code=? AND status!='ended'", code);
       if (!classroom) throw new ClassroomError("课堂码无效或课堂已结束，请向教师确认", 404);
-      let raw = previous;
-      if (!raw || !this.get("SELECT hash FROM student_sessions WHERE hash=? AND expires_at>?", digest(raw), Date.now())) {
-        raw = token(); this.run("INSERT INTO student_sessions VALUES (?,?)", digest(raw), Date.now() + STUDENT_AGE);
-      }
+      // Establish the HttpOnly device cookie in a separate acknowledged request first.
+      // Losing the first join response must not create another participant on retry.
+      const raw = previous;
+      if (!raw || !this.get("SELECT hash FROM student_sessions WHERE hash=? AND expires_at>?", digest(raw), Date.now())) throw new ClassroomError("设备会话已过期，请重新入课", 401);
       let p = this.get("SELECT * FROM participants WHERE classroom_id=? AND session_hash=?", classroom.id, digest(raw));
       if (!p) {
         if (Number(this.get("SELECT COUNT(*) AS n FROM participants WHERE classroom_id=?", classroom.id)?.n) >= 200) conflict("课堂人数已满，请联系教师");

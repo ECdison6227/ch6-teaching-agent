@@ -21,19 +21,20 @@ node --import ./scripts/register-ts.mjs scripts/classroom-load.mjs
 
 `tests/classroom.test.mjs` 由既有 npm test 自动发现，在 Android、macOS、Windows 全部执行。
 覆盖参数/16 KiB 请求限制、来源检查、教师配置/所有权/会话过期、跨课堂隔离、同名不同人、
-重复加入/提交/迟到旧命令、三题型及三态判题、同题不同轮次、状态幂等、结束冻结、
+重复加入/提交/迟到旧命令、首次加入响应丢失后重试不重计人数、三题型及三态判题、同题不同轮次、状态幂等、结束冻结、
 两个独立进程同时放行的收题/提交竞争、跨连接变更、SQLite 重开恢复、SSE 最新快照与取消清理。
 HTTP/SSE/重连的学生视图显式检查答案/解析/grade 的缺失，学生页面与 SSR 入口没有题库导入。
 
 三平台生产浏览器 smoke 复用 `scripts/classroom-browser-check.mjs`：HTTPS 代理使用公开测试证书，
 实际验证生产 Secure / HttpOnly Cookie；创建、二维码加载、手输入课、三题型发题/提交/收题/公布、
-刷新不重复人数、结束通知。Android 使用真实模拟器 Chrome，macOS WebKit，Windows Chromium。
+刷新不重复人数、请求失败可重试、结束通知。Android 使用真实模拟器 Chrome，macOS WebKit，Windows Chromium。
 截图、二维码和 trace 上传为 CI artifacts；测试证书私钥仅用于本地测试，绝不部署。
 
 ## 本机运行记录（2026-10-20）
 
 Windows 11 x64 (10.0.26200)，Intel Core i7-10700，Node.js v24.21.0。
 根路径生产构建、类型检查、全部回归、22 项数学检查、148 页课件质检和 Chromium HTTPS 闭环已通过。
+已下载校验官方 Node.js v24.19.0，与生产固定版本一致，全部测试、子路径构建与 HTTPS 浏览器闭环通过。
 二维码 PNG 使用独立 ZXing 解码器核对入课 URL，编码完全在本应用服务端进行，不请求外部图片服务。
 
 | 100 名模拟学生，同出口 IP | 根路径 | /teachdemo |

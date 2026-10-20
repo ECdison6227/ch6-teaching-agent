@@ -21,12 +21,13 @@ const { classroomHttp, joinUrl, publicOrigin, TEACHER_COOKIE, STUDENT_COOKIE } =
 const { classroomStore } = await import("../src/lib/classroom/store.ts");
 const q = type => questions.find(q => q.type === type && classroomCatalog().some(c => c.id === q.id));
 const stores = [];
+const joinClass = (store, code, name, studentNo = "", previous) => store.join(code, name, studentNo, store.deviceSession(previous));
 after(() => { classroomStore().close(); for (const store of stores) try { store.close(); } catch {} rmSync(directory, { recursive: true, force: true }); });
 function fixture(filename = randomUUID() + ".sqlite") {
   const path = join(directory, filename), store = new ClassroomStore(path); stores.push(store);
   const credential = store.login(process.env.CLASSROOM_TEACHER_ACCESS_CODE), owner = store.teacher(credential);
   const c = store.create(owner, "测试课堂", randomUUID());
-  const p = store.join(c.code, "同名学生", "");
+  const p = joinClass(store, c.code, "同名学生");
   store.start(owner, c.id);
   return { store, path, credential, owner, c, p };
 }
@@ -46,9 +47,9 @@ function assertRedacted(state, question) {
 
 test("课堂 SQLite：三种题型、修改答案、轮次隔离、收题/公布幂等、结束冻结", () => {
   const { store, owner, c, p } = fixture();
-  const other = store.join(c.code, "同名学生", "");
+  const other = joinClass(store, c.code, "同名学生");
   assert.notEqual(p.participantId, other.participantId);
-  assert.equal(store.join(c.code, "更名不重建", "", p.token).participantId, p.participantId);
+  assert.equal(joinClass(store, c.code, "更名不重建", "", p.token).participantId, p.participantId);
   assert.equal(store.teacherSnapshot(owner, c.id).participants.length, 2);
   let previousRound;
   for (const type of ["choice", "judge", "fill"]) {
@@ -120,7 +121,7 @@ test("课堂：长描述填空使用现有三态判题，未答与待核对独�
   const question = { ...q("fill"), answer: "这是一个超过二十个汉字的标准长描述答案需要教师亲自核对内容是否等价" };
   const round = store.publish(owner, c.id, question, randomUUID());
   store.answer(p.token, c.id, round, "另一种长描述", randomUUID());
-  store.join(c.code, "未答学生", "");
+  joinClass(store, c.code, "未答学生");
   const stats = store.teacherSnapshot(owner, c.id).rounds[0].stats;
   assert.equal(stats.pending, 1); assert.equal(stats.unanswered, 1); assert.equal(stats.incorrect, 0);
 });
@@ -167,7 +168,7 @@ test("课堂 SSE：初始/旧游标均返回经过权限过滤的最新快照，
   const iterator = readSseData(response.body)[Symbol.asyncIterator]();
   const first = JSON.parse((await iterator.next()).value); assertRedacted(first, question);
   const secondStore = new ClassroomStore(path); stores.push(secondStore);
-  secondStore.join(c.code, "第二设备", "");
+  joinClass(secondStore, c.code, "第二设备");
   const second = JSON.parse((await iterator.next()).value);
   assert.ok(second.classroom.version > first.classroom.version); assertRedacted(second, question);
   abort.abort(); await iterator.return();
@@ -186,6 +187,7 @@ test("课堂 SSE：同校园 NAT 不限 3 连接，独立会话配额、心跳�
 
 const credentials = new Map();
 async function api(student, path = [], method = "GET", data, role = "", origin = process.env.CLASSROOM_PUBLIC_ORIGIN) {
+  if (student && path[0] === "join" && role && !credentials.has(role)) await api(true, ["session"], "POST", {}, role, origin);
   const headers = { "Content-Type": "application/json", ...(credentials.get(role) ? { cookie: credentials.get(role) } : {}) };
   if (origin) headers.origin = origin;
   const response = await classroomHttp(new Request(`https://classroom.example/api/${student ? "classroom-participation" : "classrooms"}/${path.join("/")}`, { method, headers, body: method === "POST" ? JSON.stringify(data) : undefined }), path, student);
@@ -214,6 +216,10 @@ test("课堂 HTTP：访问码配置、来源/大小/参数校验、凭证隔离�
   assert.equal((await api(false, [c.id], "GET", undefined, "otherTeacher")).status, 404);
   assert.equal((await api(true, ["join"], "POST", { code: c.code, name: "" }, "s")).status, 400);
   const joined = await api(true, ["join"], "POST", { code: c.code, name: "HTTP学生" }, "s"); assert.equal(joined.status, 200);
+  // The join response can be completely lost: the previously acknowledged device
+  // cookie makes a retry return the same participant without increasing the count.
+  await api(true, ["join"], "POST", { code: c.code, name: "HTTP学生" }, "s");
+  assert.equal((await (await api(false, [c.id], "GET", undefined, "t")).json()).participants.length, 1);
   assert.equal((await api(false, [c.id], "GET", undefined, "s")).status, 401);
   assert.equal((await api(true, [c.id], "GET", undefined, "t")).status, 401);
   await api(false, [c.id, "start"], "POST", {}, "t");
