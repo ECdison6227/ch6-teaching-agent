@@ -176,11 +176,44 @@ try {
   await page.getByRole("button", { name: "错题本（1）", exact: true }).click();
   await page.getByText("独立错题本", { exact: true }).waitFor();
   await page.getByRole("button", { name: "重练此题（保存版本）", exact: true }).waitFor();
-  assert.deepEqual(aiRequests, [], "Self-test must work without calling model or digest APIs");
   await page.screenshot({ path: path.join(output, "self-test-passed.png"), fullPage: true });
+
+  // Exercise actual controlled Input events, not only pure grading helpers.
+  // Reading e.target.value after an async boundary loses typed fill answers.
+  await page.getByRole("button", { name: "自测", exact: true }).click();
+  await page.getByRole("button", { name: "重新组卷", exact: true }).click();
+  const typeSettings = page.getByRole("group", { name: "题型", exact: true });
+  await typeSettings.getByRole("button", { name: "选择题", exact: true }).click();
+  await typeSettings.getByRole("button", { name: "判断题", exact: true }).click();
+  await page.getByRole("textbox", { name: "自定义题量", exact: true }).fill("3");
+  await page.getByRole("button", { name: "开始自测", exact: true }).click();
+  const fillInput = page.getByRole("textbox", { name: "我的答案", exact: true });
+  await fillInput.waitFor();
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("ch6-self-test-v1"))?.questions.length === 3);
+  const fillSession = await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-self-test-v1")));
+  assert.ok(fillSession.questions.every(question => question.type === "fill"));
+  const correctFill = fillSession.questions[0];
+  await fillInput.fill(correctFill.answer);
+  await page.waitForFunction(({ id, answer }) => JSON.parse(localStorage.getItem("ch6-self-test-v1"))?.answers[id] === answer, { id: correctFill.id, answer: correctFill.answer });
+  await page.getByRole("button", { name: "下一题", exact: true }).click();
+  const wrongFill = fillSession.questions[1];
+  await fillInput.fill("错误填空测试值");
+  await page.waitForFunction(id => JSON.parse(localStorage.getItem("ch6-self-test-v1"))?.answers[id] === "错误填空测试值", wrongFill.id);
+  await page.reload({ waitUntil: "networkidle" });
+  await fillInput.waitFor();
+  assert.equal(await fillInput.inputValue(), "错误填空测试值");
+  assert.equal(await page.evaluate(id => JSON.parse(localStorage.getItem("ch6-self-test-v1")).answers[id], correctFill.id), correctFill.answer);
+  await page.getByRole("button", { name: "交卷", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "确认交卷", exact: true }).click();
+  await page.getByText("自测结果", { exact: true }).waitFor();
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("ch6-self-test-v1"))?.status === "submitted");
+  const fillResults = await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-self-test-v1")).results);
+  assert.deepEqual(fillResults.map(result => result.status), ["correct", "wrong", "unanswered"]);
+  assert.deepEqual(aiRequests, [], "Self-test must work without calling model or digest APIs");
+  await page.screenshot({ path: path.join(output, "self-test-fill-passed.png"), fullPage: true });
   assert.deepEqual(errors, [], "Browser must not report uncaught runtime or hydration errors");
   await page.screenshot({ path: path.join(output, "passed.png"), fullPage: true });
-  console.log(`PASS ${platform}: production health, navigation, slides, notes persistence, self-test snapshots, unanswered dialog, results and wrongbook (${basePath || "/"})`);
+  console.log(`PASS ${platform}: production health, navigation, slides, notes persistence, self-test snapshots, fill input persistence, unanswered dialog, results and wrongbook (${basePath || "/"})`);
 } catch (error) {
   if (page) await page.screenshot({ path: path.join(output, "failed.png"), fullPage: true }).catch(() => {});
   throw error;

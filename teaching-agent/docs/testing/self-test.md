@@ -28,7 +28,7 @@ node --import ./scripts/register-ts.mjs --test tests/self-test.test.mjs
 
 新增 `tests/self-test.test.mjs` 共20项，自动进入全量 `npm test`（现42项）：覆盖150题元数据与原题只读、严格题型结构、条件交集、无放回RNG、非法/不足题量、快照恢复、三态与空白、填空单位和顺序、幂等交卷、去重/移出/答对保留、超过80条、独立key、读取/写入失败、并发重试、损坏判题字段、模板边界与范围排序。
 
-`scripts/platform-smoke.mjs` 在现有真实三平台生产浏览器中额外走 `/self-test`：默认10题、交卷前无标准答案/解析、作答1题、切题后刷新恢复相同快照顺序和答案、9题未答的 Dialog 提醒、交卷结果、仅1条错题、结果刷新不重复累计、错题浏览/保存版本重练入口、零模型请求。截图 `test-results/<browser>/self-test-passed.png` 与 trace 由原CI上传。
+`scripts/platform-smoke.mjs` 在现有真实三平台生产浏览器中额外走 `/self-test`：默认10题、交卷前无标准答案/解析、作答1题、切题后刷新恢复相同快照顺序和答案、9题未答的 Dialog 提醒、交卷结果、仅1条错题、结果刷新不重复累计、错题浏览/保存版本重练入口、零模型请求。另通过真实界面选择仅填空3题，分别键入标准答案和错误答案、刷新恢复文本输入，交卷得到答对/答错/未答各1题。截图 `test-results/<browser>/self-test-passed.png`、`self-test-fill-passed.png` 与 trace 由原CI上传。
 
 CI部署前缀是 `/teachdemo`。本地同配置验证：
 
