@@ -17,6 +17,8 @@ test ! -e "$release"
 id teachdemo >/dev/null 2>&1 || useradd --system --home-dir "$base" --no-create-home --shell /sbin/nologin teachdemo
 install -d -m 755 "$base/releases" "$base/shared/fonts" /etc/teachdemo
 install -d -o teachdemo -g teachdemo -m 750 "$base/shared/cache"
+install -d -o teachdemo -g teachdemo -m 750 "$base/shared/classroom"
+runuser -u teachdemo -- test -w "$base/shared/classroom"
 install -d -m 700 "$base/backups/$release_id"
 install -d -m 755 "$release"
 tar -xzf "$archive" -C "$release"
