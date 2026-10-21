@@ -1,0 +1,39 @@
+   ▲ Next.js 15.5.27
+   - Experiments (use with caution):
+     · serverActions
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 9.7s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/7) ...
+   Generating static pages (1/7)
+   Generating static pages (3/7)
+   Generating static pages (5/7)
+ ✓ Generating static pages (7/7)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                      Size  First Load JS
+┌ ○ /                                          138 kB         536 kB
+├ ○ /_not-found                                 995 B         104 kB
+├ ƒ /api/chat                                   143 B         103 kB
+├ ƒ /api/classroom-participation/[[...path]]    143 B         103 kB
+├ ƒ /api/classrooms/[[...path]]                 143 B         103 kB
+├ ƒ /api/digest                                 143 B         103 kB
+├ ƒ /api/health                                 143 B         103 kB
+├ ƒ /api/materials                              143 B         103 kB
+├ ƒ /api/materials/preview                      143 B         103 kB
+├ ƒ /api/models                                 143 B         103 kB
+├ ○ /classroom                                 2.2 kB         367 kB
+├ ○ /join                                       136 B         328 kB
+├ ƒ /join/[code]                                136 B         328 kB
+└ ○ /self-test                                  778 B         393 kB
++ First Load JS shared by all                  103 kB
+  ├ chunks/255-ce8c7c75002f810b.js            46.5 kB
+  ├ chunks/4bd1b696-c023c6e3521b1417.js       54.2 kB
+  └ other shared chunks (total)               2.08 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand

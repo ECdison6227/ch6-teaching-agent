@@ -1,0 +1,93 @@
+{
+  "kind": "rea-design-application",
+  "classification": "D target choices; source grades retained in the upstream package",
+  "sourceCommit": "4f18afe7a0bc28039006dc950d6b3ef8520faaaa",
+  "mapping": [
+    {
+      "source": "cmp-navigation / layout-home",
+      "target": "Sidebar.tsx + ui/sidebar.tsx + AppShell.tsx",
+      "treatment": "existing shadcn Sidebar; 240px ground, 36px rows, offcanvas, 6px/12px canvas, 300ms",
+      "dataPath": "AppView + URL hash; existing worktree-specific navigation retained",
+      "verification": "geometry, navigation/back, mobile overlay"
+    },
+    {
+      "source": "cmp-composer / cmp-submit / cmp-context",
+      "target": "Composer.tsx + ChatView.tsx",
+      "treatment": "existing Button/Select plus official shadcn Textarea; 768×114 / radius24 / 16:24; original arrow/document SVG",
+      "dataPath": "useChat.send/stop, quote, pendingImages, modelId; draft in per-tab sessionStorage",
+      "verification": "empty/filled, multiline, synthetic composition, refresh, pending/stop/late result, retry"
+    },
+    {
+      "source": "auth-cmp-instructions / cmp-modal",
+      "target": "notes.tsx NoteEditor + ui/dialog.tsx",
+      "treatment": "existing Radix/shadcn Dialog; 560px/16px/24px, explicit cancel, validation, Escape and focus return",
+      "dataPath": "existing useNotes.update → notes-store → IndexedDB, unchanged storage schema and retry",
+      "verification": "cancel/reopen, empty title, save/reload, Escape/focus"
+    },
+    {
+      "source": "auth-layout-catalog / cmp-category-tab / cmp-gallery",
+      "target": "MaterialsView.tsx",
+      "treatment": "800px search/category/two-column resource directory; 16px cards, 36px pills; original download SVG",
+      "dataPath": "existing materialSections + /api/materials?kind=original|questions|explain&section=…; no backend rewrite",
+      "verification": "search/empty/reset, categories, intercepted download failure/retry/cancel, actual resource previews"
+    },
+    {
+      "source": "auth-cmp-rich-document",
+      "target": "Markdown.tsx + globals.css",
+      "treatment": "existing react-markdown/KaTeX retained, 16:26 body, 22:36 H1, 20:32 H2, 14:22 tables; original code-header CSS and copy SVG",
+      "dataPath": "existing useChat message content; clipboard helper preserves fallback; learning highlights retained",
+      "verification": "mocked rich result with real rendered table, formula, code copy"
+    },
+    {
+      "source": "auth-layout-project / knowledge-card declaration",
+      "target": "AppShell.tsx course overview",
+      "treatment": "original knowledge-card rule with D 20px padding; course identity/content replaces Kimi project business",
+      "dataPath": "KNOWLEDGE_SECTIONS; enter chat, browse study, download materials",
+      "verification": "outline expand/collapse; before/after/source visual review"
+    },
+    {
+      "source": "motion/catalog.json",
+      "target": "existing motion + shadcn state animations + globals.css",
+      "treatment": "300ms sidebar, 150ms controls/menu with source curves, 320ms/45ms shortcut staggering; reduced-motion",
+      "dataPath": "existing view/panel state; latest state replaces earlier transitions",
+      "verification": "computed timings/reduced-motion; open/close/reopen paths"
+    }
+  ],
+  "uiChanges": [
+    [
+      "首页独立居中介绍",
+      "始终可达的课程工作区，保留进入学习并增加课件/资料快捷入口",
+      "减少重复跳转，课程资料和对话同一导航；保留原 AppView 数据与挂载状态"
+    ],
+    [
+      "建议问题点击后立即调用模型",
+      "先填入输入草稿，再由用户发送",
+      "允许核对题意、编辑和撤销；仅确认发送才走 useChat.send"
+    ],
+    [
+      "单行紧凑输入，刷新后草稿清空",
+      "两层多行输入与按主对话/AI侧栏隔离的本标签页草稿",
+      "sessionStorage key ch6:chat-draft:<appPath>:{main|assistant}；不保存图片或对话到新服务器"
+    ],
+    [
+      "笔记自制遮罩和关闭/保存",
+      "复用现有 Dialog/Input/Textarea；取消、标题校验、Escape、焦点返回",
+      "只在保存时调用原 useNotes.update，取消不写入；存储失败仍沿用原重试路径"
+    ],
+    [
+      "资料按长列表展示，失败只显示文字",
+      "搜索、类别、双列目录、明确重试与取消下载",
+      "资源、查询参数、文件名保持；取消中止客户端 fetch，不声称服务器已停止 PDF 生成"
+    ],
+    [
+      "正文普通代码框",
+      "带复制操作的代码标题栏，保留公式和课程黄色重点",
+      "复用原始代码标题栏 CSS 与 copy.svg；沿用现有剪贴板降级行为"
+    ],
+    [
+      "自测分支独立 /self-test 入口",
+      "已有自测分支同时纳入统一侧栏",
+      "只在该工作树存在 SelfTestView 时增加入口；/self-test 仍保留，题库/快照/错题存储不改"
+    ]
+  ]
+}

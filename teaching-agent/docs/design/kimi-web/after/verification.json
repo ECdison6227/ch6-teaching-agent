@@ -1,0 +1,170 @@
+{
+  "classification": "D target integration tests; not original Kimi evidence",
+  "origin": "http://127.0.0.1:43412",
+  "checkedAt": "2026-10-21T13:21:49.989Z",
+  "browser": "Chrome on Windows; desktop and 390px emulation; not Android/iOS acceptance",
+  "networkBoundary": "real Next server and slide assets; deterministic intercepted model and material responses",
+  "checks": [
+    {
+      "label": "real-server-health",
+      "passed": true
+    },
+    {
+      "label": "course-outline-expand-collapse",
+      "passed": true
+    },
+    {
+      "label": "source-geometry-font-binding",
+      "passed": true,
+      "detail": {
+        "x": 453,
+        "y": 447,
+        "width": 768,
+        "height": 114,
+        "radius": "24px",
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, Roboto, \"Noto Sans\", Ubuntu, Cantarell, \"Helvetica Neue\", sans-serif, Arial, \"PingFang SC\", \"Source Han Sans SC\", \"Microsoft YaHei UI\", \"Microsoft YaHei\", \"Noto Sans CJK SC\"",
+        "fontSize": "16px",
+        "lineHeight": "24px",
+        "background": "rgb(255, 255, 255)",
+        "sidebarWidth": 240
+      }
+    },
+    {
+      "label": "model-menu-selection-original-accent",
+      "passed": true
+    },
+    {
+      "label": "original-svg-assets-loaded",
+      "passed": true
+    },
+    {
+      "label": "suggestion-fills-draft-without-submitting",
+      "passed": true
+    },
+    {
+      "label": "multiline-and-composing-enter",
+      "passed": true
+    },
+    {
+      "label": "browser-back-retains-draft",
+      "passed": true
+    },
+    {
+      "label": "refresh-restores-tab-draft",
+      "passed": true
+    },
+    {
+      "label": "failed-request-retry-rich-result-code-copy",
+      "passed": true
+    },
+    {
+      "label": "note-cancel-validation-save-persist-escape-focus",
+      "passed": true
+    },
+    {
+      "label": "stop-cancels-ui-and-rejects-late-result",
+      "passed": true
+    },
+    {
+      "label": "unanswered-card-blocks-free-input",
+      "passed": true
+    },
+    {
+      "label": "catalog-search-category-empty-reset",
+      "passed": true
+    },
+    {
+      "label": "download-error-retry-real-browser-download",
+      "passed": true
+    },
+    {
+      "label": "download-cancel-ignores-late-file",
+      "passed": true
+    },
+    {
+      "label": "actual-slides-bookmark-chapter-escape",
+      "passed": true
+    },
+    {
+      "label": "assistant-panel-return-and-independent-draft",
+      "passed": true
+    },
+    {
+      "label": "branch-self-test-start",
+      "passed": true
+    },
+    {
+      "label": "branch-classroom-entry-friendly-configuration-state",
+      "passed": true
+    },
+    {
+      "label": "narrow-chat-no-page-overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "document": 390
+      }
+    },
+    {
+      "label": "narrow-assistant-return-to-slide",
+      "passed": true
+    },
+    {
+      "label": "narrow-catalog-no-page-overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "document": 390
+      }
+    },
+    {
+      "label": "system-dark-theme-content-contrast",
+      "passed": true,
+      "detail": {
+        "bodyColor": "rgb(24, 24, 23)",
+        "darkCardColor": "rgb(224, 224, 224)"
+      }
+    },
+    {
+      "label": "large-text-no-page-overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1440,
+        "document": 1440
+      }
+    },
+    {
+      "label": "reduced-motion-completes-immediately",
+      "passed": true,
+      "detail": "1e-05s"
+    },
+    {
+      "label": "no-runtime-or-hydration-errors",
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "composer": {
+      "x": 453,
+      "y": 447,
+      "width": 768,
+      "height": 114,
+      "radius": "24px",
+      "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", system-ui, Roboto, \"Noto Sans\", Ubuntu, Cantarell, \"Helvetica Neue\", sans-serif, Arial, \"PingFang SC\", \"Source Han Sans SC\", \"Microsoft YaHei UI\", \"Microsoft YaHei\", \"Noto Sans CJK SC\"",
+      "fontSize": "16px",
+      "lineHeight": "24px",
+      "background": "rgb(255, 255, 255)"
+    },
+    "platformFonts": {
+      "fonts": [
+        {
+          "familyName": "Microsoft YaHei UI",
+          "postScriptName": "MicrosoftYaHeiUI",
+          "isCustomFont": false,
+          "glyphCount": 13
+        }
+      ]
+    }
+  },
+  "runtimeErrors": []
+}

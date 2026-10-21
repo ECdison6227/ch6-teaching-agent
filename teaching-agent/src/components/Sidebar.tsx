@@ -270,7 +270,7 @@ export function Sidebar({
 
   return (
     <>
-      <Side collapsible="icon">
+      <Side collapsible="offcanvas">
         <div className="flex min-h-0 w-full flex-1 flex-col pt-3.5">
         <SidebarHeader className="group-data-[collapsible=icon]:px-0">
           <div className="flex min-w-0 items-center gap-2 px-1 py-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-1 group-data-[collapsible=icon]:px-0">
@@ -331,7 +331,7 @@ export function Sidebar({
               ))}
             </SidebarMenu>
           </SidebarGroup>
-          <SidebarGroup className="min-h-0 flex-1">
+          <SidebarGroup className="min-h-0 flex-1 border-t border-border/60 pt-4">
             <div className="flex w-full min-w-0 items-center gap-1 group-data-[collapsible=icon]:hidden">
               <SidebarGroupLabel className="w-auto shrink-0">笔记</SidebarGroupLabel>
               <Button
@@ -356,7 +356,7 @@ export function Sidebar({
             ) : null}
             {notes.length === 0 ? (
               <p className="px-2 text-xs leading-5 text-muted-foreground group-data-[collapsible=icon]:hidden">
-                选中老师的话即可收藏。
+                还没有笔记。在对话中收藏回答，或在课件上点击书签。
               </p>
             ) : (
               <ul className="space-y-1 overflow-y-auto px-1 group-data-[collapsible=icon]:hidden">
