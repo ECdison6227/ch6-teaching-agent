@@ -2,14 +2,14 @@ import assert from "node:assert/strict";
 import path from "node:path";
 
 /** Actual production HTTPS, existing credentials and isolated test data. */
-export async function classroomBrowserCheck({ context, page, origin, basePath, output, assertTeacherStreams }) {
+export async function classroomBrowserCheck({ context, page, origin, basePath, output, assertTeacherStreams, teacherAccessCode = "classroom-browser-test-only", classroomTitle = "CI 实时课堂" }) {
   const endpoint = origin + basePath, errors = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.goto(endpoint + "/classroom", { waitUntil: "networkidle" });
-  await page.getByLabel("访问码", { exact: true }).fill("classroom-browser-test-only");
+  await page.getByLabel("访问码", { exact: true }).fill(teacherAccessCode);
   await page.getByRole("button", { name: "进入课堂", exact: true }).click();
   await page.getByRole("button", { name: "新建课堂", exact: true }).click();
-  await page.getByLabel("课堂名称", { exact: true }).fill("CI 实时课堂");
+  await page.getByLabel("课堂名称", { exact: true }).fill(classroomTitle);
   await page.getByRole("button", { name: "创建课堂", exact: true }).click();
   await page.getByRole("dialog").waitFor({ state: "hidden" });
   await page.getByRole("button", { name: "邀请学生", exact: true }).click();
