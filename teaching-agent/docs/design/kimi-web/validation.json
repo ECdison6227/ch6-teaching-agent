@@ -1,0 +1,18 @@
+{
+  "project": "ch6-self-test",
+  "branch": "style/kimi-web-self-test",
+  "sourceCommit": "4f18afe7a0bc28039006dc950d6b3ef8520faaaa",
+  "build": "passed",
+  "typecheck": "passed as part of final Next production build",
+  "regressionTests": {
+    "passed": 42,
+    "failed": 0
+  },
+  "mathRendering": "passed",
+  "browserChecks": {
+    "passed": 26,
+    "failed": 0
+  },
+  "preview": "http://127.0.0.1:43413",
+  "platformBoundary": "Windows Chrome; 390px desktop-UA emulation. Android/macOS required PR checks have not been run or waived."
+}

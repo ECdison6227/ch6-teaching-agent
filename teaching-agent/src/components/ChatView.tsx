@@ -12,36 +12,13 @@ import { useNotes } from "./notes";
 import { Thinking, StreamingCaret } from "./Typing";
 import { tidySelection } from "@/lib/selection-text";
 import type { useChat } from "@/lib/useChat";
+import { copyText } from "@/lib/clipboard";
+import { appPath } from "@/lib/app-path";
 import { MAX_MESSAGE_CHARS } from "@/lib/request-limits";
 
 type Chat = ReturnType<typeof useChat>;
 
 /** 复制到剪贴板。内网 http 下没有剪贴板权限，退回选中复制的老办法。 */
-async function copyText(text: string) {
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  } catch {
-    /* 继续走下面的兜底 */
-  }
-  try {
-    const area = document.createElement("textarea");
-    area.value = text;
-    area.setAttribute("readonly", "");
-    area.style.position = "fixed";
-    area.style.top = "-1000px";
-    document.body.appendChild(area);
-    area.select();
-    const ok = document.execCommand("copy");
-    area.remove();
-    return ok;
-  } catch {
-    return false;
-  }
-}
-
 /** 收藏时用的标题：取第一行有效文字，去掉 Markdown 记号 */
 function answerTitle(text: string) {
   const line = text.split("\n").map((s) => s.trim()).find((s) => s && !s.startsWith("```")) ?? "";
@@ -153,10 +130,12 @@ export function ChatView({
   chat,
   compact = false,
   welcome,
+  suggestions = [],
 }: {
   chat: Chat;
   compact?: boolean;
   welcome?: ReactNode;
+  suggestions?: string[];
 }) {
   const {
     msgs,
@@ -175,13 +154,19 @@ export function ChatView({
   } = chat;
   const { add: addNote } = useNotes();
   const [input, setInput] = useState("");
+  const [draftReady, setDraftReady] = useState(false);
+  const [draftAvailable, setDraftAvailable] = useState(true);
+  const draftKey = "ch6:chat-draft:" + appPath("/") + (compact ? ":assistant" : ":main");
+  useEffect(() => { try { setInput(sessionStorage.getItem(draftKey) || ""); } catch { setDraftAvailable(false); } setDraftReady(true); }, [draftKey]);
+  useEffect(() => { if (!draftReady) return; try { if (input) sessionStorage.setItem(draftKey, input); else sessionStorage.removeItem(draftKey); } catch { setDraftAvailable(false); } }, [draftReady, draftKey, input]);
   const [figure, setFigure] = useState<Figure | null>(null);
   const [gallery, setGallery] = useState<{ pages: number[]; index: number } | null>(null);
   const [menu, setMenu] = useState<{ x: number; y: number; text: string } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (!menu) return; const escape = (event: KeyboardEvent) => { if (event.key === "Escape") setMenu(null); }; const outside = (event: PointerEvent) => { if (!(event.target instanceof Element) || !event.target.closest(".kimi-selection-menu")) setMenu(null); }; window.addEventListener("keydown", escape); window.addEventListener("pointerdown", outside); return () => { window.removeEventListener("keydown", escape); window.removeEventListener("pointerdown", outside); }; }, [menu]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    bottomRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "end" });
   }, [msgs, busy]);
 
   /**
@@ -197,10 +182,10 @@ export function ChatView({
   const streaming = busy && !!last?.content;
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="min-h-0 flex-1 overflow-y-auto">
+    <div className="kimi-chat-view flex h-full min-h-0 flex-col" data-empty={msgs.length === 0} data-compact={compact} aria-busy={busy}>
+      <div className="kimi-messages min-h-0 flex-1 overflow-y-auto" role="log" aria-label="引导对话记录">
         <div
-          className={`mx-auto w-full px-4 ${
+          className={`kimi-message-column mx-auto w-full px-4 ${
             msgs.length === 0 && welcome ? "flex min-h-full flex-col justify-center" : ""
           } ${compact ? "py-5" : "max-w-chat py-10"}`}
         >
@@ -287,9 +272,10 @@ export function ChatView({
           )}
 
           {waiting ? <Thinking /> : null}
+          {last?.status === "stopped" ? <p role="status" className="mb-4 text-xs text-muted-foreground">已停止生成，已收到的内容保留。你可以继续提问。</p> : null}
 
           {error ? (
-            <div className="mt-2 rounded-xl border border-paper-line bg-paper px-3 py-2 text-[13px] leading-6 text-ink-soft">
+            <div role="alert" className="kimi-chat-error mt-2 text-sm leading-6">
               {error}
               {!busy ? <Button type="button" variant="ghost" size="sm" className="ml-2" onClick={() => void chat.retry()}>重试这一轮</Button> : null}
             </div>
@@ -300,6 +286,7 @@ export function ChatView({
       </div>
 
       <Composer
+        draftStatus={!draftAvailable ? "草稿暂存不可用" : input ? "草稿已保存" : "Enter 发送"}
         value={input}
         onChange={setInput}
         onSend={() => {
@@ -322,10 +309,13 @@ export function ChatView({
         onModelChange={setModel}
       />
 
+      {msgs.length === 0 && !compact && suggestions.length ? <div className="kimi-shortcuts" aria-label="试试这样问">{suggestions.map(suggestion => <Button key={suggestion} variant="outline" onClick={() => { setInput(suggestion); document.querySelector<HTMLTextAreaElement>('.kimi-chat-view[data-compact="false"] textarea')?.focus(); }}>{suggestion}</Button>)}</div> : null}
+
       {menu ? (
         <div
-          className="fixed z-40 flex overflow-hidden rounded-lg border border-paper-line bg-paper shadow-lg"
-          style={{ left: Math.max(8, menu.x), top: menu.y }}
+          className="kimi-selection-menu fixed z-40 flex overflow-hidden rounded-2xl border border-paper-line bg-paper p-1 shadow-lg"
+          role="toolbar" aria-label="选中文本操作"
+          style={{ left: Math.max(8, Math.min(menu.x, window.innerWidth - 240)), top: Math.min(window.innerHeight - 48, Math.max(8, menu.y)) }}
         >
           <button
             type="button"

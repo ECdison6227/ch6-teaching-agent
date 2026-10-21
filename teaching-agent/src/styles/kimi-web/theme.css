@@ -1,0 +1,37 @@
+:root {
+  --kimi-ground: #fbfaf9;
+  --kimi-paper: #fff;
+  --kimi-surface: #f5f5f5;
+  --kimi-underlay: #f5f5f5e6;
+  --kimi-popover: #fff;
+  --kimi-text-primary: #000000e6;
+  --kimi-text-secondary: #0009;
+  --kimi-text-tertiary: #00000073;
+  --kimi-text-disabled: #0000004d;
+  --kimi-fill-hover: #00000008;
+  --kimi-fill-selected: #0000000d;
+  --kimi-separator: #00000021;
+  --kimi-accent: #1783ff;
+  --kimi-mask: #0009;
+  --kimi-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, "Noto Sans", Ubuntu, Cantarell, "Helvetica Neue", sans-serif, Arial, "PingFang SC", "Source Han Sans SC", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC";
+  --kimi-input-max: 768px;
+  --kimi-sidebar: 240px;
+  --kimi-radius-input: 24px;
+  --kimi-radius-menu: 16px;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --kimi-ground: #181817;
+  --kimi-paper: #121212;
+  --kimi-surface: #1f1f1f;
+  --kimi-underlay: #1f1f1fe6;
+  --kimi-popover: #292929;
+  --kimi-text-primary: #ffffffd6;
+  --kimi-text-secondary: #ffffff8f;
+  --kimi-text-tertiary: #ffffff6b;
+  --kimi-text-disabled: #ffffff42;
+  --kimi-fill-hover: #ffffff0d;
+  --kimi-fill-selected: #ffffff1a;
+  --kimi-separator: #ffffff1f;
+  --kimi-accent: #1a88ff;
+  --kimi-mask: #0009;
+} }
