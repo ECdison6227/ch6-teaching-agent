@@ -79,7 +79,7 @@ export async function classroomBrowserCheck({ context, page, origin, basePath, o
     await student.bringToFront(); await student.getByText("等待老师公布答案", { exact: true }).waitFor();
     assert.equal(await student.getByRole("button", { name: "更新答案", exact: true }).count(), 0);
     await page.bringToFront(); await page.getByRole("button", { name: "公布答案", exact: true }).click();
-    await student.bringToFront(); await student.getByText("标准答案：", { exact: false }).last().waitFor();
+    await student.bringToFront(); await student.getByRole("region", { name: "当前课堂题目" }).getByText("标准答案：", { exact: false }).waitFor();
   }
   await page.bringToFront(); await page.goto(endpoint + "/", { waitUntil: "networkidle" });
   await page.getByRole("button", { name: "引导学习", exact: true }).click();
