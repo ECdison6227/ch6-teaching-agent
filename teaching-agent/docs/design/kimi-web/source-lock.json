@@ -1,0 +1,223 @@
+{
+  "repository": "https://github.com/ECdison6227/rea-ui-library",
+  "requestedRef": "main",
+  "commit": "4f18afe7a0bc28039006dc950d6b3ef8520faaaa",
+  "sourceDirectory": "platforms/web/kimi-web",
+  "sourceVersion": "Live snapshot 2026-10-20; page release marker c42d8c1",
+  "target": "ch6-self-test-review",
+  "targetBaseCommit": "ff44e52fa1723bce3f06ad54738e901413bac6ce",
+  "assets": [
+    {
+      "source": "assets/reusable/arrow.svg",
+      "target": "public/design/kimi-web/arrow.svg",
+      "sha256": "2ce85a1d78129397ab3831fb2b2d4a2cc4e99737a0b1a2a198657164a0049a17",
+      "treatment": "B original, byte-identical; D CSS mask wrapper"
+    },
+    {
+      "source": "assets/reusable/copy.svg",
+      "target": "public/design/kimi-web/copy.svg",
+      "sha256": "06721339b8f0a252ac3215bbd5052875a8dc90056125d2f8059b3aaf622614e8",
+      "treatment": "B original, byte-identical; D CSS mask wrapper"
+    },
+    {
+      "source": "assets/reusable/document.svg",
+      "target": "public/design/kimi-web/document.svg",
+      "sha256": "e4f690933109028a8bc93e1ee503ab5127c5dce1439cb8c9d3b4dd29abe259e3",
+      "treatment": "B original, byte-identical; D CSS mask wrapper"
+    },
+    {
+      "source": "assets/reusable/download.svg",
+      "target": "public/design/kimi-web/download.svg",
+      "sha256": "ea95cc360010ef406b3fd1854b1087b922c0033778222d1f23cfebdb4b270f59",
+      "treatment": "B original, byte-identical; D CSS mask wrapper"
+    },
+    {
+      "source": "assets/reusable/folder.svg",
+      "target": "public/design/kimi-web/folder.svg",
+      "sha256": "d4bf3c02dc1b8aba0da4443ae60d73df525c51e98fc44c202417c74356b28084",
+      "treatment": "B original, byte-identical; D CSS mask wrapper"
+    },
+    {
+      "source": "tokens/theme.css",
+      "target": "src/styles/kimi-web/theme.css",
+      "sha256": "d5fc375917b22dff073b194554a95c211b2770612733011784ce576e9392aea1",
+      "treatment": "B/A source values retained byte-identically; target shadcn binding D"
+    },
+    {
+      "source": "assets/reusable/components.css",
+      "target": "src/styles/kimi-web/source-components.css",
+      "sha256": "d2c934283de7d5f7cf47ddab398400635f496784ca5986a38054d2f30531355b",
+      "treatment": "B exact selected knowledge-card and markdown-header-content declarations; D selection/comment and LF framing"
+    }
+  ],
+  "changes": [
+    {
+      "path": ".gitignore",
+      "beforeSha256": "951e3a80c1e6db5214b9c3068720ac164361ca3aeb8010ab5d6f4c2eff9ca45a",
+      "afterSha256": "2148516696fee1996da1368dfb81ffe9601ca79b7c125f5770ac527ade78e2e9"
+    },
+    {
+      "path": "next.config.mjs",
+      "beforeSha256": "cfa019fa4cfb3c736b087b5e423f35e3294f96c02758e2c2dd4ac633011d37ac",
+      "afterSha256": "1957a937e8d350296c904de92472cab6a9ee5be332a2af2c7ff8322daf788d27"
+    },
+    {
+      "path": "src/app/globals.css",
+      "beforeSha256": "1ea6e64204cd2b4b5c5f81e82ed1de27365e612be7c8d9eb1c66e4b3882181dd",
+      "afterSha256": "d7e5dfbe5dd02204a1267b32eb5732e6c979d0beb04799f5157f3bf66a7d789a"
+    },
+    {
+      "path": "src/components/AiDrawer.tsx",
+      "beforeSha256": "74ad0e74c41c0918bd91234b54de0aaaee5d9f292e34e5cb446a951fcb452552",
+      "afterSha256": "0425a86aee95f11170228cce4c0c9f6ab3cbec115d47717027225ff9e246b653"
+    },
+    {
+      "path": "src/components/AppShell.tsx",
+      "beforeSha256": "6b27cb1788b3fe447dfa621e3c27bc5ed95a31921570a4d93a341807cf085c41",
+      "afterSha256": "6d5e3e71e2a1dbb8723fe1745e98d88a0c2399b9e14a7aab96d46e1ed0c0ea81"
+    },
+    {
+      "path": "src/components/ChatView.tsx",
+      "beforeSha256": "6e44383534747bbfa40661219c4e4dbd61e20e27e51f2e7601096ab4203e9c3c",
+      "afterSha256": "051f02c3d19022533a95930e254edb835af9a97ad126c2f8db3d3e52720f05a8"
+    },
+    {
+      "path": "src/components/Composer.tsx",
+      "beforeSha256": "9d93f18b55f9f31b16ffb6b44e7606ed6e871c9f7a3d4c9108327b7d21660be2",
+      "afterSha256": "d793fd43f0c2071b3d58a5c200b08d5df7bd5ad008270391eedf67deec075e4a"
+    },
+    {
+      "path": "src/components/Markdown.tsx",
+      "beforeSha256": "67cc665161867d0088129bf55b7cd4c0d1c846ae12890a5adcd91d913c851cf1",
+      "afterSha256": "b8582da5352ae1352638c8e90ab49c7c5681992d25136cbddcc135310efe6b79"
+    },
+    {
+      "path": "src/components/MaterialsView.tsx",
+      "beforeSha256": "427cd45382749d2a80a981c9fa44c1ad2c43244fc68ac3dd3ebbff5b2e66c9fe",
+      "afterSha256": "f59bd268ae26ac96d0c3b184276788943a56887f80233c3a47ac01312f6c0458"
+    },
+    {
+      "path": "src/components/Sidebar.tsx",
+      "beforeSha256": "9aff410578c53081a46cc4fc134b367ba14a5e5cd2fee53b04d4f8df747731ca",
+      "afterSha256": "7ab164c95a044105d748902d1ca7e7180304e7b22c896f50a28ee5e7d546ac7d"
+    },
+    {
+      "path": "src/components/StudyView.tsx",
+      "beforeSha256": "ed069442f632a2573fa9d405389c654f6579793ecd9f1f849c6539a86fffe9ae",
+      "afterSha256": "a431abd719db28e81ffd4e44cb047aa3d5826dd7d4c0f0ccff96cc2b00943d2a"
+    },
+    {
+      "path": "src/components/notes.tsx",
+      "beforeSha256": "18b22530f7ded502265376450d90ee4524295d8c7d46118b000e7c843802ed55",
+      "afterSha256": "6de8849d1ee75e0f2b7a97244789b92880a1ff038ddf55e911ee70e1054dffe0"
+    },
+    {
+      "path": "src/components/ui/button.tsx",
+      "beforeSha256": "c2b999a96781e6c932632bd089095368e973bf5602e1b1a62156b7d2b43f1e84",
+      "afterSha256": "f53b174a665811f743b471dc21103bbff70b69f950b987bf6f85a862d8acb61f"
+    },
+    {
+      "path": "src/components/ui/card.tsx",
+      "beforeSha256": "525c4bb2c051987be64df0e92e1d90174912b219bf541e24ffbc4a3406de49e8",
+      "afterSha256": "718c0058abe87e481030e375611f2c0a2cd27b6cae5d604a15b50da9fa8167f5"
+    },
+    {
+      "path": "src/components/ui/dialog.tsx",
+      "beforeSha256": "f40b858cce8049f92389000761cd96c316fb0c17f6b791635ae751f8d881a9f9",
+      "afterSha256": "5489bf0e67fabcb175d889c46eba92c720cc33df02450ce6e9c8c7b3b025d455"
+    },
+    {
+      "path": "src/components/ui/input.tsx",
+      "beforeSha256": "6299a6a387dc55e528aec4342deaea0b83f1ea3a365c135a31a18ee55334f441",
+      "afterSha256": "d9adc966eb27a97adc9d224727f55185f6accc2e130453746d044b6708e1a602"
+    },
+    {
+      "path": "src/components/ui/select.tsx",
+      "beforeSha256": "5ad415acc825c09d3e9391d9428d30faee476be355f6507c6d906c1d09e3044d",
+      "afterSha256": "f85d4e69e31278a9905d31cc69836be8edcd389788cd3d16a7919e84bf037d16"
+    },
+    {
+      "path": "src/components/ui/sheet.tsx",
+      "beforeSha256": "ca94e3404f193423260a4b33d2e4798c4d7ea41a0e1b734d7be4ed6472151fef",
+      "afterSha256": "4ca1418cafdb5e8a6adf906571a49b614574a49bed9cd6b1af34a21ed1363225"
+    },
+    {
+      "path": "src/components/ui/sidebar.tsx",
+      "beforeSha256": "a5df76725d722a8a4607a0dc9178ded5bf7c0d08c36b4a81e7622da65afcecff",
+      "afterSha256": "411d49c03bd6ee9cdc6809fe38f5a31b2a1021bacf480d9ee4d00ee063d52645"
+    },
+    {
+      "path": "src/lib/useChat.ts",
+      "beforeSha256": "ac87db8370adea5c96ed8d388cdd887ade1e6727fca0f513bacbbe203b8feecc",
+      "afterSha256": "e93bd538fa5f65ee5f0df4af1eebb58f551bde695d560e36c48e8c3370bda412"
+    },
+    {
+      "path": "tailwind.config.ts",
+      "beforeSha256": "d26c335064853eb32966097321e0e97bc7b546d4955aaa288e5dbd597837374f",
+      "afterSha256": "736555ea77a251f8564bfe5a58b08749e209ad07268f2bdfaf73ad3a7b407fe6"
+    },
+    {
+      "path": "tsconfig.json",
+      "beforeSha256": "ea6125dd5a756e3f9f17e57463a615ebd2dfbee1c9f30facf8a6b89458faf952",
+      "afterSha256": "87e318c77ab9b05d5fe0003846cef20d042be3121a65c54b03980ee526728e77"
+    },
+    {
+      "path": ".gitattributes",
+      "beforeSha256": null,
+      "afterSha256": "682fcab248edb14c9993a73edee8b23b0b006ffc10c910ff58395785f5814c0a"
+    },
+    {
+      "path": "src/lib/clipboard.ts",
+      "beforeSha256": null,
+      "afterSha256": "f431561f651f097fdb90914e1d9e10cf3c85cff1a27f4b52b8490ceb5323c418"
+    },
+    {
+      "path": "src/components/ui/textarea.tsx",
+      "beforeSha256": null,
+      "afterSha256": "f154b95aac97ddabed2900e1ed9a08aecb39d7476f68ce890180c1215f1984e1"
+    },
+    {
+      "path": "scripts/verify-kimi-web.mjs",
+      "beforeSha256": null,
+      "afterSha256": "1d1e8e0f14d4ed13ce22411bdb6a3a0d8b4b23302047231693d0c47a7ac4ea7b"
+    },
+    {
+      "path": "src/styles/kimi-web/theme.css",
+      "beforeSha256": null,
+      "afterSha256": "d5fc375917b22dff073b194554a95c211b2770612733011784ce576e9392aea1"
+    },
+    {
+      "path": "src/styles/kimi-web/source-components.css",
+      "beforeSha256": null,
+      "afterSha256": "d2c934283de7d5f7cf47ddab398400635f496784ca5986a38054d2f30531355b"
+    },
+    {
+      "path": "public/design/kimi-web/arrow.svg",
+      "beforeSha256": null,
+      "afterSha256": "2ce85a1d78129397ab3831fb2b2d4a2cc4e99737a0b1a2a198657164a0049a17"
+    },
+    {
+      "path": "public/design/kimi-web/copy.svg",
+      "beforeSha256": null,
+      "afterSha256": "06721339b8f0a252ac3215bbd5052875a8dc90056125d2f8059b3aaf622614e8"
+    },
+    {
+      "path": "public/design/kimi-web/document.svg",
+      "beforeSha256": null,
+      "afterSha256": "e4f690933109028a8bc93e1ee503ab5127c5dce1439cb8c9d3b4dd29abe259e3"
+    },
+    {
+      "path": "public/design/kimi-web/download.svg",
+      "beforeSha256": null,
+      "afterSha256": "ea95cc360010ef406b3fd1854b1087b922c0033778222d1f23cfebdb4b270f59"
+    },
+    {
+      "path": "public/design/kimi-web/folder.svg",
+      "beforeSha256": null,
+      "afterSha256": "d4bf3c02dc1b8aba0da4443ae60d73df525c51e98fc44c202417c74356b28084"
+    }
+  ],
+  "acquiredCommit": "4f18afe7a0bc28039006dc950d6b3ef8520faaaa",
+  "sourceRefPinned": true,
+  "implementedAt": "2026-10-21T13:26:17.000Z"
+}

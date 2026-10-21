@@ -1,0 +1,3 @@
+# Preserve pinned design-package asset bytes across platforms.
+public/design/kimi-web/** -text
+src/styles/kimi-web/** -text

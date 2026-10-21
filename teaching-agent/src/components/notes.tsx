@@ -3,6 +3,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import elementsJson from "@/content/slide-elements.json";
 import slidesJson from "@/content/slides.json";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Markdown } from "./Markdown";
 import { noteImagesHtml, noteImageSource, rawNotesMarkdown } from "@/lib/note-export";
 import { requestScope } from "@/lib/request-lifecycle";
@@ -112,69 +116,28 @@ export function useNotes() {
 }
 
 /** 点开一条笔记：看全文、改文字 */
-export function NoteEditor({
-  note,
-  onClose,
-}: {
-  note: Note | null;
-  onClose: () => void;
-}) {
+export function NoteEditor({ note, onClose }: { note: Note | null; onClose: () => void }) {
   const { update } = useNotes();
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
-
-  useEffect(() => {
-    setTitle(note ? displayNoteTitle(note) : "");
-    setText(note ? displayNoteText(note) : "");
-  }, [note]);
-
-  if (!note) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
-      <div
-        className="flex max-h-[86dvh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-paper shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center gap-2 border-b border-paper-line px-4 py-3">
-          <span className="text-[13px] font-medium">笔记</span>
-          <button type="button" onClick={onClose} className="ml-auto text-[12px] text-ink-faint hover:text-ink">
-            关闭
-          </button>
-        </div>
-        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3">
-          {note.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={noteImageSource(note.image) ?? undefined} alt="" className="w-full rounded-lg ring-1 ring-paper-line" />
-          ) : null}
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-lg border border-paper-line bg-paper-soft px-3 py-2 text-[14px] outline-none"
-          />
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={8}
-            placeholder="写下笔记"
-            className="w-full resize-none rounded-lg border border-paper-line bg-paper-soft px-3 py-2 text-[13px] leading-6 outline-none"
-          />
-        </div>
-        <div className="flex justify-end gap-2 border-t border-paper-line px-4 py-3">
-          <button
-            type="button"
-            onClick={() => {
-              update(note.id, { title, text });
-              onClose();
-            }}
-            className="rounded-lg bg-ink px-3 py-1.5 text-[13px] text-paper"
-          >
-            保存
-          </button>
-        </div>
+  const returnFocus = useRef<HTMLElement | null>(null);
+  useEffect(() => { setTitle(note ? displayNoteTitle(note) : ""); setText(note ? displayNoteText(note) : ""); }, [note]);
+  return <Dialog open={!!note} onOpenChange={open => { if (!open) onClose(); }}>
+    <DialogContent className="kimi-note-editor flex flex-col gap-5 overflow-hidden"
+      onOpenAutoFocus={() => { returnFocus.current = document.activeElement as HTMLElement | null; }}
+      onCloseAutoFocus={event => { event.preventDefault(); returnFocus.current?.focus(); }}>
+      <DialogHeader className="pr-6 text-left"><DialogTitle className="text-lg font-medium">编辑笔记</DialogTitle><DialogDescription>保存后更新这条笔记；取消将放弃本次修改。</DialogDescription></DialogHeader>
+      <div className="min-h-0 space-y-4 overflow-y-auto">
+        {note?.image ? <img src={noteImageSource(note.image) ?? undefined} alt="收藏的课程图片" className="w-full rounded-xl border" /> : null}
+        <label className="block space-y-2 text-sm"><span>标题</span><Input aria-label="笔记标题" value={title} onChange={e => setTitle(e.target.value)} maxLength={200} placeholder="给笔记起一个标题" aria-invalid={!title.trim()} /></label>
+        {!title.trim() ? <p role="status" className="text-xs text-destructive">请填写笔记标题。</p> : null}
+        <label className="block space-y-2 text-sm"><span>笔记内容</span><Textarea aria-label="笔记内容" value={text} onChange={e => setText(e.target.value)} rows={7} placeholder="记下你的理解、公式或待解决的问题…" /></label>
       </div>
-    </div>
-  );
+      <DialogFooter className="flex-row justify-end gap-2"><Button type="button" variant="outline" onClick={onClose}>取消</Button><Button type="button" disabled={!title.trim()} onClick={() => { if (note) { update(note.id, { title: title.trim(), text }); onClose(); } }}>保存</Button></DialogFooter>
+    </DialogContent>
+  </Dialog>;
 }
+
 
 /** 先在用户点击时打开窗口，图片笔记不依赖模型；文字保留公式渲染。 */
 export async function exportNotePdf(notes: Note[]) {

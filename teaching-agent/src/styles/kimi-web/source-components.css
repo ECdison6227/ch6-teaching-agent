@@ -1,0 +1,3 @@
+/* B: byte-identical selected declaration from assets/reusable/components.css. */
+.knowledge-card{box-sizing:border-box;border:.5px solid var(--Separators-S1);background:var(--Bg-Primary);border-radius:20px;flex-direction:column;gap:12px;width:100%;padding:16px;display:flex}
+.markdown-header-content{background-color:var(--Bg-Secondary);border:.5px solid var(--Separators-S1);border-bottom:none;border-top-left-radius:12px;border-top-right-radius:12px;justify-content:space-between;align-items:center;gap:8px;padding:8px 8px 8px 16px;display:flex}

@@ -118,6 +118,7 @@ export function StudyView() {
   const [chapterGate, setChapterGate] = useState(false);
   const [beta, setBeta] = useState(false);
   const notesRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { const escape = (event: KeyboardEvent) => { if (event.key === "Escape") { setChaptersOpen(false); setNotesOpen(false); } }; window.addEventListener("keydown", escape); return () => window.removeEventListener("keydown", escape); }, []);
 
   useEffect(() => {
     setBeta(window.localStorage.getItem(BETA_KEY) === "1");
@@ -306,10 +307,12 @@ export function StudyView() {
   return (
     <div ref={shellRef} className="relative h-full min-h-0 overflow-y-auto">
       <div className="flex min-h-full flex-col">
-      <div className="sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b border-paper-line bg-paper px-3 py-2">
+      <div className="kimi-toolbar sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b border-paper-line bg-paper px-3 py-2">
         <SidebarTrigger />
         <button
           type="button"
+          aria-expanded={chaptersOpen}
+          aria-label="章节"
           onClick={() => setChaptersOpen((v) => !v)}
           className="rounded-lg border border-paper-line px-2.5 py-1 text-[12.5px] text-ink-soft hover:bg-paper-soft"
         >
