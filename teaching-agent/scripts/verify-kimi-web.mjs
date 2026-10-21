@@ -44,11 +44,11 @@ try {
  });
  const health=await context.request.get(origin+'/api/health'); assert.equal(health.status(),200); complete('real-server-health');
  await page.goto(origin,{waitUntil:'networkidle',timeout:120000});
- await page.getByRole('button',{name:'进入学习',exact:true}).waitFor();
+ await page.getByRole('button',{name:'引导学习',exact:true}).waitFor();
  await page.waitForTimeout(200); await shot('home');
- await page.getByRole('button',{name:'展开全部',exact:true}).click();
- assert.equal(await page.locator('.kimi-overview ol > li').count(),14);await page.getByRole('button',{name:'收起',exact:true}).click();complete('course-outline-expand-collapse');
- await page.getByRole('button',{name:'进入学习',exact:true}).click();
+ await page.getByRole('button',{name:'全部知识点',exact:true}).click();
+ assert.equal(await page.locator('.kimi-page ol > li').count(),14);await page.getByRole('button',{name:'收起目录',exact:true}).click();complete('course-outline-expand-collapse');
+ await page.getByRole('button',{name:'引导学习',exact:true}).click();
  let input=await waitInput();
  assert.ok(await page.getByRole('button',{name:'发送',exact:true}).isDisabled());
  const geometry=await page.locator('.kimi-composer:visible').evaluate(el=>{const b=el.getBoundingClientRect(),style=getComputedStyle(el),t=el.querySelector('textarea'),ts=getComputedStyle(t);return{x:b.x,y:b.y,width:b.width,height:b.height,radius:style.borderRadius,font:ts.fontFamily,fontSize:ts.fontSize,lineHeight:ts.lineHeight,background:style.backgroundColor};});
@@ -93,7 +93,7 @@ try {
  await page.getByRole('button',{name:'收藏这一页',exact:true}).click();await page.getByRole('button',{name:'取消收藏这一页',exact:true}).waitFor();await page.getByRole('button',{name:'章节',exact:true}).click();assert.equal(await page.getByRole('button',{name:'章节',exact:true}).getAttribute('aria-expanded'),'true');await page.keyboard.press('Escape');assert.equal(await page.getByRole('button',{name:'章节',exact:true}).getAttribute('aria-expanded'),'false');await shot('study');complete('actual-slides-bookmark-chapter-escape');
  await page.getByRole('button',{name:'问 AI',exact:true}).click();const ai=page.locator('aside textarea');await ai.waitFor();await ai.fill('侧栏里的独立草稿');await page.locator('aside').getByRole('button',{name:'收起',exact:true}).click();await page.getByRole('button',{name:'问 AI',exact:true}).click();assert.equal(await ai.inputValue(),'侧栏里的独立草稿');await page.locator('aside').getByRole('button',{name:'收起',exact:true}).click();complete('assistant-panel-return-and-independent-draft');
  if(fs.existsSync('src/components/SelfTestView.tsx')) {
-  await navigate('题库自测');await page.getByRole('heading',{name:'题库自测',exact:true}).waitFor();await page.getByRole('button',{name:'5 题',exact:true}).click();await page.getByRole('button',{name:'开始自测',exact:true}).click();await page.getByRole('button',{name:'交卷',exact:true}).waitFor();await shot('self-test');complete('branch-self-test-start');
+  await navigate('题库自测');await page.getByRole('heading',{name:'题库自测',exact:true}).waitFor();await page.getByRole('button',{name:'设置',exact:true}).click();await page.getByRole('button',{name:'5 题',exact:true}).click();await page.getByRole('button',{name:'开始自测',exact:true}).click();await page.getByRole('button',{name:'交卷',exact:true}).waitFor();await shot('self-test');complete('branch-self-test-start');
  }
  if(fs.existsSync('src/components/ClassroomView.tsx')) {
   await navigate('实时课堂');await page.getByRole('heading',{name:/实时课堂/}).waitFor();assert.equal(await page.getByText(/CLASSROOM_DB_PATH|CLASSROOM_TEACHER_ACCESS_CODE/).count(),0);await shot('classroom');complete('branch-classroom-entry-friendly-configuration-state');

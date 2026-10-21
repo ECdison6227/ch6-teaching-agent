@@ -307,17 +307,17 @@ export function StudyView() {
   return (
     <div ref={shellRef} className="relative h-full min-h-0 overflow-y-auto">
       <div className="flex min-h-full flex-col">
-      <div className="kimi-toolbar sticky top-0 z-20 flex shrink-0 items-center gap-2 border-b border-paper-line bg-paper px-3 py-2">
+      <div className="kimi-toolbar sticky top-0 z-20 flex shrink-0 items-center gap-2 bg-paper">
         <SidebarTrigger />
-        <button
+        <Button variant="ghost" size="sm"
           type="button"
           aria-expanded={chaptersOpen}
           aria-label="章节"
           onClick={() => setChaptersOpen((v) => !v)}
-          className="rounded-lg border border-paper-line px-2.5 py-1 text-[12.5px] text-ink-soft hover:bg-paper-soft"
+
         >
           {chaptersOpen ? "收起章节" : "章节"}
-        </button>
+        </Button>
         <span className="min-w-0 flex-1 truncate text-[12px] text-ink-faint">
           {bookSel ? activeSection : slide?.section}
         </span>
@@ -328,7 +328,7 @@ export function StudyView() {
           aria-pressed={beta}
           onClick={toggleBeta}
         >
-          Beta
+          实验
         </Button>
         {beta ? (
           <Button type="button" size="sm" variant="outline" onClick={discuss}>
@@ -336,22 +336,22 @@ export function StudyView() {
           </Button>
         ) : null}
         {nextLabel ? (
-          <button
+          <Button variant="ghost" size="sm"
             type="button"
             onClick={goNextChapter}
             title={`下一章：${nextLabel}`}
-            className="shrink-0 rounded-lg border border-paper-line px-2.5 py-1 text-[12.5px] text-ink-soft hover:bg-paper-soft"
+
           >
             下一章
-          </button>
+          </Button>
         ) : null}
-        <button
+        <Button variant="ghost" size="sm"
           type="button"
           onClick={() => (open ? close() : ask({ context: pageCtx }))}
-          className="shrink-0 rounded-lg border border-paper-line px-2.5 py-1 text-[12.5px] text-ink-soft hover:bg-paper-soft"
+
         >
           {open ? "收起" : "问 AI"}
-        </button>
+        </Button>
       </div>
 
       {chaptersOpen ? (
@@ -392,7 +392,7 @@ export function StudyView() {
       ) : null}
 
       <div className="flex w-full flex-1 flex-col justify-center">
-      <div className="mx-auto w-full max-w-3xl px-4 py-5 sm:px-6">
+      <div className="mx-auto w-full max-w-[864px] px-4 py-6 sm:px-8">
         {chapterGate && nextLabel ? (
           <div className="relative flex aspect-[4/3] w-full items-center justify-center rounded-2xl border border-paper-line bg-paper">
             <Button
