@@ -1,0 +1,20 @@
+[
+  {
+    "file": "build.log",
+    "rawSha256": "7737c7ee7ed7256389deb550b73f97e439578e8b29cdd48b00bbcc5ff6291712",
+    "normalizedSha256": "668f0a278e654505d49e52d411b8c7e1094a6447ac5046fd8a96ab8750911888",
+    "treatment": "only trailing line whitespace normalized; complete original retained in .design-sources/verification/ch6-ci-main"
+  },
+  {
+    "file": "test.log",
+    "rawSha256": "82f2b01f493d2c33ade9e86e2ce5eacd427b7acee072c916a2688ec4283f16a4",
+    "normalizedSha256": "82f2b01f493d2c33ade9e86e2ce5eacd427b7acee072c916a2688ec4283f16a4",
+    "treatment": "only trailing line whitespace normalized; complete original retained in .design-sources/verification/ch6-ci-main"
+  },
+  {
+    "file": "math.log",
+    "rawSha256": "4f28e40a7e04d340811397ea0aab0d5d9a733decd1b774b48774422424df8a96",
+    "normalizedSha256": "4f28e40a7e04d340811397ea0aab0d5d9a733decd1b774b48774422424df8a96",
+    "treatment": "only trailing line whitespace normalized; complete original retained in .design-sources/verification/ch6-ci-main"
+  }
+]

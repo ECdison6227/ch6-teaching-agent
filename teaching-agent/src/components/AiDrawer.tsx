@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useHydratedReducedMotion } from "@/hooks/use-hydrated-reduced-motion";
 import { motion } from "motion/react";
 import { PanelRightClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -132,15 +133,16 @@ export function AiDrawerProvider({ children }: { children: ReactNode }) {
 
 /** 放进自学天地那一栏的右侧，和课件并排 */
 export function AiSidePanel() {
+  const reduce = useHydratedReducedMotion();
   const { open, close } = useAiDrawer();
   const isMobile = useIsMobile();
   const panel = useContext(PanelCtx);
   if (!open || !panel) return null;
   return (
     <motion.aside
-      initial={{ width: 0, opacity: 0 }}
+      initial={reduce ? false : { width: 0, opacity: 0 }}
       animate={{ width: isMobile ? "100%" : 400, opacity: 1 }}
-      transition={{ duration: 0.22, ease: "easeOut" }}
+      transition={{ duration: reduce ? 0 : 0.3, ease: "easeInOut" }}
       className="flex h-full shrink-0 flex-col overflow-hidden border-l bg-background"
     >
       {/* 面板自己的收起入口：手机上面板占了大半屏，从里面也能退回去 */}
