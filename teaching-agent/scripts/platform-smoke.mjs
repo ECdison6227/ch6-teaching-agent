@@ -141,6 +141,20 @@ try {
   await page.reload({ waitUntil: "networkidle" });
   await navigate("自学天地");
   await page.getByRole("button", { name: "取消收藏这一页", exact: true }).waitFor();
+  await page.evaluate(() => {
+    const originalOpen = window.open;
+    window.open = function (...args) {
+      const popup = originalOpen.apply(this, args);
+      if (popup) popup.print = () => { popup.__notePrintCalled = true; };
+      return popup;
+    };
+  });
+  const notePopupPromise = page.waitForEvent("popup");
+  await page.getByRole("button", { name: "汇总并导出 PDF", exact: true }).click();
+  const notePopup = await notePopupPromise;
+  await notePopup.waitForFunction(() => window.__notePrintCalled === true);
+  assert.ok(await notePopup.locator("img").evaluate(image => image.complete && image.naturalWidth > 0), "Image-only notes must load the image and invoke print");
+  await notePopup.close(); await page.bringToFront();
   await page.getByRole("button", { name: "取消收藏这一页", exact: true }).click();
   await page.getByRole("button", { name: "收藏这一页", exact: true }).waitFor();
 
@@ -248,6 +262,11 @@ try {
     };
   });
   await page.getByRole("button", { name: "导出错题", exact: true }).click();
+  for (const template of ["空白重练", "对照纠错"]) {
+    await page.getByRole("combobox", { name: "导出模板", exact: true }).click();
+    await page.getByRole("option", { name: template, exact: true }).click();
+    assert.match(await page.getByRole("combobox", { name: "导出模板", exact: true }).innerText(), new RegExp(template));
+  }
   const popupPromise = page.waitForEvent("popup");
   await page.getByRole("button", { name: "打印 / PDF", exact: true }).click();
   const printPopup = await popupPromise;

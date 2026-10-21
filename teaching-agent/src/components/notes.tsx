@@ -167,6 +167,8 @@ export async function exportNotePdf(notes: Note[]) {
     }).join("");
     const { renderToStaticMarkup } = await import("react-dom/server");
     const body = renderToStaticMarkup(<Markdown text={markdown} />);
+    // document.open() clears window listeners, so subscribe after opening it.
+    printWindow.document.open();
     printWindow.addEventListener("load", () => {
       void (async () => {
         await printWindow.document.fonts.ready;
@@ -174,7 +176,6 @@ export async function exportNotePdf(notes: Note[]) {
         if (!printWindow.closed) printWindow.print();
       })();
     }, { once: true });
-    printWindow.document.open();
     printWindow.document.write('<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>我的第六章笔记</title>' + styles +
       '<style>body{font-family:"Microsoft YaHei",sans-serif;max-width:720px;margin:32px auto;padding:16px;line-height:1.75;background:white;color:#1a1a18}img{max-width:100%}figure{break-inside:avoid}figcaption{font-size:12px;color:#666}h1{font-size:22px}h2{font-size:18px;margin-top:1.4em}.md-body{font-size:14px}.katex{color:inherit}</style></head><body><h1>我的第六章笔记</h1>' +
       (markdown ? '<p>' + (summarized ? '已根据收藏汇总。' : '以下按收藏原文整理。') + '</p>' : '') + body + noteImagesHtml(notes) + '</body></html>');
