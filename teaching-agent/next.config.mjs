@@ -4,6 +4,8 @@ if (basePath && !/^\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)*$/.test(basePath)) throw
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   basePath,
+  // Allow isolated verification builds while an existing dev server stays open.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   experimental: {
     // 允许服务端读取本地内容文件（知识库/题库）
     serverActions: { bodySizeLimit: "10mb" },

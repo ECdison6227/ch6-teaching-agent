@@ -1,0 +1,20 @@
+[
+  {
+    "file": "build.log",
+    "rawSha256": "d162ff02313f4df26f02c0c2541d9f4a94922cb97e5adbac74ef5668d034e066",
+    "normalizedSha256": "ef3bf686e2e61394d59aac588e6ecc93236fda97f0d4e3dcabcc2a2a3bbc786f",
+    "treatment": "only trailing line whitespace normalized; complete original retained in .design-sources/verification/ch6-teaching-agent"
+  },
+  {
+    "file": "test.log",
+    "rawSha256": "30e9467b70f9d523bba49657a93c28341f76a3de41a559e90219ed17e1a7fefc",
+    "normalizedSha256": "30e9467b70f9d523bba49657a93c28341f76a3de41a559e90219ed17e1a7fefc",
+    "treatment": "only trailing line whitespace normalized; complete original retained in .design-sources/verification/ch6-teaching-agent"
+  },
+  {
+    "file": "math.log",
+    "rawSha256": "4f28e40a7e04d340811397ea0aab0d5d9a733decd1b774b48774422424df8a96",
+    "normalizedSha256": "4f28e40a7e04d340811397ea0aab0d5d9a733decd1b774b48774422424df8a96",
+    "treatment": "only trailing line whitespace normalized; complete original retained in .design-sources/verification/ch6-teaching-agent"
+  }
+]
