@@ -114,6 +114,7 @@ try {
       button = page.getByRole("button", { name: label, exact: true });
     }
     await button.click();
+    await page.getByRole("dialog", { name: "Sidebar", exact: true }).waitFor({ state: "hidden" });
   }
 
   await navigate("自学天地");
@@ -149,12 +150,16 @@ try {
       return popup;
     };
   });
-  const notePopupPromise = page.waitForEvent("popup");
-  await page.getByRole("button", { name: "汇总并导出 PDF", exact: true }).click();
-  const notePopup = await notePopupPromise;
+  const exportNotes = page.getByRole("button", { name: "汇总并导出 PDF", exact: true });
+  // Mobile navigation closes the drawer; reopen it before using its export action.
+  if (!(await exportNotes.isVisible())) {
+    await page.getByRole("button", { name: "Toggle Sidebar", exact: true }).filter({ visible: true }).first().click();
+  }
+  const [notePopup] = await Promise.all([page.waitForEvent("popup"), exportNotes.click()]);
   await notePopup.waitForFunction(() => window.__notePrintCalled === true);
   assert.ok(await notePopup.locator("img").evaluate(image => image.complete && image.naturalWidth > 0), "Image-only notes must load the image and invoke print");
   await notePopup.close(); await page.bringToFront();
+  await navigate("自学天地");
   await page.getByRole("button", { name: "取消收藏这一页", exact: true }).click();
   await page.getByRole("button", { name: "收藏这一页", exact: true }).waitFor();
 
@@ -267,9 +272,9 @@ try {
     await page.getByRole("option", { name: template, exact: true }).click();
     assert.match(await page.getByRole("combobox", { name: "导出模板", exact: true }).innerText(), new RegExp(template));
   }
-  const popupPromise = page.waitForEvent("popup");
-  await page.getByRole("button", { name: "打印 / PDF", exact: true }).click();
-  const printPopup = await popupPromise;
+  const [printPopup] = await Promise.all([
+    page.waitForEvent("popup"), page.getByRole("button", { name: "打印 / PDF", exact: true }).click(),
+  ]);
   await printPopup.waitForFunction(() => window.__selfTestPrintCalled === true);
   await page.getByRole("button", { name: "打印 / PDF", exact: true }).waitFor();
   assert.match(await printPopup.locator("body").innerText(), /标准答案/);
