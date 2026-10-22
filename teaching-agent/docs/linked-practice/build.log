@@ -13,13 +13,13 @@
    We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
    The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
 
-   	- include was updated to add '.cache/linked-practice-build/types/**/*.ts'
+     - include was updated to add '.cache/linked-practice-build/types/**/*.ts'
 
    Collecting page data ...
    Generating static pages (0/8) ...
-   Generating static pages (2/8) 
-   Generating static pages (4/8) 
-   Generating static pages (6/8) 
+   Generating static pages (2/8)
+   Generating static pages (4/8)
+   Generating static pages (6/8)
  ✓ Generating static pages (8/8)
    Finalizing page optimization ...
    Collecting build traces ...
@@ -48,4 +48,3 @@ Route (app)                                      Size  First Load JS
 
 ○  (Static)   prerendered as static content
 ƒ  (Dynamic)  server-rendered on demand
-
