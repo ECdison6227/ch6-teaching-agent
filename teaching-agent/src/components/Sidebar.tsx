@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bookmark, BookOpen, BookOpenCheck, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, Radio, StickyNote, Trash2 } from "lucide-react";
+import { Bookmark, BookOpen, BookOpenCheck, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, Network, Radio, StickyNote, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -224,7 +224,7 @@ function HelpDetail({ id }: { id: HelpId }) {
   );
 }
 
-export type AppView = "home" | "chat" | "study" | "materials" | "self-test" | "classroom";
+export type AppView = "home" | "chat" | "study" | "materials" | "self-test" | "classroom" | "linked-practice";
 
 export function Sidebar({
   view,
@@ -330,6 +330,10 @@ export function Sidebar({
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
+          </SidebarGroup>
+          <SidebarGroup className="border-t border-border/60 pt-3">
+            <SidebarGroupLabel>新增功能</SidebarGroupLabel>
+            <SidebarMenu><SidebarMenuItem><SidebarMenuButton isActive={view === "linked-practice"} tooltip="关联练习" onClick={() => goView("linked-practice")}><Network /><span>关联练习</span></SidebarMenuButton></SidebarMenuItem></SidebarMenu>
           </SidebarGroup>
           <SidebarGroup className="min-h-0 flex-1 border-t border-border/60 pt-4">
             <div className="flex w-full min-w-0 items-center gap-1 group-data-[collapsible=icon]:hidden">

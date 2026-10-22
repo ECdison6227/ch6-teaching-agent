@@ -1,0 +1,51 @@
+
+> ch6-teaching-agent@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.27
+   - Experiments (use with caution):
+     · serverActions
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 8.0s
+   Linting and checking validity of types ...
+
+   We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+   The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+   	- include was updated to add '.cache/linked-practice-build/types/**/*.ts'
+
+   Collecting page data ...
+   Generating static pages (0/8) ...
+   Generating static pages (2/8) 
+   Generating static pages (4/8) 
+   Generating static pages (6/8) 
+ ✓ Generating static pages (8/8)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                      Size  First Load JS
+┌ ○ /                                          209 kB         536 kB
+├ ○ /_not-found                                 990 B         104 kB
+├ ƒ /api/chat                                   149 B         103 kB
+├ ƒ /api/classroom-participation/[[...path]]    149 B         103 kB
+├ ƒ /api/classrooms/[[...path]]                 149 B         103 kB
+├ ƒ /api/digest                                 149 B         103 kB
+├ ƒ /api/health                                 149 B         103 kB
+├ ƒ /api/materials                              149 B         103 kB
+├ ƒ /api/materials/preview                      149 B         103 kB
+├ ƒ /api/models                                 149 B         103 kB
+├ ○ /classroom                                  149 B         103 kB
+├ ○ /join                                       136 B         330 kB
+├ ƒ /join/[code]                                137 B         330 kB
+├ ○ /linked-practice                            149 B         103 kB
+└ ○ /self-test                                  149 B         103 kB
++ First Load JS shared by all                  103 kB
+  ├ chunks/203-ba40efc85e0828df.js            46.3 kB
+  ├ chunks/2f4149e1-82b6202eb7160665.js       54.2 kB
+  └ other shared chunks (total)               2.14 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

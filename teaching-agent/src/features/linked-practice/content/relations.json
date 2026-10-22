@@ -1,0 +1,178 @@
+[
+  {
+    "id": "MY-REL-001",
+    "fromId": "MY-DEMO-DOUBLE-JUDGE-001",
+    "toId": "MY-DEMO-DOUBLE-FILL-002",
+    "type": "prerequisite",
+    "label": "前置基础",
+    "reason": "不会写条件，就无法判断其目的"
+  },
+  {
+    "id": "MY-REL-002",
+    "fromId": "MY-DEMO-DOUBLE-JUDGE-001",
+    "toId": "MY-DEMO-DOUBLE-JUDGE-003",
+    "type": "parallel",
+    "label": "平行概念",
+    "reason": "三个适用条件并列，各自约束不同失效模式"
+  },
+  {
+    "id": "MY-REL-003",
+    "fromId": "MY-DEMO-DOUBLE-JUDGE-001",
+    "toId": "MY-DEMO-DOUBLE-JUDGE-004",
+    "type": "parallel",
+    "label": "平行概念",
+    "reason": "三个适用条件并列，各自约束不同失效模式"
+  },
+  {
+    "id": "MY-REL-006",
+    "fromId": "MY-DEMO-DOUBLE-JUDGE-001",
+    "toId": "MY-DEMO-DOUBLE-JUDGE-007",
+    "type": "contrast",
+    "label": "易混对比",
+    "reason": "典型张冠李戴式错因，两题互为镜像"
+  },
+  {
+    "id": "MY-REL-007",
+    "fromId": "MY-DEMO-DOUBLE-JUDGE-001",
+    "toId": "MY-DEMO-CROSS-MODULE-CALCULATION-008",
+    "type": "cross-module",
+    "label": "跨模块延伸",
+    "reason": "同为”受压钢筋是否屈服”的判别逻辑"
+  },
+  {
+    "id": "MY-REL-017",
+    "fromId": "MY-DEMO-SINGLE-CHOICE-017",
+    "toId": "MY-DEMO-SINGLE-CHOICE-018",
+    "type": "prerequisite",
+    "label": "前置基础",
+    "reason": "两个判据各自成题，本题为综合应用"
+  },
+  {
+    "id": "MY-REL-018",
+    "fromId": "MY-DEMO-SINGLE-CHOICE-017",
+    "toId": "MY-DEMO-SINGLE-CHOICE-019",
+    "type": "prerequisite",
+    "label": "前置基础",
+    "reason": "两个判据各自成题，本题为综合应用"
+  },
+  {
+    "id": "MY-REL-019",
+    "fromId": "MY-DEMO-SINGLE-CHOICE-017",
+    "toId": "MY-DEMO-SINGLE-CHOICE-020",
+    "type": "parallel",
+    "label": "平行概念",
+    "reason": "三题构成”适筋/超筋/少筋”完整对照组"
+  },
+  {
+    "id": "MY-REL-021",
+    "fromId": "MY-DEMO-SINGLE-CHOICE-017",
+    "toId": "MY-DEMO-SINGLE-CALCULATION-022",
+    "type": "inverse",
+    "label": "逆向设计",
+    "reason": "本题”已知 As 判形态” ↔ “给定目标选 As”"
+  },
+  {
+    "id": "MY-REL-022",
+    "fromId": "MY-DEMO-SINGLE-CHOICE-017",
+    "toId": "MY-DEMO-SINGLE-CALCULATION-023",
+    "type": "advanced",
+    "label": "进阶应用",
+    "reason": "从”不超筋”上升到”满足延性”"
+  },
+  {
+    "id": "MY-REL-023",
+    "fromId": "MY-DEMO-SINGLE-CHOICE-017",
+    "toId": "MY-DEMO-DOUBLE-JUDGE-007",
+    "type": "contrast",
+    "label": "易混对比",
+    "reason": "选择考”算”，判断考”辨”，同知识点异题型"
+  },
+  {
+    "id": "MY-REL-024",
+    "fromId": "MY-DEMO-SINGLE-CHOICE-017",
+    "toId": "MY-DEMO-DOUBLE-JUDGE-001",
+    "type": "contrast",
+    "label": "易混对比",
+    "reason": "选择考”算”，判断考”辨”，同知识点异题型"
+  },
+  {
+    "id": "MY-REL-025",
+    "fromId": "MY-DEMO-SINGLE-CHOICE-017",
+    "toId": "MY-DEMO-CROSS-MODULE-CALCULATION-008",
+    "type": "cross-module",
+    "label": "跨模块延伸",
+    "reason": "同一 As 在斜截面与构造中的联动"
+  },
+  {
+    "id": "MY-REL-026",
+    "fromId": "MY-DEMO-SINGLE-CHOICE-017",
+    "toId": "MY-DEMO-CROSS-MODULE-FILL-024",
+    "type": "cross-module",
+    "label": "跨模块延伸",
+    "reason": "同一 As 在斜截面与构造中的联动"
+  },
+  {
+    "id": "MY-REL-027",
+    "fromId": "MY-DEMO-DOUBLE-CALCULATION-025",
+    "toId": "MY-DEMO-SINGLE-CALCULATION-026",
+    "type": "prerequisite",
+    "label": "前置基础",
+    "reason": "双筋设计＝单筋设计＋“不足部分由 A’s 补足”"
+  },
+  {
+    "id": "MY-REL-028",
+    "fromId": "MY-DEMO-DOUBLE-CALCULATION-025",
+    "toId": "MY-DEMO-DOUBLE-FILL-002",
+    "type": "prerequisite",
+    "label": "前置基础",
+    "reason": "双筋设计＝单筋设计＋“不足部分由 A’s 补足”"
+  },
+  {
+    "id": "MY-REL-030",
+    "fromId": "MY-DEMO-DOUBLE-CALCULATION-025",
+    "toId": "MY-DEMO-SINGLE-CHOICE-017",
+    "type": "parallel",
+    "label": "平行概念",
+    "reason": "设计过程中并行完成三项验算"
+  },
+  {
+    "id": "MY-REL-031",
+    "fromId": "MY-DEMO-DOUBLE-CALCULATION-025",
+    "toId": "MY-DEMO-DOUBLE-FILL-027",
+    "type": "parallel",
+    "label": "平行概念",
+    "reason": "设计过程中并行完成三项验算"
+  },
+  {
+    "id": "MY-REL-033",
+    "fromId": "MY-DEMO-DOUBLE-CALCULATION-025",
+    "toId": "MY-DEMO-SINGLE-CALCULATION-014",
+    "type": "advanced",
+    "label": "进阶应用",
+    "reason": "从”算得出”到”用得合理”"
+  },
+  {
+    "id": "MY-REL-034",
+    "fromId": "MY-DEMO-DOUBLE-CALCULATION-025",
+    "toId": "MY-DEMO-DOUBLE-CALCULATION-029",
+    "type": "advanced",
+    "label": "进阶应用",
+    "reason": "从”算得出”到”用得合理”"
+  },
+  {
+    "id": "MY-REL-035",
+    "fromId": "MY-DEMO-DOUBLE-CALCULATION-025",
+    "toId": "MY-DEMO-SINGLE-CALCULATION-030",
+    "type": "contrast",
+    "label": "易混对比",
+    "reason": "同一参数下”该不该用双筋”的典型误判"
+  },
+  {
+    "id": "MY-REL-036",
+    "fromId": "MY-DEMO-DOUBLE-CALCULATION-025",
+    "toId": "MY-DEMO-CROSS-MODULE-CALCULATION-031",
+    "type": "cross-module",
+    "label": "跨模块延伸",
+    "reason": "正截面配筋结果直接输入斜截面与正常使用极限状态"
+  }
+]
