@@ -19,6 +19,7 @@ import { StudyView } from "./StudyView";
 import { SelfTestView } from "./SelfTestView";
 import { ClassroomView } from "./ClassroomView";
 const LinkedPracticeView = dynamic(() => import("@/features/linked-practice/LinkedPracticeView"), { loading: () => <p className="kimi-quiet-state" role="status">正在读取关联练习…</p> });
+const BeamDemoView = dynamic(() => import("@/features/beam-demo/BeamDemoView"), { loading: () => <p className="kimi-quiet-state" role="status">正在读取演示…</p> });
 
 const SUGGESTIONS = [
   "帮我判断这个梁截面会不会超筋",
@@ -86,7 +87,7 @@ export function AppShell() {
   const [view, setViewState] = useState<AppView>("home");
   const reduce = useHydratedReducedMotion();
   useEffect(() => {
-    const sync = () => { const next = window.location.hash.slice(1); setViewState((["home", "chat", "study", "materials", "self-test", "classroom", "linked-practice"] as string[]).includes(next) ? next as AppView : "home"); };
+    const sync = () => { const next = window.location.hash.slice(1); setViewState((["home", "chat", "study", "materials", "self-test", "classroom", "linked-practice", "reinforcement-demo"] as string[]).includes(next) ? next as AppView : "home"); };
     sync(); window.addEventListener("hashchange", sync); return () => window.removeEventListener("hashchange", sync);
   }, []);
   const setView = (next: AppView) => { if (next !== view) window.history.pushState(null, "", next === "home" ? window.location.pathname + window.location.search : "#" + next); setViewState(next); };
@@ -159,6 +160,10 @@ export function AppShell() {
               {view === "linked-practice" ? <motion.div className="absolute inset-0 flex min-h-0 flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.15 }}>
                 <header className="kimi-toolbar"><SidebarTrigger /><span>关联练习</span></header>
                 <div className="min-h-0 flex-1 overflow-y-auto"><LinkedPracticeView /></div>
+              </motion.div> : null}
+              {view === "reinforcement-demo" ? <motion.div className="absolute inset-0 flex min-h-0 flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.15 }}>
+                <header className="kimi-toolbar"><SidebarTrigger /><span>单筋与双筋</span></header>
+                <div className="min-h-0 flex-1 overflow-y-auto"><BeamDemoView /></div>
               </motion.div> : null}
             </div>
           </SidebarInset>
