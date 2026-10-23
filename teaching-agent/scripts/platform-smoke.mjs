@@ -79,7 +79,7 @@ try {
     assert.match(await page.evaluate(() => navigator.userAgent), /Android/, "Mobile viewport emulation cannot replace an Android browser");
   }
   await page.getByRole("heading", { name: "钢筋混凝土梁承载力计算原理", exact: true }).waitFor();
-  await page.getByRole("button", { name: "进入学习", exact: true }).click();
+  await page.getByRole("button", { name: "引导学习", exact: true }).click();
   await page.getByText("先看资料，再做题。", { exact: true }).waitFor();
 
   async function navigate(label) {
@@ -114,7 +114,6 @@ try {
     };
   }));
   await page.reload({ waitUntil: "networkidle" });
-  await page.getByRole("button", { name: "进入学习", exact: true }).click();
   await navigate("自学天地");
   await page.getByRole("button", { name: "取消收藏这一页", exact: true }).waitFor();
   await page.getByRole("button", { name: "取消收藏这一页", exact: true }).click();

@@ -1,0 +1,78 @@
+{
+    "revision":  "unified-v2",
+    "project":  "ch6-ci-main",
+    "branch":  "style/kimi-unified-v2-ch6-ci-main",
+    "sourceCommit":  "4f18afe7a0bc28039006dc950d6b3ef8520faaaa",
+    "sourceVersion":  "Live snapshot 2026-10-20; page release marker c42d8c1",
+    "classification":  "D target adaptation; not new original evidence",
+    "checks":  [
+                   {
+                       "project":  "ch6-ci-main",
+                       "kind":  "test",
+                       "code":  0,
+                       "durationMs":  1831,
+                       "log":  "C:\\Users\\edsjrcheng\\Desktop\\教学agent\\.design-sources\\unified-v2\\checks\\ch6-ci-main\\test.log"
+                   },
+                   {
+                       "project":  "ch6-ci-main",
+                       "kind":  "build",
+                       "code":  0,
+                       "durationMs":  36399,
+                       "log":  "C:\\Users\\edsjrcheng\\Desktop\\教学agent\\.design-sources\\unified-v2\\checks\\ch6-ci-main\\build.log"
+                   }
+               ],
+    "finalBuild":  {
+                       "project":  "ch6-ci-main",
+                       "kind":  "build",
+                       "code":  0,
+                       "durationMs":  36399,
+                       "log":  "C:\\Users\\edsjrcheng\\Desktop\\教学agent\\.design-sources\\unified-v2\\checks\\ch6-ci-main\\build.log"
+                   },
+    "captures":  [
+                     {
+                         "file":  "home.png",
+                         "sha256":  "c31fd541eaeb44610dca8b900f4c42dca72efbee11cf58998daba1c128444100",
+                         "capturedAt":  "2026-10-21T15:03:41.174Z",
+                         "pixelWidth":  2195,
+                         "pixelHeight":  1066,
+                         "cssViewport":  "2195x1066 desktop",
+                         "method":  "CUA Windows Chrome screenshot; sequential observations",
+                         "mimeType":  "image/jpeg"
+                     },
+                     {
+                         "file":  "materials.png",
+                         "sha256":  "914790dbcefa6f84f9e2c19b2060a387780cd0d77c0de15cfec14486031b2316",
+                         "capturedAt":  "2026-10-21T15:03:50.754Z",
+                         "pixelWidth":  2195,
+                         "pixelHeight":  1066,
+                         "cssViewport":  "2195x1066 desktop",
+                         "method":  "CUA Windows Chrome screenshot; sequential observations",
+                         "mimeType":  "image/jpeg"
+                     },
+                     {
+                         "file":  "chat.png",
+                         "sha256":  "7434d118af5ace79803b98738ba4fb549eadc0be26df981aaee61d733488ef7c",
+                         "capturedAt":  "2026-10-21T15:03:31.604Z",
+                         "pixelWidth":  2195,
+                         "pixelHeight":  1066,
+                         "cssViewport":  "2195x1066 desktop",
+                         "method":  "CUA Windows Chrome screenshot; sequential observations",
+                         "mimeType":  "image/jpeg"
+                     },
+                     {
+                         "file":  "study.png",
+                         "sha256":  "448efafbbf2b3159d93b7ecfb641054955e00a7d35dbeb300678f58045961f80",
+                         "capturedAt":  "2026-10-21T15:04:02.697Z",
+                         "pixelWidth":  2195,
+                         "pixelHeight":  1066,
+                         "cssViewport":  "2195x1066 desktop",
+                         "method":  "CUA Windows Chrome screenshot; sequential observations",
+                         "mimeType":  "image/jpeg"
+                     }
+                 ],
+    "browser":  "CUA actual Windows Chrome desktop",
+    "mobile":  "student page verified at 390x844; teacher/self-test narrow and real mobile not accepted this round",
+    "remoteRequiredChecks":  "not run; no merge or push",
+    "businessData":  "existing storage keys and backend retained; new same-tab student draft uses sessionStorage",
+    "guiScripts":  "updated but not executed this round"
+}
