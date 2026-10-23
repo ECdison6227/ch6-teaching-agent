@@ -40,16 +40,16 @@ export function MaterialsView() {
     } finally { if (controller.current === abort) { controller.current = null; setDownloading(null); } }
   };
   const items = [
-    { key: "original", category: "original", title: "原版课件 PDF", description: "148 页课件原图，按页序排列，适合离线阅读。", image: slideThumb(coverPage), href: versioned("/api/materials?kind=original"), filename: "第六章-原版课件.pdf", action: "下载原版课件" },
-    { key: "questions", category: "questions", title: "题目 PDF", description: "第六章题库，以及受扭、变形、裂缝的补充题。", image: appPath("/api/materials/preview"), href: versioned("/api/materials?kind=questions"), filename: "第六章-题目.pdf", action: "下载题目" },
-    ...materialSections.map(section => ({ key: section.id, category: "explain", title: section.label, description: `${section.pages} 页 · 课件原图与逐页重点讲解`, image: slideThumb(section.firstPage), href: versioned(`/api/materials?kind=explain&section=${encodeURIComponent(section.id)}`), filename: `第六章-讲解版-${section.label}.pdf`, action: "下载讲解版" })),
+    { key: "original", category: "original", title: "原版课件 PDF", description: "148 页 · 完整课件", image: slideThumb(coverPage), href: versioned("/api/materials?kind=original"), filename: "第六章-原版课件.pdf", action: "下载原版课件" },
+    { key: "questions", category: "questions", title: "题目 PDF", description: "第六章及教材补充题", image: appPath("/api/materials/preview"), href: versioned("/api/materials?kind=questions"), filename: "第六章-题目.pdf", action: "下载题目" },
+    ...materialSections.map(section => ({ key: section.id, category: "explain", title: section.label, description: `${section.pages} 页 · 课件与逐页讲解`, image: slideThumb(section.firstPage), href: versioned(`/api/materials?kind=explain&section=${encodeURIComponent(section.id)}`), filename: `第六章-讲解版-${section.label}.pdf`, action: "下载讲解版" })),
   ];
   const results = items.filter(item => (category === "all" || item.category === category) && `${item.title} ${item.description}`.toLowerCase().includes(query.trim().toLowerCase()));
   return <div className="flex h-full min-h-0 flex-col">
-    <header className="kimi-toolbar"><SidebarTrigger /><span>学习资源</span></header>
-    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-8 sm:px-8">
-      <div className="kimi-catalog mx-auto max-w-[800px]">
-        <div className="flex flex-wrap items-start justify-between gap-5"><div><h1 className="text-[22px] font-medium leading-9">资料下载</h1><p className="mt-1 text-sm leading-6 text-muted-foreground">把课件和讲解带走，按自己的节奏学习。</p></div><label className="relative w-full sm:w-64"><Search aria-hidden className="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground" /><Input aria-label="搜索资料" placeholder="搜索章节或资料" value={query} onChange={e => setQuery(e.target.value)} className="pl-9" /></label></div>
+    <header className="kimi-toolbar"><SidebarTrigger /><span>资料下载</span></header>
+    <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="kimi-page kimi-catalog">
+        <div className="kimi-page-heading"><div><h1 >资料下载</h1><p >课件、讲解与练习，随时带走。</p></div><label className="relative w-full sm:w-64"><Search aria-hidden className="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground" /><Input aria-label="搜索资料" placeholder="搜索章节或资料" value={query} onChange={e => setQuery(e.target.value)} className="pl-9" /></label></div>
         <div className="kimi-category-tabs" role="group" aria-label="资料分类">{[["all","全部资料"],["original","原版课件"],["explain","逐页讲解"],["questions","题目"]].map(([id,label]) => <Button key={id} variant="ghost" aria-pressed={category === id} onClick={() => setCategory(id)}>{label}</Button>)}</div>
         <div role="status" className="mb-4 text-xs text-muted-foreground">{notice || (downloading ? "正在准备文件…" : `共 ${results.length} 份资料`)}</div>
         {error ? <Card className="mb-5 border-destructive/30 bg-destructive/5 p-4"><p role="alert" className="text-sm text-destructive">{error}</p>{failed ? <Button className="mt-2" variant="outline" onClick={() => void downloadMaterial(failed)}><RefreshCw />重试下载</Button> : null}</Card> : null}
