@@ -1,0 +1,161 @@
+{
+  "checkedAt": "2026-10-22T12:01:01.616Z",
+  "branch": "feat/mayue-linked-practice",
+  "baseCommit": "65d0e8b6253ed2600eddf416dca71f9f4a626508",
+  "preview": "http://10.26.62.26:43316/linked-practice",
+  "automated": {
+    "tests": 69,
+    "passed": 69,
+    "failed": 0,
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "diffCheck": "passed"
+  },
+  "data": {
+    "version": "a1f9a58d137e23a2",
+    "featureId": "linked-practice",
+    "questionCount": 610,
+    "relationCount": 22,
+    "quarantinedCount": 14,
+    "blockedRelationCount": 15,
+    "sourceReview": "source-only",
+    "sourceHashes": [
+      "73F03B075D8F3BF709D03B1E19ADA59749B4DB92A2E46D02B0A49122F713B8E5",
+      "ED88ED7C28590724DE9960EC0A288E5D5B2B41C7C236895EE0447DF08A0D9028",
+      "6C8438F66768FB7710C73A2E7DA4DDC1FE7564B6F42205A8543995842845D5EA",
+      "8953D9178D9B14296020EBC50E52978BBA9DCC87A829038CC00E649A46A9BA49"
+    ],
+    "cleanedPackage": "new-features/linked-practice",
+    "excludesOriginalQuestionBanks": true,
+    "storageKey": "ch6-linked-practice-v1"
+  },
+  "browser": {
+    "platform": "Windows Chrome",
+    "desktopCss": {
+      "width": 1455,
+      "height": 878
+    },
+    "narrowCss": {
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390
+    },
+    "verified": [
+      "direct-entry-and-separate-navigation",
+      "draft-survives-reload",
+      "wrong-answer-to-prerequisite",
+      "settings-cancel-preserves-question-and-draft",
+      "reference-self-review-separate-from-auto-grade",
+      "return-to-original-and-retry",
+      "independent-history-2-auto-1-self",
+      "switch-to-original-self-test-and-back",
+      "word-prime-math-rendering-no-visible-dollar-delimiters",
+      "narrow-sidebar-closes",
+      "no-narrow-horizontal-overflow"
+    ],
+    "syntheticPreviewAttempts": 3,
+    "viewportOverrideReset": true,
+    "download": {
+      "buttonTriggered": true,
+      "markdownGenerationTested": true,
+      "savedFileConfirmed": false,
+      "limitation": "Browser download event timed out; expected file was not found in Downloads. No saved-file success claimed."
+    }
+  },
+  "originalEvidence": [
+    {
+      "file": "src/app/globals.css",
+      "normalizedSha256": "6c4b3035606e2e13ba381d3d3baee764462911bbd9274030835ff63e2ecb84d0",
+      "unchanged": true
+    },
+    {
+      "file": "package.json",
+      "normalizedSha256": "736ec83f4368f1a012cc0d38ef917cf8e53f5c6306bb2e13768f1ba42a0e534d",
+      "unchanged": true
+    },
+    {
+      "file": "package-lock.json",
+      "normalizedSha256": "07be2536f7c6359c6aa0194f6f48d4cd1e11eed8e9c48ab119d19ebeb326c322",
+      "unchanged": true
+    },
+    {
+      "file": "src/lib/questions.ts",
+      "normalizedSha256": "bfec2808e746dad31715dc9b10f58a2bdd7f67daa24db2a3e0a99f6148cd3ec5",
+      "unchanged": true
+    },
+    {
+      "file": "src/content/questions.json",
+      "normalizedSha256": "31b7422155953cfdd3d0bc88543ffce0de2f2d14e78b0b557de95ecf916a0069",
+      "unchanged": true
+    },
+    {
+      "file": "src/content/question-meta.json",
+      "normalizedSha256": "50c0eea3caa87672ed82457d18e1c4f25d2d8f35e5fdf091de29654be33696ec",
+      "unchanged": true
+    },
+    {
+      "file": "src/content/k12-14-questions.json",
+      "normalizedSha256": "b9abd38602f70aa6b6ebf94dbedfc87c3e6502619afd75adc61980e0fbbd31dd",
+      "unchanged": true
+    },
+    {
+      "file": "src/components/Markdown.tsx",
+      "normalizedSha256": "baf96113d4a8f86ee61000247bae9dd111d79d0fdcf0b8733c2957f46b65c9a8",
+      "unchanged": true
+    },
+    {
+      "file": "src/components/SelfTestView.tsx",
+      "normalizedSha256": "24ae3ebcd6bc129347e8c7846cbd31804ede3211c85316c909fd0a00571def79",
+      "unchanged": true
+    },
+    {
+      "file": "src/components/ClassroomView.tsx",
+      "normalizedSha256": "ee0edddeaa0eeb786b253e2f8c72636bc704591df43f348d88bf713b96a506f4",
+      "unchanged": true
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "screenshots/01-start.jpg",
+      "width": 1455,
+      "height": 878,
+      "mimeType": "image/jpeg",
+      "sha256": "b0e58a7efa935e5a1c96a5301d2306e4c45fa91a9c22fcbc24056dd554e90110"
+    },
+    {
+      "file": "screenshots/02-feedback.jpg",
+      "width": 1455,
+      "height": 878,
+      "mimeType": "image/jpeg",
+      "sha256": "9a5d29e6316c97e234a3074a42242e0dbe8b9de2324172f21f55d878e689a74f"
+    },
+    {
+      "file": "screenshots/03-foundation.jpg",
+      "width": 1455,
+      "height": 878,
+      "mimeType": "image/jpeg",
+      "sha256": "1d9d27bebb96658deac9416d2842c4468c9c3022e669f0e51d5e71a3c80e261f"
+    },
+    {
+      "file": "screenshots/04-history.jpg",
+      "width": 1455,
+      "height": 878,
+      "mimeType": "image/jpeg",
+      "sha256": "4e77fd0aa2d3d25e9fe99e9c220557b18e9adc9924594da4a28ca0075fd112b9"
+    },
+    {
+      "file": "screenshots/05-mobile.jpg",
+      "width": 390,
+      "height": 843,
+      "mimeType": "image/jpeg",
+      "sha256": "791f5aeb3b7d52ad2ae427d5c51ba5b7a3d9bdceb45783f3b4f71bb23b15c53d"
+    }
+  ],
+  "notRun": [
+    "real-Android-emulator-Chrome",
+    "macOS-WebKit",
+    "remote-CI-required-checks",
+    "live-model-backend-testing"
+  ],
+  "releaseState": "local-task-branch-and-preview-only-no-push-or-merge"
+}

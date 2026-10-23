@@ -186,6 +186,7 @@ export function useChat(context?: PageCtx | null) {
           const event = JSON.parse(data) as Record<string, unknown>;
           if (event.type === "error") throw new Error(String(event.message || "模型调用失败"));
           if (event.type === "done") { completed = true; break; }
+          scope.signal.throwIfAborted();
           handleEvent(event, id);
         }
         scope.signal.throwIfAborted();

@@ -1,0 +1,129 @@
+{
+  "date": "2026-10-22",
+  "branch": "feat/beam-animations",
+  "base": "8d9eb2c627559da91b16f76c79eaadf5a72bf273",
+  "sourceCommit": "4f18afe7a0bc28039006dc950d6b3ef8520faaaa",
+  "preview": "http://10.26.62.26:43316/reinforcement-demo",
+  "unit": {
+    "tests": 75,
+    "pass": 75,
+    "fail": 0
+  },
+  "typecheck": "passed",
+  "productionBuild": "passed",
+  "browser": "Actual Windows Chrome through CUA",
+  "desktop": {
+    "height": 878,
+    "scrollWidth": 1455,
+    "width": 1455
+  },
+  "mobile": {
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "kind": "CSS viewport override; not real Android"
+  },
+  "checks": [
+    {
+      "check": "replay-and-pause",
+      "restart": "0",
+      "paused": "0"
+    },
+    {
+      "check": "stage-seek",
+      "value": "68"
+    },
+    {
+      "check": "replay",
+      "before": "100",
+      "after": "0"
+    },
+    {
+      "check": "replay-while-playing",
+      "before": "27",
+      "after": "0"
+    },
+    {
+      "check": "replay-resumed-motion",
+      "progress": "68"
+    },
+    {
+      "check": "pause-stays-frozen",
+      "before": "68",
+      "after": "68"
+    },
+    {
+      "check": "refresh-checkpoint",
+      "before": "68",
+      "after": "68"
+    },
+    {
+      "check": "switch-stops-old-playback",
+      "case": "double-yield",
+      "progress": "0"
+    },
+    {
+      "check": "double-yield-section",
+      "progress": 100,
+      "tension": "已屈服",
+      "compression": "已屈服"
+    },
+    {
+      "check": "double-elastic",
+      "progress": 100,
+      "case": "double-elastic"
+    },
+    {
+      "check": "crack-stage-visible",
+      "crackLines": 1
+    },
+    {
+      "check": "single-low-end",
+      "case": "single-low",
+      "text": "单筋与双筋演示\n\n看清钢筋屈服与混凝土破坏的先后。\n\n单筋梁\n双筋梁\n少筋梁\n\n少筋梁\n\n梁变形\n截面应变\n向下加载\n上缘受压 · 下缘受拉\n受拉筋 · 已屈服\n混凝土 · 受压\n再播放\n重播\n阶段 4 / 4\n演示进度\n未开裂\n混凝土开裂\n迅速失效\n少筋破坏\n少筋破坏\n\n重点看开裂与迅速失效紧接发生。本演示把这个短过程放慢展示。\n\n蓝色表示钢筋达到屈服；变形与裂缝已放大。 只显示参与受弯的纵筋，进度不代表荷载或真实时间。\n\n演示说明"
+    },
+    {
+      "check": "single-high-end",
+      "text": "单筋与双筋演示\n\n看清钢筋屈服与混凝土破坏的先后。\n\n单筋梁\n双筋梁\n超筋梁\n\n超筋梁\n\n梁变形\n截面应变\n向下加载\n上缘受压 · 下缘受拉\n受拉筋 · 未屈服\n混凝土 · 已压碎\n再播放\n重播\n阶段 4 / 4\n演示进度\n未开裂\n混凝土开裂\n压区发展\n混凝土先压碎\n混凝土先压碎\n\n受压区混凝土先压碎，受拉钢筋未屈服，缺少充分的变形预兆。\n\n蓝色表示钢筋达到屈服；变形与裂缝已放大。 只显示参与受弯的纵筋，进度不代表荷载或真实时间。\n\n演示说明"
+    },
+    {
+      "check": "linked-practice-preserved",
+      "text": "关联练习\n\n从一道题开始，把相关知识串起来。\n\n题库说明\n练习\n学习记录\n3\n今天练哪个主题？\n\n选好主题，直接开始。答完再决定要不要补基础。\n\n主题\n\n单筋梁\n双筋梁\n题型\n判断与选择\n\n153 题\n\n继续练习\n开始新练习"
+    },
+    {
+      "check": "leave-return-checkpoint",
+      "case": "single-high",
+      "progress": 100
+    },
+    {
+      "check": "mobile-css-layout",
+      "height": 844,
+      "scrollWidth": 390,
+      "width": 390
+    },
+    {
+      "check": "mobile-final-labels",
+      "svgFont": "24px",
+      "width": 390,
+      "scrollWidth": 390
+    }
+  ],
+  "console": [],
+  "notes": [
+    "One heading wait timed out during animation; subsequent DOM reads observed progress from 0 to 60 and pause at 68.",
+    "The retained origin preserves 3 synthetic linked-practice verification attempts.",
+    "Reduced-motion code and failure/retry reuse are reviewed; OS reduced-motion toggle and forced browser storage failure were not exercised in this turn."
+  ],
+  "notRun": [
+    "Real Android Chrome",
+    "macOS WebKit",
+    "Full original backend business",
+    "Engineering solver or weight validation"
+  ],
+  "screenshots": [
+    "single-normal-desktop.jpg",
+    "single-normal-mobile.jpg",
+    "double-section-desktop.jpg",
+    "double-section-mobile.jpg"
+  ]
+}

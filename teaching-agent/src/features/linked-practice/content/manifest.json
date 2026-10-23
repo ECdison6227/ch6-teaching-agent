@@ -1,0 +1,17 @@
+{
+  "version": "a1f9a58d137e23a2",
+  "featureId": "linked-practice",
+  "questionCount": 610,
+  "relationCount": 22,
+  "quarantinedCount": 14,
+  "blockedRelationCount": 15,
+  "sourceReview": "source-only",
+  "sourceHashes": [
+    "73F03B075D8F3BF709D03B1E19ADA59749B4DB92A2E46D02B0A49122F713B8E5",
+    "ED88ED7C28590724DE9960EC0A288E5D5B2B41C7C236895EE0447DF08A0D9028",
+    "6C8438F66768FB7710C73A2E7DA4DDC1FE7564B6F42205A8543995842845D5EA",
+    "8953D9178D9B14296020EBC50E52978BBA9DCC87A829038CC00E649A46A9BA49"
+  ],
+  "cleanedPackage": "new-features/linked-practice",
+  "excludesOriginalQuestionBanks": true
+}

@@ -158,7 +158,7 @@ test('实际 HTTP 模型适配：CRLF、协议解析、断开连接和超时释�
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   process.env.MODEL_PROVIDER='school';process.env.SCHOOL_CHAT_BASE_URL='http://127.0.0.1:'+server.address().port+'/v1';process.env.SCHOOL_CHAT_MODEL='mock';
   try{
-    const response=await chatRoute(request('chat',{messages:[{role:'user',content:'测试'}]}));const events=[];
+    const response=await chatRoute(request('chat',{messages:[{role:'user',content:'讲解本节'},{role:'assistant',content:'本节已经讲解，接下来做一步练习。'},{role:'user',content:'测试'}]}));const events=[];
     for await(const value of readSseData(response.body))events.push(JSON.parse(value));
     assert.equal(events.filter(e=>e.type==='card').length,1);assert.equal(events.at(-1).type,'done');
     mode='hang';const started=new Promise(resolve=>onStarted=resolve),closed=new Promise(resolve=>onClosed=resolve);

@@ -1,3 +1,5 @@
+@import "../styles/kimi-web/theme.css";
+@import "../styles/kimi-web/source-components.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -267,4 +269,263 @@ textarea {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Kimi Web c42d8c1, 2026-10-20. Source tokens stay byte-identical.
+   D: bind source roles to the existing shadcn/Tailwind teaching UI. */
+:root {
+  --background: 0 0% 100%; --foreground: 0 0% 10%;
+  --card: 0 0% 100%; --card-foreground: 0 0% 10%;
+  --popover: 0 0% 100%; --popover-foreground: 0 0% 10%;
+  --primary: 0 0% 10%; --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 96%; --secondary-foreground: 0 0% 10%;
+  --muted: 0 0% 96%; --muted-foreground: 0 0% 43%;
+  --accent: 0 0% 97%; --accent-foreground: 0 0% 10%;
+  --border: 0 0% 90%; --input: 0 0% 87%;
+  --ring: 212 100% 55%; --radius: 1rem;
+  --sidebar-background: 30 20% 98%; --sidebar-foreground: 0 0% 10%;
+  --sidebar-primary: 0 0% 10%; --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 0 0% 94%; --sidebar-accent-foreground: 0 0% 10%;
+  --sidebar-border: 0 0% 94%; --sidebar-ring: 212 100% 55%;
+  --Bg-Primary: var(--kimi-paper); --Bg-Secondary: var(--kimi-surface);
+  --Labels-Primary: var(--kimi-text-primary); --Separators-S1: var(--kimi-separator);
+}
+body { font-family: var(--kimi-font); background: var(--kimi-ground); color: var(--kimi-text-primary); }
+button, input, textarea, select { font: inherit; }
+::selection { background: #1783ff26; }
+* { scrollbar-color: #00000026 transparent; }
+*:focus-visible { outline: 2px solid var(--kimi-accent); outline-offset: 2px; }
+.group\/sidebar-wrapper { background: var(--kimi-ground); height: 100svh; min-height: 0; }
+.kimi-canvas { margin: 6px 6px 6px 0; height: calc(100svh - 12px); border: 1px solid #00000009; border-radius: 12px; background: var(--kimi-paper); overflow: hidden; }
+.group\/sidebar-wrapper:has([data-collapsible="offcanvas"]) .kimi-canvas { margin-left: 6px; }
+[data-sidebar="sidebar"] { background: var(--kimi-ground); }
+[data-sidebar="menu-button"] { height: 36px; border-radius: 10px; font-size: 14px; font-weight: 400; transition: background-color 150ms ease, color 150ms ease; }
+[data-sidebar="menu-button"] svg { width: 18px; height: 18px; stroke-width: 1.8; }
+[data-sidebar="menu-button"][data-active="true"] { background: var(--kimi-fill-selected); font-weight: 500; }
+[data-sidebar="group-label"] { color: var(--kimi-text-tertiary); font-size: 12px; font-weight: 400; }
+[data-sidebar="content"] { gap: 16px; }
+.kimi-toolbar { display: flex; align-items: center; gap: 8px; height: 52px; min-height: 52px; padding: 0 16px; font-size: 14px; }
+.kimi-source-icon { display: inline-block; width: 18px; height: 18px; flex-shrink: 0; background: currentColor; mask-size: contain; mask-position: center; mask-repeat: no-repeat; }
+.kimi-overview-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr); align-items: center; gap: 56px; max-width: 1040px; min-height: calc(100% - 120px); margin: 0 auto; padding: 48px 40px; }
+.kimi-course-intro { max-width: 530px; }
+.kimi-course-facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.kimi-course-facts span { padding: 6px 12px; border-radius: 100px; color: var(--kimi-text-secondary); background: var(--kimi-surface); font-size: 12px; }
+.kimi-overview .knowledge-card { border-radius: 20px; padding: 20px; gap: 12px; box-shadow: none; }
+.kimi-course-footer { margin: 0 24px 24px; text-align: center; font-size: 12px; color: var(--kimi-text-tertiary); }
+.kimi-chat-view { position: relative; }
+.kimi-chat-view[data-empty="true"][data-compact="false"] { justify-content: center; padding-bottom: min(10vh, 100px); overflow-y: auto; }
+.kimi-chat-view[data-empty="true"][data-compact="false"] .kimi-messages { flex: none; overflow: visible; }
+.kimi-chat-view[data-empty="true"][data-compact="false"] .kimi-message-column { min-height: 0; padding-top: 20px; padding-bottom: 32px; }
+.kimi-chat-view[data-empty="true"][data-compact="false"] .kimi-composer-wrap { padding-bottom: 0; }
+.kimi-chat-welcome { padding: 0; text-align: center; }
+.kimi-chat-welcome h1 { font-size: 22px; line-height: 36px; font-weight: 500; }
+.kimi-chat-welcome p { margin-top: 8px; }
+.kimi-shortcuts { display: flex; flex-shrink: 0; gap: 12px; max-width: 800px; margin: 28px auto 0; padding: 0 16px 8px; overflow-x: auto; }
+.kimi-shortcuts > button { flex-shrink: 0; height: 36px; border: .5px solid var(--kimi-separator); border-radius: 20px; padding: 0 12px; background: transparent; color: var(--kimi-text-secondary); font-size: 12px; font-weight: 400; box-shadow: none; animation: kimi-shortcut 320ms cubic-bezier(.49,.45,.8,1.18) both; }
+.kimi-shortcuts > button:nth-child(2) { animation-delay: 45ms; }
+.kimi-shortcuts > button:nth-child(3) { animation-delay: 90ms; }
+.kimi-shortcuts > button:hover { color: var(--kimi-text-primary); background: var(--kimi-fill-hover); }
+.kimi-composer-wrap { flex-shrink: 0; padding: 12px 24px max(20px, env(safe-area-inset-bottom)); }
+.kimi-composer { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 114px; border: 1px solid #0000000f; border-radius: 24px; background: var(--kimi-paper); box-shadow: 0 5px 16px -4px #00000012; transition: border-color 300ms ease, box-shadow 300ms ease; }
+.kimi-composer:hover, .kimi-composer:focus-within { border-color: #00000017; box-shadow: 0 5px 16px -4px #00000012, 0 4px 12px #00000008; }
+.kimi-composer .kimi-editor { width: 100%; min-height: 60px; max-height: 170px; resize: none; border: 0; border-radius: 24px 24px 0 0; padding: 12px 16px 0; outline: none; background: transparent; box-shadow: none; font-family: inherit; font-size: 16px; line-height: 24px; }
+.kimi-composer .kimi-editor:focus-visible { outline: none; box-shadow: none; }
+.kimi-editor::placeholder { color: var(--kimi-text-tertiary); }
+.kimi-composer-actions { display: flex; align-items: center; gap: 8px; height: 36px; margin: 8px 0; padding: 0 8px; }
+.kimi-composer-actions .kimi-model-select { height: 36px; width: auto; min-width: 0; max-width: min(55%, 290px); justify-content: flex-end; gap: 4px; padding: 0 4px; border: 0; background: transparent; font-size: 12px; box-shadow: none; }
+.kimi-model-select > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kimi-send { width: 36px; height: 36px; flex-shrink: 0; padding: 4px; border-radius: 100%; color: white; background: #000000e6; box-shadow: none; }
+.kimi-send:disabled { opacity: 1; background: #00000026; color: white; }
+.kimi-send-icon { width: 28px; height: 28px; }
+.kimi-underlay { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 76px; margin: -36px 20px 0; padding: 42px 12px 8px; border-radius: 0 0 24px 24px; background: var(--kimi-underlay); font-size: 12px; line-height: 20px; color: var(--kimi-text-secondary); }
+.kimi-underlay .kimi-source-icon { width: 16px; height: 16px; }
+.kimi-draft-status { flex-shrink: 0; color: var(--kimi-text-tertiary); }
+.kimi-quote { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 10px 12px; border-radius: 12px; background: var(--kimi-surface); }
+.kimi-chat-view[data-compact="true"] .kimi-composer-wrap { padding: 8px 12px max(16px, env(safe-area-inset-bottom)); }
+.kimi-chat-view[data-compact="true"] .kimi-underlay { margin-right: 12px; margin-left: 12px; padding-right: 8px; padding-left: 8px; }
+.kimi-chat-view[data-compact="true"] .kimi-draft-status { display: none; }
+.kimi-chat-error { border: 1px solid #dc262633; border-radius: 16px; background: #dc262608; padding: 16px; }
+.kimi-category-tabs { display: flex; gap: 4px; margin: 24px 0; overflow-x: auto; }
+.kimi-category-tabs > button { height: 36px; border-radius: 100px; padding: 0 12px; color: var(--kimi-text-secondary); font-weight: 400; }
+.kimi-category-tabs > button[aria-pressed="true"] { color: var(--kimi-text-primary); background: var(--kimi-fill-selected); }
+.kimi-material-card { border-radius: 16px; box-shadow: none; transition: border-color 150ms ease, background-color 150ms ease; }
+.kimi-material-card:hover { border-color: var(--kimi-separator); background: var(--kimi-fill-hover); }
+.kimi-empty { border-style: dashed; background: var(--kimi-surface); box-shadow: none; }
+.kimi-note-editor { width: calc(100% - 32px); max-width: 560px; max-height: 86dvh; border-radius: 16px; padding: 24px; background: var(--kimi-paper); }
+.kimi-note-editor textarea { min-height: 180px; max-height: 45dvh; background: var(--kimi-surface); font-size: 14px; line-height: 24px; }
+.md-body { font-size: 16px; line-height: 26px; color: var(--kimi-text-primary); }
+.md-body h1 { font-size: 22px; line-height: 36px; }
+.md-body h2 { font-size: 20px; line-height: 32px; }
+.md-body h3, .md-body h4 { font-size: 18px; line-height: 28px; }
+.md-body em { color: var(--kimi-text-secondary); }
+.md-body pre, .md-body code { background: var(--kimi-surface); border-color: var(--kimi-separator); }
+.md-body pre { border-radius: 12px; padding: 16px; }
+.md-body table { display: block; max-width: 100%; overflow-x: auto; font-size: 14px; line-height: 22px; }
+.md-body th, .md-body td { border: 0; border-bottom: .5px solid var(--kimi-separator); padding: 10px 16px 10px 0; }
+.md-body th { background: transparent; font-weight: 600; }
+.md-body blockquote { border-color: var(--kimi-separator); color: var(--kimi-text-secondary); }
+[role="dialog"] { max-width: calc(100vw - 24px); }
+[role="option"][data-state="checked"] { color: var(--kimi-text-primary); background: var(--kimi-fill-selected); }
+[role="option"][data-state="checked"] > span:first-child { color: var(--kimi-accent); }
+@keyframes kimi-shortcut { 0% { opacity: 0; transform: translateY(14px); } 80% { transform: translateY(-4px); } 100% { opacity: 1; transform: translateY(0); } }
+@media (max-width: 1099px) { .kimi-overview-grid { gap: 32px; padding: 40px 28px; } .kimi-course-intro h1 { font-size: 26px; } }
+@media (max-width: 839px) {
+  .kimi-overview-grid { grid-template-columns: 1fr; max-width: 640px; min-height: auto; gap: 32px; padding: 32px 24px; }
+  .kimi-canvas { margin-left: 6px; }
+  .kimi-course-intro { max-width: none; }
+}
+@media (max-width: 568px) {
+  .kimi-toolbar { padding: 0 12px; }
+  .kimi-composer-wrap { padding: 8px 12px max(16px, env(safe-area-inset-bottom)); }
+  .kimi-chat-welcome { padding: 0 12px; }
+  .kimi-chat-welcome h1 { font-size: 20px; line-height: 30px; }
+  .kimi-shortcuts { width: 100%; gap: 8px; margin-top: 24px; padding: 0 16px 8px; }
+  .kimi-underlay { gap: 4px; padding-right: 8px; padding-left: 8px; font-size: 11px; }
+  .kimi-draft-status { font-size: 10px; }
+  .kimi-composer-actions { gap: 4px; padding: 0 4px; }
+  .kimi-overview-grid { padding: 24px 20px 32px; }
+  .kimi-course-intro h1 { font-size: 25px; }
+  .kimi-note-editor { padding: 20px; }
+  .kimi-chat-view[data-empty="true"][data-compact="false"] { padding-bottom: 32px; }
+}
+@media (max-height: 650px) { .kimi-chat-view[data-empty="true"][data-compact="false"] { justify-content: flex-start; padding-top: 12px; padding-bottom: 16px; } }
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark; --background: 0 0% 7%; --foreground: 0 0% 88%;
+    --card: 0 0% 7%; --card-foreground: 0 0% 88%; --popover: 0 0% 16%; --popover-foreground: 0 0% 88%;
+    --primary: 0 0% 88%; --primary-foreground: 0 0% 8%; --secondary: 0 0% 12%; --secondary-foreground: 0 0% 88%;
+    --muted: 0 0% 12%; --muted-foreground: 0 0% 60%; --accent: 0 0% 16%; --accent-foreground: 0 0% 88%;
+    --border: 0 0% 22%; --input: 0 0% 26%;
+    --sidebar-background: 60 2% 9%; --sidebar-foreground: 0 0% 88%; --sidebar-accent: 0 0% 16%; --sidebar-accent-foreground: 0 0% 88%;
+    --sidebar-border: 0 0% 16%;
+  }
+  .kimi-canvas { border-color: #ffffff0a; }
+  .kimi-composer { background: var(--kimi-surface); border-color: #ffffff12; }
+  .kimi-composer:hover, .kimi-composer:focus-within { border-color: #ffffff26; }
+  .kimi-send { background: #ffffffd6; color: #121212; }
+  .kimi-send:disabled { background: #ffffff26; color: #121212; }
+  .hl-key { background: #725e2459; box-shadow: inset 0 -1px #d7ad3b66; }
+  * { scrollbar-color: #ffffff26 transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+.md-body .markdown-container pre { margin: 0; border-top: 0; border-radius: 0 0 12px 12px; }
+.kimi-selection-menu { animation: kimi-menu-in 150ms cubic-bezier(0,0,.2,1); }
+@keyframes kimi-menu-in { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+
+
+/* D: shared Kimi content rails and progressive disclosure across teaching views. */
+.kimi-page { width: 100%; max-width: 864px; margin: 0 auto; padding: 36px 32px 64px; }
+.kimi-page-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.kimi-page-heading h1 { font-size: 22px; line-height: 36px; font-weight: 500; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.kimi-page-heading p { margin-top: 4px; font-size: 14px; line-height: 24px; color: var(--kimi-text-secondary); }
+.kimi-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.kimi-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.kimi-eyebrow { color: var(--kimi-text-secondary); font-size: 12px; line-height: 20px; font-weight: 400; }
+.kimi-primary { border-radius: 100px; padding-left: 20px; padding-right: 20px; }
+.kimi-stage { margin-top: 24px; border: .5px solid var(--kimi-separator); border-radius: 20px; box-shadow: none; background: var(--kimi-paper); overflow: hidden; }
+.kimi-start-state { display: flex; min-height: 340px; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 48px 24px; text-align: center; }
+.kimi-start-state h2 { font-size: 22px; line-height: 36px; font-weight: 500; }
+.kimi-start-state > p:not(.kimi-eyebrow) { max-width: 480px; font-size: 14px; line-height: 24px; color: var(--kimi-text-secondary); }
+.kimi-start-state > .kimi-primary { margin: 12px 0 8px; height: 40px; }
+.kimi-question-content { padding: 24px 28px; outline: none; }
+.kimi-question-content > * + * { margin-top: 24px; }
+.kimi-question-prompt { font-size: 16px; line-height: 28px; }
+.kimi-progress { height: 3px; overflow: hidden; border-radius: 4px; background: var(--kimi-fill-selected); }
+.kimi-progress > span { display: block; height: 100%; border-radius: inherit; background: var(--kimi-text-primary); transition: width 150ms ease; }
+.kimi-answer-options { display: grid; gap: 10px; }
+.kimi-answer-options > button { width: 100%; min-height: 48px; height: auto; justify-content: flex-start; gap: 12px; padding: 12px 16px; border-color: var(--kimi-separator); border-radius: 12px; background: transparent; white-space: normal; text-align: left; color: var(--kimi-text-primary); }
+.kimi-answer-options > button:hover { background: var(--kimi-fill-hover); }
+.kimi-answer-options > button[aria-pressed="true"] { border-color: var(--kimi-text-secondary); background: var(--kimi-fill-selected); }
+.kimi-answer-options .md-body { font-size: 14px; line-height: 24px; }
+.kimi-option-key { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; flex-shrink: 0; border: .5px solid var(--kimi-separator); border-radius: 7px; font-size: 12px; color: var(--kimi-text-secondary); }
+.kimi-question-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: .5px solid var(--kimi-separator); padding-top: 20px; }
+.kimi-field { display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 20px; }
+.kimi-field input { height: 44px; border-radius: 12px; }
+.kimi-dialog { width: calc(100vw - 32px); max-width: 560px; max-height: calc(100dvh - 40px); overflow-y: auto; border-radius: 16px; padding: 24px; gap: 24px; }
+.kimi-dialog h2 { font-size: 18px; line-height: 26px; font-weight: 500; }
+.kimi-dialog [data-radix-collection-item] { font-size: 14px; }
+.kimi-choice-pills { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.kimi-choice-pills > button { height: 36px; border: .5px solid var(--kimi-separator); border-radius: 100px; padding: 0 12px; }
+.kimi-choice-pills > button[aria-pressed="true"] { background: var(--kimi-fill-selected); border-color: var(--kimi-text-secondary); }
+.kimi-choice-pills > button[aria-pressed="true"] svg { color: var(--kimi-accent); }
+.kimi-disclosure { border-bottom: .5px solid var(--kimi-separator); padding: 16px 0; }
+.kimi-disclosure > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; list-style: none; font-size: 14px; line-height: 24px; }
+.kimi-disclosure > summary > span { display: inline-flex; align-items: center; gap: 12px; color: var(--kimi-text-secondary); font-size: 12px; }
+.kimi-disclosure > summary svg { width: 16px; height: 16px; transition: transform 150ms ease; }
+details[open] > summary > svg, .kimi-disclosure[open] > summary > span > svg { transform: rotate(180deg); }
+summary::-webkit-details-marker { display: none; }
+.kimi-question-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.kimi-question-grid > button { width: 44px; height: 36px; padding: 0; border: .5px solid var(--kimi-separator); border-radius: 10px; gap: 2px; }
+.kimi-question-grid > button[data-answered="true"] { background: var(--kimi-fill-selected); }
+.kimi-question-grid > button[aria-pressed="true"] { border-color: var(--kimi-text-primary); }
+.kimi-result-summary { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; padding: 28px; }
+.kimi-score { margin: 8px 0 12px; font-size: 40px; line-height: 48px; font-weight: 500; letter-spacing: -.04em; }
+.kimi-review-list { border-top: .5px solid var(--kimi-separator); }
+.kimi-review-item { border-bottom: .5px solid var(--kimi-separator); }
+.kimi-review-item > summary { display: flex; align-items: flex-start; gap: 16px; padding: 20px 0; cursor: pointer; list-style: none; }
+.kimi-review-item > summary > .kimi-eyebrow { width: 24px; flex-shrink: 0; padding-top: 2px; }
+.kimi-review-item > summary > svg { margin-top: 4px; }
+.kimi-review-item > summary .md-body { font-size: 14px; line-height: 24px; }
+.kimi-review-item > summary .kimi-eyebrow { display: block; margin-top: 6px; }
+.kimi-review-body { padding: 0 0 24px 40px; }
+.kimi-review-body > * + * { margin-top: 16px; }
+.kimi-review-body .md-body { font-size: 14px; line-height: 24px; }
+.kimi-answer-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; border-radius: 12px; background: var(--kimi-surface); }
+.kimi-answer-comparison > div > p { font-size: 12px; line-height: 20px; color: var(--kimi-text-secondary); margin-bottom: 6px; }
+.kimi-wrongbook-row { display: flex; align-items: flex-start; gap: 8px; border-bottom: .5px solid var(--kimi-separator); }
+.kimi-wrongbook-row .kimi-review-item { border: 0; }
+.kimi-wrongbook-row .kimi-review-body { padding-left: 0; }
+.kimi-check-select { margin-top: 16px; flex-shrink: 0; }
+.kimi-check-select[aria-pressed="true"] { background: var(--kimi-fill-selected); color: var(--kimi-accent); }
+.kimi-footnote { margin: 24px 0 0; color: var(--kimi-text-secondary); font-size: 12px; line-height: 20px; }
+.kimi-feedback { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 20px 0; border: .5px solid var(--kimi-separator); border-radius: 12px; padding: 12px 16px; font-size: 14px; line-height: 24px; }
+.kimi-quiet-state { padding: 64px 16px; text-align: center; font-size: 14px; line-height: 24px; }
+.kimi-quiet-state p + p { margin-top: 8px; color: var(--kimi-text-secondary); font-size: 12px; }
+.kimi-auth-content { max-width: 420px; margin: auto; padding: 40px 24px; }
+.kimi-auth-content h2 { font-size: 18px; line-height: 28px; font-weight: 500; }
+.kimi-auth-content > p { font-size: 14px; line-height: 24px; color: var(--kimi-text-secondary); margin: 8px 0 24px; }
+.kimi-back { margin-left: -12px; margin-bottom: 16px; color: var(--kimi-text-secondary); }
+.kimi-classroom-list { display: flex; flex-direction: column; gap: 4px; }
+.kimi-classroom-row { width: 100%; height: auto; min-height: 80px; gap: 16px; padding: 16px; border-radius: 16px; white-space: normal; }
+.kimi-list-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; background: var(--kimi-surface); }
+.kimi-list-icon svg { width: 18px; height: 18px; }
+.kimi-distribution { display: flex; flex-direction: column; gap: 8px; }
+.kimi-distribution-row { display: flex; position: relative; overflow: hidden; align-items: center; gap: 12px; min-height: 48px; padding: 12px 16px; border-radius: 12px; border: .5px solid var(--kimi-separator); }
+.kimi-distribution-row > *:not(.kimi-distribution-bar) { z-index: 1; }
+.kimi-distribution-row .md-body { font-size: 14px; }
+.kimi-distribution-bar { position: absolute; left: 0; top: 0; bottom: 0; background: var(--kimi-fill-selected); transition: width 150ms ease; }
+.kimi-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; line-height: 22px; }
+.kimi-table th, .kimi-table td { border-bottom: .5px solid var(--kimi-separator); padding: 10px 16px 10px 0; font-weight: 400; }
+.kimi-table th { color: var(--kimi-text-secondary); font-size: 12px; }
+.kimi-table tr:last-child td { border: 0; }
+.kimi-question-picker { max-width: 640px; }
+.kimi-picker-list { max-height: min(42dvh, 360px); overflow-y: auto; overscroll-behavior: contain; }
+.kimi-picker-row { height: auto; width: 100%; min-height: 76px; justify-content: flex-start; gap: 12px; padding: 12px; white-space: normal; border-radius: 12px; }
+.kimi-picker-row .md-body { margin-top: 4px; font-size: 14px; line-height: 24px; }
+.kimi-picker-row[aria-pressed="true"] { background: var(--kimi-fill-selected); }
+.kimi-student-shell { margin: 6px; min-height: calc(100svh - 12px); border: .5px solid var(--kimi-separator); border-radius: 12px; background: var(--kimi-paper); }
+.kimi-revealed { border-top: .5px solid var(--kimi-separator); padding-top: 20px; }
+.kimi-revealed .md-body { font-size: 14px; line-height: 24px; }
+@media (max-width: 568px) {
+  .kimi-page { padding: 24px 16px 48px; }
+  .kimi-page-heading { gap: 12px; }
+  .kimi-page-heading h1 { font-size: 20px; line-height: 30px; }
+  .kimi-page-heading p { font-size: 13px; line-height: 22px; }
+  .kimi-stage { border-radius: 16px; margin-top: 20px; }
+  .kimi-start-state { min-height: 300px; padding: 32px 16px; }
+  .kimi-start-state h2 { font-size: 20px; line-height: 30px; }
+  .kimi-question-content { padding: 20px 16px; }
+  .kimi-question-content > * + * { margin-top: 20px; }
+  .kimi-question-footer { gap: 8px; }
+  .kimi-question-footer > .text-xs { order: 3; width: 100%; text-align: center; }
+  .kimi-result-summary { padding: 24px 20px; }
+  .kimi-score { font-size: 36px; }
+  .kimi-review-body { padding-left: 0; }
+  .kimi-answer-comparison { grid-template-columns: 1fr; }
+  .kimi-dialog { padding: 20px; gap: 20px; }
+  .kimi-dialog [class*="flex-col-reverse"] { gap: 8px; }
+  .kimi-review-item > summary { gap: 10px; }
 }

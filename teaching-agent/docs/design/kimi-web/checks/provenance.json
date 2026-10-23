@@ -1,0 +1,20 @@
+[
+  {
+    "file": "build.log",
+    "rawSha256": "79dd52aff5dc4c6dbf63885ebacb19984a0a23f84aff300e5e0aca8bdb5770cb",
+    "normalizedSha256": "abb1c7227b72985adc9616a8548691ed832728024672b2ea9232474d487541e3",
+    "treatment": "only trailing line whitespace normalized; complete original retained in .design-sources/verification/ch6-live-classroom"
+  },
+  {
+    "file": "test.log",
+    "rawSha256": "4b8c16f7893891fb0f0b6e91239f97c1ffff1f1354cfe1e64cd78c057f1a442a",
+    "normalizedSha256": "4b8c16f7893891fb0f0b6e91239f97c1ffff1f1354cfe1e64cd78c057f1a442a",
+    "treatment": "only trailing line whitespace normalized; complete original retained in .design-sources/verification/ch6-live-classroom"
+  },
+  {
+    "file": "math.log",
+    "rawSha256": "4f28e40a7e04d340811397ea0aab0d5d9a733decd1b774b48774422424df8a96",
+    "normalizedSha256": "4f28e40a7e04d340811397ea0aab0d5d9a733decd1b774b48774422424df8a96",
+    "treatment": "only trailing line whitespace normalized; complete original retained in .design-sources/verification/ch6-live-classroom"
+  }
+]

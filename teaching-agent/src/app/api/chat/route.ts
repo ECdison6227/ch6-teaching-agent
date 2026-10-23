@@ -3,6 +3,7 @@ import { buildSystemPrompt } from "@/lib/prompt";
 import { createChatParser, type StreamEvent } from "@/lib/chat-protocol";
 import { ChatRequestSchema, readJson, RequestValidationError } from "@/lib/request-validation";
 import { requestScope, requestError } from "@/lib/request-lifecycle";
+import { createFirstTurnGuide } from "@/lib/first-turn-guide";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,13 +36,15 @@ export async function POST(req: Request) {
           scope.signal.throwIfAborted();
           if (!choice) send({ type: "error", message: "没有可用的对话模型。请先配好模型通道。" });
           else {
-            const parser = createChatParser(send);
+            const guide = createFirstTurnGuide(body.messages, body.pageContext, send);
+            const parser = createChatParser(guide.emit);
             const provider = getProvider(choice.provider);
-            for await (const delta of provider.chat([{ role: "system", content: system }, ...body.messages], scope.signal, choice.model)) {
+            for await (const delta of provider.chat([{ role: "system", content: system + guide.instruction }, ...body.messages], scope.signal, choice.model)) {
               scope.signal.throwIfAborted();
               parser.push(delta);
             }
             parser.end();
+            guide.finish();
           }
         } catch (error) {
           if (!req.signal.aborted) send({ type: "error", message: requestError(error, scope.signal) });

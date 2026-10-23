@@ -34,6 +34,8 @@ const CASES = [
     name: "④ 让学生看 PPT 某一页",
     messages: [{ role: "user", content: "T 形截面第一类第二类怎么判别？把课件那一页也给我看看" }],
     expect: ["figure"],
+    forbidText: /x\s*(?:\\(?:leq?|geq?|gt|lt)|[<>≤≥]=?)\s*b_?(?:\{f\}|f)/,
+    expectText: /h_(?:\{f\}|f)|翼缘厚度/,
   },
 ];
 
@@ -79,7 +81,8 @@ async function run(c) {
   const kinds = [...new Set(events.map((e) => e.type))];
   const ok =
     c.expect.every((k) => kinds.includes(k)) &&
-    !(c.forbid || []).some((k) => kinds.includes(k));
+    !(c.forbid || []).some((k) => kinds.includes(k)) &&
+    !c.forbidText?.test(text) && (!c.expectText || c.expectText.test(text));
   if (!ok || events.some(event => event.type === "error")) process.exitCode = 1;
   const verdict = events.find((e) => e.type === "verdict");
   const card = events.find((e) => e.type === "card");
