@@ -15,7 +15,6 @@ import { NotesProvider } from "./notes";
 import { MaterialsView } from "./MaterialsView";
 import { Sidebar, type AppView } from "./Sidebar";
 import { StudyView } from "./StudyView";
-import { appPath } from "@/lib/app-path";
 
 import { SelfTestView } from "./SelfTestView";
 
@@ -66,41 +65,17 @@ function StudyPane() {
 
 function Landing({ onEnter, onStudy, onMaterials }: { onEnter: () => void; onStudy: () => void; onMaterials: () => void }) {
   const [sectionsOpen, setSectionsOpen] = useState(false);
-  const reduce = useHydratedReducedMotion();
   const visibleSections = sectionsOpen ? KNOWLEDGE_SECTIONS : KNOWLEDGE_SECTIONS.slice(0, PREVIEW_SECTION_COUNT);
-  return (
-    <div className="kimi-overview h-full overflow-y-auto">
-      <header className="kimi-toolbar"><SidebarTrigger /><span>课程概览</span><span className="ml-auto text-xs text-muted-foreground">第六章 · 东南大学</span></header>
-      <div className="kimi-overview-grid">
-        <motion.section className="kimi-course-intro" initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : 0.32, ease: [0.49, 0.45, 0.8, 1.18] }}>
-          <img src={appPath("/seu-logo.png")} alt="东南大学" width={64} height={64} className="size-16 rounded-full object-contain" />
-          <p className="mt-6 text-sm text-muted-foreground">土木工程 · 结构工程设计原理</p>
-          <h1 className="mt-3 text-[30px] font-medium leading-[1.5] tracking-tight">钢筋混凝土梁承载力计算原理</h1>
-          <p className="mt-4 max-w-lg text-sm leading-7 text-muted-foreground">从受力现象出发，理解公式，再一步步完成计算。课件、引导对话和练习，陪你把这一章学明白。</p>
-          <div className="kimi-course-facts"><span>148 页课件</span><span>14 个知识点</span><span>随学随记</span></div>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button type="button" onClick={onEnter} className="h-11 rounded-full px-6">进入学习<ArrowRight /></Button>
-            <Button type="button" variant="outline" onClick={onStudy} className="h-11 rounded-full px-6">浏览课件</Button>
-          </div>
-          <Button type="button" variant="link" className="mt-5 h-auto justify-start px-0 text-sm text-muted-foreground" onClick={onMaterials}>需要离线学习？下载课程资料 <ArrowRight className="size-3.5" /></Button>
-        </motion.section>
-        <motion.aside className="space-y-4" initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduce ? 0 : 0.32, delay: reduce ? 0 : 0.045 }}>
-          <Card className="knowledge-card">
-            <div className="flex items-center gap-2 text-sm font-medium"><span className="kimi-source-icon" style={{ maskImage: `url(${appPath("/design/kimi-web/folder.svg")})` }} aria-hidden />本章学习路线</div>
-            <p className="text-sm leading-6 text-muted-foreground">先理解受弯与受剪的破坏形态，再学习截面计算；受扭、挠度和裂缝宽度结合教材补充。</p>
-          </Card>
-          <Card className="knowledge-card">
-            <div className="flex items-center justify-between text-sm font-medium"><span>知识目录</span><span className="text-xs font-normal text-muted-foreground">K1 — K14</span></div>
-            <ol className="divide-y divide-border/60">
-              {visibleSections.map(section => <li key={section.id} className="flex items-baseline gap-3 py-3 text-sm"><span className="w-7 shrink-0 text-xs tabular-nums text-muted-foreground">{section.id}</span><span>{section.name}</span></li>)}
-            </ol>
-            <Button type="button" variant="ghost" className="w-full text-muted-foreground" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen(open => !open)}>{sectionsOpen ? "收起" : "展开全部"}{sectionsOpen ? <ChevronUp /> : <ChevronDown />}</Button>
-          </Card>
-        </motion.aside>
-      </div>
-      <p className="kimi-course-footer">理解每一个步骤，也保留自己的思考。</p>
-    </div>
-  );
+  return <div className="h-full overflow-y-auto">
+    <header className="kimi-toolbar"><SidebarTrigger /><span>课程概览</span><span className="ml-auto text-xs text-muted-foreground">第六章 · 东南大学</span></header>
+    <main className="kimi-page">
+      <header className="kimi-page-heading"><div><h1>开始学习</h1><p>结构工程设计原理 · 第六章</p></div></header>
+      <Card className="kimi-stage"><div className="kimi-start-state"><p className="kimi-eyebrow">钢筋混凝土结构</p><h2>钢筋混凝土梁承载力计算原理</h2><p>从受力现象到截面计算，一步步理解。</p><div className="kimi-actions mt-3"><Button className="kimi-primary" onClick={onEnter}>引导学习<ArrowRight /></Button><Button variant="outline" className="rounded-full" onClick={onStudy}>浏览课件</Button></div><span className="mt-3 text-xs text-muted-foreground">148 页课件 · 14 个知识点 · 随学随记</span></div></Card>
+      <div className="kimi-row mb-2 mt-8"><h2 className="text-sm font-medium">本章目录</h2><Button variant="ghost" size="sm" onClick={onMaterials}>资料下载<ArrowRight /></Button></div>
+      <ol className="divide-y divide-border/60">{visibleSections.map(section => <li key={section.id} className="flex items-baseline gap-4 py-4 text-sm"><span className="w-7 shrink-0 text-xs tabular-nums text-muted-foreground">{section.id}</span><span>{section.name}</span></li>)}</ol>
+      <Button variant="ghost" className="mt-3 text-muted-foreground" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen(open => !open)}>{sectionsOpen ? "收起目录" : "全部知识点"}{sectionsOpen ? <ChevronUp /> : <ChevronDown />}</Button>
+    </main>
+  </div>;
 }
 
 

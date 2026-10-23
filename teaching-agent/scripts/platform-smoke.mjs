@@ -79,7 +79,7 @@ try {
     assert.match(await page.evaluate(() => navigator.userAgent), /Android/, "Mobile viewport emulation cannot replace an Android browser");
   }
   await page.getByRole("heading", { name: "钢筋混凝土梁承载力计算原理", exact: true }).waitFor();
-  await page.getByRole("button", { name: "进入学习", exact: true }).click();
+  await page.getByRole("button", { name: "引导学习", exact: true }).click();
   await page.getByText("先看资料，再做题。", { exact: true }).waitFor();
 
   async function navigate(label) {
@@ -114,7 +114,6 @@ try {
     };
   }));
   await page.reload({ waitUntil: "networkidle" });
-  await page.getByRole("button", { name: "进入学习", exact: true }).click();
   await navigate("自学天地");
   await page.getByRole("button", { name: "取消收藏这一页", exact: true }).waitFor();
   await page.getByRole("button", { name: "取消收藏这一页", exact: true }).click();
@@ -132,7 +131,10 @@ try {
   page.on("request", request => { if (/\/api\/(chat|digest)(?:\?|$)/.test(request.url())) aiRequests.push(request.url()); });
   await page.goto(`${origin}${basePath}/self-test`, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "题库自测", exact: true }).waitFor();
+  await page.getByRole("button", { name: "设置", exact: true }).click();
   assert.equal(await page.getByRole("textbox", { name: "自定义题量", exact: true }).inputValue(), "10");
+  await page.getByRole("button", { name: "取消", exact: true }).click();
+  await page.getByRole("dialog").waitFor({ state: "hidden" });
   await page.getByRole("button", { name: "开始自测", exact: true }).click();
   await page.getByRole("button", { name: "交卷", exact: true }).waitFor();
   assert.equal(await page.getByText("标准答案", { exact: true }).count(), 0, "Standard answer must be hidden before submission");
@@ -162,31 +164,31 @@ try {
   assert.equal(await page.getByText("标准答案", { exact: true }).count(), 0);
   await page.getByRole("button", { name: "交卷", exact: true }).click();
   const submitDialog = page.getByRole("dialog");
-  await submitDialog.getByRole("heading", { name: "还有未答题，确认交卷？", exact: true }).waitFor();
+  await submitDialog.getByRole("heading", { name: /还有 \d+ 题未答/ }).waitFor();
   await submitDialog.getByRole("button", { name: "确认交卷", exact: true }).click();
-  await page.getByText("自测结果", { exact: true }).waitFor();
+  await page.getByText("本次正确率", { exact: true }).waitFor();
   await page.getByText("标准答案", { exact: true }).first().waitFor();
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("ch6-wrongbook-v1") || "null")?.records.length === 1);
   const wrongbook = await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-wrongbook-v1")));
   assert.equal(wrongbook.records[0].questionId, firstQuestion.id);
   assert.equal(wrongbook.records[0].wrongCount, 1);
   await page.reload({ waitUntil: "networkidle" });
-  await page.getByText("自测结果", { exact: true }).waitFor();
+  await page.getByText("本次正确率", { exact: true }).waitFor();
   assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-wrongbook-v1")).records[0].wrongCount), 1, "Reloading results must not apply the same error twice");
-  await page.getByRole("button", { name: "错题本（1）", exact: true }).click();
-  await page.getByText("独立错题本", { exact: true }).waitFor();
-  await page.getByRole("button", { name: "重练此题（保存版本）", exact: true }).waitFor();
+  await page.getByRole("button", { name: "错题本 1", exact: true }).click();
+  await page.locator(".kimi-review-item").filter({ hasText: firstQuestion.id }).locator("summary").click();
+  await page.getByRole("button", { name: "重练此题", exact: true }).waitFor();
   await page.screenshot({ path: path.join(output, "self-test-passed.png"), fullPage: true });
 
   // Exercise actual controlled Input events, not only pure grading helpers.
   // Reading e.target.value after an async boundary loses typed fill answers.
   await page.getByRole("button", { name: "自测", exact: true }).click();
-  await page.getByRole("button", { name: "重新组卷", exact: true }).click();
+  await page.getByRole("button", { name: "设置", exact: true }).click();
   const typeSettings = page.getByRole("group", { name: "题型", exact: true });
   await typeSettings.getByRole("button", { name: "选择题", exact: true }).click();
   await typeSettings.getByRole("button", { name: "判断题", exact: true }).click();
   await page.getByRole("textbox", { name: "自定义题量", exact: true }).fill("3");
-  await page.getByRole("button", { name: "开始自测", exact: true }).click();
+  await page.getByRole("button", { name: "开始新自测", exact: true }).click();
   const fillInput = page.getByRole("textbox", { name: "我的答案", exact: true });
   await fillInput.waitFor();
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("ch6-self-test-v1"))?.questions.length === 3);
@@ -205,7 +207,7 @@ try {
   assert.equal(await page.evaluate(id => JSON.parse(localStorage.getItem("ch6-self-test-v1")).answers[id], correctFill.id), correctFill.answer);
   await page.getByRole("button", { name: "交卷", exact: true }).click();
   await page.getByRole("dialog").getByRole("button", { name: "确认交卷", exact: true }).click();
-  await page.getByText("自测结果", { exact: true }).waitFor();
+  await page.getByText("本次正确率", { exact: true }).waitFor();
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("ch6-self-test-v1"))?.status === "submitted");
   const fillResults = await page.evaluate(() => JSON.parse(localStorage.getItem("ch6-self-test-v1")).results);
   assert.deepEqual(fillResults.map(result => result.status), ["correct", "wrong", "unanswered"]);
@@ -220,11 +222,12 @@ try {
       return popup;
     };
   });
+  await page.getByRole("button", { name: "导出错题", exact: true }).click();
   const popupPromise = page.waitForEvent("popup");
-  await page.getByRole("button", { name: "浏览器打印 / 另存为 PDF", exact: true }).click();
+  await page.getByRole("button", { name: "打印 / PDF", exact: true }).click();
   const printPopup = await popupPromise;
   await printPopup.waitForFunction(() => window.__selfTestPrintCalled === true);
-  await page.getByRole("button", { name: "浏览器打印 / 另存为 PDF", exact: true }).waitFor();
+  await page.getByRole("button", { name: "打印 / PDF", exact: true }).waitFor();
   assert.match(await printPopup.locator("body").innerText(), /标准答案/);
   await printPopup.close();
   assert.deepEqual(aiRequests, [], "Self-test must work without calling model or digest APIs");
