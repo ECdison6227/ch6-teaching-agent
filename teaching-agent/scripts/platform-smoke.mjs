@@ -9,6 +9,7 @@ import { createServer as createHttpsServer } from "node:https";
 import { request as httpRequest } from "node:http";
 import { networkInterfaces, tmpdir } from "node:os";
 import { classroomBrowserCheck } from "./classroom-browser-check.mjs";
+import { sectionExplorationBrowserCheck } from "./section-exploration-browser-check.mjs";
 import { DatabaseSync } from "node:sqlite";
 
 const platform = process.env.CI_BROWSER || "chromium";
@@ -70,7 +71,7 @@ try {
   }
   assert.ok(ready, "Production health endpoint did not become ready");
 
-  for (const view of ["self-test", "classroom"]) {
+  for (const view of ["self-test", "classroom", "linked-practice", "reinforcement-demo"]) {
     const response = await fetch(`${origin}${basePath}/${view}`, { redirect: "manual" });
     assert.equal(response.status, 307);
     assert.equal(response.headers.get("location"), `${basePath}/#${view}`, "Direct entry must contain the deployment prefix exactly once");
@@ -281,6 +282,8 @@ try {
   await printPopup.close();
   assert.deepEqual(aiRequests, [], "Self-test must work without calling model or digest APIs");
   await page.screenshot({ path: path.join(output, "self-test-fill-passed.png"), fullPage: true });
+  await sectionExplorationBrowserCheck({ page, origin, basePath, output });
+  assert.deepEqual(aiRequests, [], "Fixed exploration and preset audit must not call model APIs");
   assert.deepEqual(errors, [], "Browser must not report uncaught runtime or hydration errors");
   await page.screenshot({ path: path.join(output, "passed.png"), fullPage: true });
   console.log(`PASS ${platform}: production health, navigation, slides, notes persistence, self-test snapshots, fill input persistence, unanswered dialog, results and wrongbook (${basePath || "/"})`);

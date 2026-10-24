@@ -10,9 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHydratedReducedMotion } from "@/hooks/use-hydrated-reduced-motion";
 import { beamStore } from "./store";
+import SectionExplorationView from "./SectionExplorationView";
+import { explorationStore, type ExplorationState } from "./exploration-store";
 import { beamOutline, beamY, casesForKind, clampProgress, compressionOutline, crackPoints, getBeamCase, getBeamFrame, steelPath, type BeamCase, type CaseId, type DiagramView } from "./model";
 
 const serverSnapshot = beamStore.getSnapshot();
+const explorationServerSnapshot = explorationStore.getSnapshot();
 const INK = "hsl(var(--foreground))";
 const MUTED = "hsl(var(--muted))";
 const ACCENT = "var(--kimi-accent)";
@@ -73,6 +76,7 @@ function BeamFigure({ scenario, frame, view }: { scenario: BeamCase; frame: Fram
 
 export default function BeamDemoView() {
   const saved = useSyncExternalStore(beamStore.subscribe, beamStore.getSnapshot, () => serverSnapshot);
+  const exploration = useSyncExternalStore(explorationStore.subscribe, explorationStore.getSnapshot, () => explorationServerSnapshot);
   const scenario = getBeamCase(saved.value.caseId);
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -106,12 +110,14 @@ export default function BeamDemoView() {
     generation.current++; playingRef.current = true; setRunId(value => value + 1); setPlaying(true);
   };
   useEffect(() => { void beamStore.initialize(); }, []);
+  useEffect(() => { void explorationStore.initialize(); }, []);
   useEffect(() => {
     if (saved.ready && saved.writable && !playingRef.current) {
       caseRef.current = saved.value.caseId;
       setFrameProgress(saved.value.progress); hydrated.current = true;
     }
   }, [saved.ready, saved.writable, saved.value.caseId, saved.value.progress]);
+  useEffect(() => { if (exploration.value.panel !== "animation") stop(); }, [exploration.value.panel]);
   useEffect(() => {
     if (!playing || reduced) return;
     const token = ++generation.current;
@@ -138,7 +144,15 @@ export default function BeamDemoView() {
     };
   }, []);
   return <main className="kimi-page" aria-label="单筋与双筋演示">
-    <header className="kimi-page-heading"><div><h1>单筋与双筋演示</h1><p>看清钢筋屈服与混凝土破坏的先后。</p></div></header>
+    <header className="kimi-page-heading"><div><h1>单筋与双筋演示</h1><p>{exploration.value.panel === "exploration" ? "改变钢筋面积，核对模型是否适用。" : "看清钢筋屈服与混凝土破坏的先后。"}</p></div></header>
+    <div className="kimi-category-tabs" role="group" aria-label="演示内容">
+      {([["animation", "受力演示"], ["exploration", "参数探究"]] as const).map(([panel, label]) => <Button key={panel} variant="ghost" aria-pressed={exploration.value.panel === panel}
+        disabled={!exploration.writable} onClick={() => { if (panel !== exploration.value.panel) { stop(); void explorationStore.update(previous => ({ ...previous, panel })); } }}>{label}</Button>)}
+    </div>
+    {exploration.error ? <div className="kimi-feedback mb-4" role="alert"><span>{exploration.error}</span><Button variant="outline" size="sm" onClick={() => void explorationStore.retry()}><RefreshCw />{exploration.writable ? "重试保存" : "重试读取"}</Button></div> : null}
+    {!exploration.ready ? <div role="status" aria-label="正在读取演示内容"><Skeleton className="h-72 w-full rounded-2xl" /></div> : exploration.value.panel === "exploration"
+      ? <SectionExplorationView state={exploration.value} writable={exploration.writable} update={(patch: Partial<ExplorationState>) => { void explorationStore.update(previous => ({ ...previous, ...patch })); }} />
+      : <>
     {saved.error ? <div className="kimi-feedback mt-5" role="alert"><span>{saved.error}</span><Button variant="outline" size="sm" onClick={() => void beamStore.retry()}><RefreshCw />重试</Button></div> : null}
     {!saved.ready ? <div role="status" aria-label="正在读取演示"><Skeleton className="mt-6 h-72 w-full rounded-2xl" /></div> : <>
       <div className="kimi-row mt-6">
@@ -170,6 +184,7 @@ export default function BeamDemoView() {
       <section className="mt-6" aria-live="polite"><h2 className="text-sm font-medium">{progress === 0 ? "准备加载" : frame.stage.label}</h2><p className="mt-2 text-sm leading-7 text-muted-foreground">{frame.stage.explanation}</p></section>
       <p className="mt-5 text-xs leading-6 text-muted-foreground">{reduced ? "已按系统设置减弱动态，可拖动进度或逐阶段查看。" : "蓝色表示钢筋达到屈服；变形与裂缝已放大。"} 只显示参与受弯的纵筋，进度不代表荷载或真实时间。</p>
       <details className="kimi-disclosure mt-3"><summary>演示说明</summary><div className="space-y-2 pt-3 text-sm leading-7 text-muted-foreground"><p>单筋只计受拉纵筋的受弯作用；双筋同时考虑受拉、受压纵筋。图中省略了架立筋和箍筋。</p><p>双筋的两个情形用于说明：配置受压钢筋并不代表它必然屈服，应结合截面变形和应变判断。</p><p>这是受力过程的教学示意，未进行工程参数求解。动画中的变形、裂缝宽度和阶段时长均不用于实际设计计算。</p></div></details>
+    </>}
     </>}
   </main>;
 }
