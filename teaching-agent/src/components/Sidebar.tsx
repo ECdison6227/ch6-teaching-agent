@@ -274,17 +274,12 @@ export function Sidebar({
         <div className="flex min-h-0 w-full flex-1 flex-col pt-3.5">
         <SidebarHeader className="group-data-[collapsible=icon]:px-0">
           <div className="flex min-w-0 items-center gap-2 px-1 py-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-1 group-data-[collapsible=icon]:px-0">
-            <img
-              src={appPath("/seu-logo.png")}
-              alt="东南大学"
-              width={32}
-              height={32}
-              style={{ width: 32, height: 32, minWidth: 32, minHeight: 32, flexShrink: 0 }}
-              className="size-8 max-h-8 min-h-8 max-w-8 min-w-8 shrink-0 grow-0 self-center aspect-square rounded-full object-contain"
-            />
+            <div aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
+              <BookOpen className="size-4" />
+            </div>
             <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
               <div className="truncate text-sm font-medium">第六章</div>
-              <div className="truncate text-xs text-muted-foreground">东南大学</div>
+              <div className="truncate text-xs text-muted-foreground">结构工程设计原理</div>
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
