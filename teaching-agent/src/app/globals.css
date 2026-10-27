@@ -313,6 +313,9 @@ button, input, textarea, select { font: inherit; }
 .kimi-overview .knowledge-card { border-radius: 20px; padding: 20px; gap: 12px; box-shadow: none; }
 .kimi-course-footer { margin: 0 24px 24px; text-align: center; font-size: 12px; color: var(--kimi-text-tertiary); }
 .kimi-chat-view { position: relative; }
+.kimi-chat-watermark { position: absolute; top: 39%; left: 50%; z-index: 0; width: min(46vw, 420px); height: auto; max-width: none; transform: translate(-50%, -50%); opacity: .06; pointer-events: none; user-select: none; }
+.kimi-chat-view[data-empty="false"] .kimi-chat-watermark { opacity: .035; }
+.kimi-chat-view > .kimi-messages, .kimi-chat-view > .kimi-composer-wrap, .kimi-chat-view > .kimi-shortcuts { position: relative; z-index: 1; }
 .kimi-chat-view[data-empty="true"][data-compact="false"] { justify-content: center; padding-bottom: min(10vh, 100px); overflow-y: auto; }
 .kimi-chat-view[data-empty="true"][data-compact="false"] .kimi-messages { flex: none; overflow: visible; }
 .kimi-chat-view[data-empty="true"][data-compact="false"] .kimi-message-column { min-height: 0; padding-top: 20px; padding-bottom: 32px; }
@@ -378,6 +381,7 @@ button, input, textarea, select { font: inherit; }
   .kimi-toolbar { padding: 0 12px; }
   .kimi-composer-wrap { padding: 8px 12px max(16px, env(safe-area-inset-bottom)); }
   .kimi-chat-welcome { padding: 0 12px; }
+  .kimi-chat-watermark { top: 42%; width: min(82vw, 300px); }
   .kimi-chat-welcome h1 { font-size: 20px; line-height: 30px; }
   .kimi-shortcuts { width: 100%; gap: 8px; margin-top: 24px; padding: 0 16px 8px; }
   .kimi-underlay { gap: 4px; padding-right: 8px; padding-left: 8px; font-size: 11px; }

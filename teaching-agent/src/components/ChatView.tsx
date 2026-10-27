@@ -183,6 +183,7 @@ export function ChatView({
 
   return (
     <div className="kimi-chat-view flex h-full min-h-0 flex-col" data-empty={msgs.length === 0} data-compact={compact} aria-busy={busy}>
+      {!compact ? <img src={appPath("/seu-logo.png")} alt="" aria-hidden="true" className="kimi-chat-watermark" /> : null}
       <div className="kimi-messages min-h-0 flex-1 overflow-y-auto" role="log" aria-label="引导对话记录">
         <div
           className={`kimi-message-column mx-auto w-full px-4 ${
