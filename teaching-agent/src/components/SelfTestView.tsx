@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import dynamic from "next/dynamic";
 import { ArrowRight, Check, ChevronDown, ChevronLeft, Download, Printer, RefreshCw, SlidersHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +24,7 @@ const toggle = <T,>(values: T[], value: T) => values.includes(value) ? values.fi
 const percent = (value: number) => `${Math.round(value * 100)}%`;
 type Settings = { countText: string; types: Question["type"][]; levels: QuestionDifficulty[] };
 const initialSettings: Settings = { countText: "10", types: DEFAULT_SETTINGS.types, levels: DEFAULT_SETTINGS.difficulties };
+const LinkedPracticeView = dynamic(() => import("@/features/linked-practice/LinkedPracticeView"), { loading: () => <p className="kimi-quiet-state" role="status">正在读取关联练习…</p> });
 const poolFor = (s: Settings) => filterQuestions(getQuestionCatalog(), { types: s.types, difficulties: s.levels });
 function validate(s: Settings, available: number) {
   const count = parseQuestionCount(s.countText);
@@ -34,7 +36,7 @@ export function SelfTestView() {
   const saved = useSyncExternalStore(sessionStore.subscribe, sessionStore.getSnapshot, sessionStore.getSnapshot);
   const book = useSyncExternalStore(wrongbookStore.subscribe, wrongbookStore.getSnapshot, wrongbookStore.getSnapshot);
   const session = saved.value;
-  const [tab, setTab] = useState<"test" | "wrongbook">("test");
+  const [tab, setTab] = useState<"test" | "wrongbook" | "linked">("test");
   const [settings, setSettings] = useState(initialSettings), [draftSettings, setDraftSettings] = useState(initialSettings);
   const [settingsOpen, setSettingsOpen] = useState(false), [exportOpen, setExportOpen] = useState(false);
   const [bookType, setBookType] = useState("all"), [bookLevel, setBookLevel] = useState("all");
@@ -102,11 +104,11 @@ export function SelfTestView() {
     </DialogContent>
   </Dialog>;
   return <main className="kimi-page" aria-label="题库自测">
-    <header className="kimi-page-heading"><div><h1>题库自测</h1><p>练习、核对，再把错题练一遍。</p></div><div className="kimi-actions">{renderSettings()}{(tab === "wrongbook" || session?.status === "submitted") ? renderExport() : null}</div></header>
-    <div className="kimi-category-tabs" role="group" aria-label="自测页面"><Button variant="ghost" aria-pressed={tab === "test"} onClick={() => setTab("test")}>自测</Button><Button variant="ghost" aria-pressed={tab === "wrongbook"} onClick={() => setTab("wrongbook")}>错题本<span className="text-xs text-muted-foreground">{book.value.records.length}</span></Button></div>
+    <header className="kimi-page-heading"><div><h1>题库自测</h1><p>{tab === "linked" ? "从一道题开始，把相关知识串起来。" : "练习、核对，再把错题练一遍。"}</p></div><div className="kimi-actions">{tab !== "linked" ? <>{renderSettings()}{(tab === "wrongbook" || session?.status === "submitted") ? renderExport() : null}</> : null}</div></header>
+    <div className="kimi-category-tabs" role="group" aria-label="自测页面"><Button variant="ghost" aria-pressed={tab === "test"} onClick={() => setTab("test")}>自测</Button><Button variant="ghost" aria-pressed={tab === "wrongbook"} onClick={() => setTab("wrongbook")}>错题本<span className="text-xs text-muted-foreground">{book.value.records.length}</span></Button><Button variant="ghost" aria-pressed={tab === "linked"} onClick={() => setTab("linked")}>关联练习</Button></div>
     {[{ snapshot: saved, store: sessionStore }, { snapshot: book, store: wrongbookStore }].map(({ snapshot, store }, i) => snapshot.error ? <div key={i} className="kimi-feedback" role="alert"><span>{snapshot.error}</span><Button variant="outline" size="sm" onClick={() => void store.retry()}><RefreshCw />{snapshot.writable ? "重试保存" : "重试读取"}</Button></div> : null)}
-    {message && !exportOpen ? <p role="alert" className="kimi-feedback text-destructive">{message}</p> : null}
-    {!saved.ready || !book.ready ? <p className="kimi-quiet-state" role="status">正在读取自测…</p> : <>
+    {tab !== "linked" && message && !exportOpen ? <p role="alert" className="kimi-feedback text-destructive">{message}</p> : null}
+    {tab === "linked" ? <LinkedPracticeView embedded /> : !saved.ready || !book.ready ? <p className="kimi-quiet-state" role="status">正在读取自测…</p> : <>
       {saved.dirty || book.dirty ? <p role="status" className="mb-4 text-xs text-muted-foreground">正在保存，请暂勿关闭页面。</p> : null}
       {!canReplace ? <p role="status" className="mb-4 text-xs text-muted-foreground">正在保存错题，完成后可开始新自测。</p> : null}
       {tab === "test" ? !session ? <Card className="kimi-stage"><CardContent className="kimi-start-state">

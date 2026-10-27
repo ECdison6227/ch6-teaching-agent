@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bookmark, BookOpen, BookOpenCheck, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, Network, Radio, SquareActivity, StickyNote, Trash2 } from "lucide-react";
+import { Bookmark, BookOpen, BookOpenCheck, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, Radio, SquareActivity, StickyNote, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -323,7 +323,7 @@ export function Sidebar({
             <SidebarMenu>
               {nav.map((n) => (
                 <SidebarMenuItem key={n.id}>
-                  <SidebarMenuButton isActive={view === n.id} tooltip={n.label} onClick={() => goView(n.id)}>
+                  <SidebarMenuButton isActive={view === n.id || (n.id === "self-test" && view === "linked-practice")} tooltip={n.label} onClick={() => goView(n.id)}>
                     <n.icon />
                     <span>{n.label}</span>
                   </SidebarMenuButton>
@@ -334,7 +334,6 @@ export function Sidebar({
           <SidebarGroup className="border-t border-border/60 pt-3">
             <SidebarGroupLabel>新增功能</SidebarGroupLabel>
             <SidebarMenu>
-              <SidebarMenuItem><SidebarMenuButton isActive={view === "linked-practice"} tooltip="关联练习" onClick={() => goView("linked-practice")}><Network /><span>关联练习</span></SidebarMenuButton></SidebarMenuItem>
               <SidebarMenuItem><SidebarMenuButton isActive={view === "reinforcement-demo"} tooltip="单筋与双筋" onClick={() => goView("reinforcement-demo")}><SquareActivity /><span>单筋与双筋</span></SidebarMenuButton></SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
