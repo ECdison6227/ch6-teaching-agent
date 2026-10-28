@@ -280,7 +280,7 @@ export function Sidebar({
             </div>
             <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
               <div className="truncate text-sm font-medium">第六章</div>
-              <div className="truncate text-xs text-muted-foreground">结构工程设计原理</div>
+              <div className="truncate text-xs text-muted-foreground">工程结构设计原理</div>
             </div>
             <Tooltip>
               <TooltipTrigger asChild>

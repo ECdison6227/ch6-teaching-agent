@@ -71,9 +71,9 @@ function Landing({ onEnter }: { onEnter: () => void }) {
   const [sectionsOpen, setSectionsOpen] = useState(false);
   const visibleSections = sectionsOpen ? KNOWLEDGE_SECTIONS : KNOWLEDGE_SECTIONS.slice(0, PREVIEW_SECTION_COUNT);
   return <div className="h-full overflow-y-auto">
-    <header className="kimi-toolbar"><SidebarTrigger /><span>课程概览</span><span className="ml-auto text-xs text-muted-foreground">第六章 · 结构工程设计原理</span></header>
+    <header className="kimi-toolbar"><SidebarTrigger /><span>课程概览</span><span className="ml-auto text-xs text-muted-foreground">第六章 · 工程结构设计原理</span></header>
     <main className="kimi-page">
-      <header className="kimi-page-heading"><div><p>结构工程设计原理 · 第六章</p></div></header>
+      <header className="kimi-page-heading"><div><p>工程结构设计原理 · 第六章</p></div></header>
       <Card className="kimi-stage"><div className="kimi-start-state"><h2>钢筋混凝土梁承载力计算原理</h2><div className="kimi-actions mt-3"><Button className="kimi-primary" onClick={onEnter}>开始学习<ArrowRight /></Button></div><span className="mt-3 text-xs text-muted-foreground">148 页课件 · 14 个知识点 · 随学随记</span></div></Card>
       <ol className="divide-y divide-border/60">{visibleSections.map(section => <li key={section.id} className="flex items-baseline gap-4 py-4 text-sm"><span className="w-7 shrink-0 text-xs tabular-nums text-muted-foreground">{section.id}</span><span>{section.name}</span></li>)}</ol>
       <Button variant="ghost" className="mt-3 text-muted-foreground" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen(open => !open)}>{sectionsOpen ? "收起目录" : "全部知识点"}{sectionsOpen ? <ChevronUp /> : <ChevronDown />}</Button>
