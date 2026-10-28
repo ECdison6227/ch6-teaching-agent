@@ -22,6 +22,7 @@ export type Msg = {
 };
 
 export type PageCtx = {
+  mode?: "beam-lab";
   page: number;
   section?: string;
   title?: string;

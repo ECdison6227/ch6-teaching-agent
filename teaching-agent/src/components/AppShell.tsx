@@ -20,6 +20,7 @@ import { SelfTestView } from "./SelfTestView";
 import { ClassroomView } from "./ClassroomView";
 const LinkedPracticeView = dynamic(() => import("@/features/linked-practice/LinkedPracticeView"), { loading: () => <p className="kimi-quiet-state" role="status">正在读取关联练习…</p> });
 const BeamDemoView = dynamic(() => import("@/features/beam-demo/BeamDemoView"), { loading: () => <p className="kimi-quiet-state" role="status">正在读取演示…</p> });
+const BeamLabView = dynamic(() => import("./BeamLabView").then(module => module.BeamLabView), { loading: () => <p className="kimi-quiet-state" role="status">正在读取智能配筋…</p> });
 
 const SUGGESTIONS = [
   "帮我判断这个梁截面会不会超筋",
@@ -66,15 +67,14 @@ function StudyPane() {
   );
 }
 
-function Landing({ onEnter, onStudy, onMaterials }: { onEnter: () => void; onStudy: () => void; onMaterials: () => void }) {
+function Landing({ onEnter }: { onEnter: () => void }) {
   const [sectionsOpen, setSectionsOpen] = useState(false);
   const visibleSections = sectionsOpen ? KNOWLEDGE_SECTIONS : KNOWLEDGE_SECTIONS.slice(0, PREVIEW_SECTION_COUNT);
   return <div className="h-full overflow-y-auto">
-    <header className="kimi-toolbar"><SidebarTrigger /><span>课程概览</span><span className="ml-auto text-xs text-muted-foreground">第六章 · 东南大学</span></header>
+    <header className="kimi-toolbar"><SidebarTrigger /><span>课程概览</span><span className="ml-auto text-xs text-muted-foreground">第六章 · 结构工程设计原理</span></header>
     <main className="kimi-page">
-      <header className="kimi-page-heading"><div><h1>开始学习</h1><p>结构工程设计原理 · 第六章</p></div></header>
-      <Card className="kimi-stage"><div className="kimi-start-state"><p className="kimi-eyebrow">钢筋混凝土结构</p><h2>钢筋混凝土梁承载力计算原理</h2><p>从受力现象到截面计算，一步步理解。</p><div className="kimi-actions mt-3"><Button className="kimi-primary" onClick={onEnter}>引导学习<ArrowRight /></Button><Button variant="outline" className="rounded-full" onClick={onStudy}>浏览课件</Button></div><span className="mt-3 text-xs text-muted-foreground">148 页课件 · 14 个知识点 · 随学随记</span></div></Card>
-      <div className="kimi-row mb-2 mt-8"><h2 className="text-sm font-medium">本章目录</h2><Button variant="ghost" size="sm" onClick={onMaterials}>资料下载<ArrowRight /></Button></div>
+      <header className="kimi-page-heading"><div><p>结构工程设计原理 · 第六章</p></div></header>
+      <Card className="kimi-stage"><div className="kimi-start-state"><h2>钢筋混凝土梁承载力计算原理</h2><div className="kimi-actions mt-3"><Button className="kimi-primary" onClick={onEnter}>开始学习<ArrowRight /></Button></div><span className="mt-3 text-xs text-muted-foreground">148 页课件 · 14 个知识点 · 随学随记</span></div></Card>
       <ol className="divide-y divide-border/60">{visibleSections.map(section => <li key={section.id} className="flex items-baseline gap-4 py-4 text-sm"><span className="w-7 shrink-0 text-xs tabular-nums text-muted-foreground">{section.id}</span><span>{section.name}</span></li>)}</ol>
       <Button variant="ghost" className="mt-3 text-muted-foreground" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen(open => !open)}>{sectionsOpen ? "收起目录" : "全部知识点"}{sectionsOpen ? <ChevronUp /> : <ChevronDown />}</Button>
     </main>
@@ -85,9 +85,11 @@ function Landing({ onEnter, onStudy, onMaterials }: { onEnter: () => void; onStu
 /** 各业务视图保留挂载和本地状态；课堂订阅仅在激活时运行。 */
 export function AppShell() {
   const [view, setViewState] = useState<AppView>("home");
+  const [beamVisited, setBeamVisited] = useState(false);
+  useEffect(() => { if (view === "beam-lab") setBeamVisited(true); }, [view]);
   const reduce = useHydratedReducedMotion();
   useEffect(() => {
-    const sync = () => { const next = window.location.hash.slice(1); setViewState((["home", "chat", "study", "materials", "self-test", "classroom", "linked-practice", "reinforcement-demo"] as string[]).includes(next) ? next as AppView : "home"); };
+    const sync = () => { const next = window.location.hash.slice(1); setViewState((["home", "chat", "study", "materials", "self-test", "classroom", "linked-practice", "reinforcement-demo", "beam-lab"] as string[]).includes(next) ? next as AppView : "home"); };
     sync(); window.addEventListener("hashchange", sync); return () => window.removeEventListener("hashchange", sync);
   }, []);
   const setView = (next: AppView) => { if (next !== view) window.history.pushState(null, "", next === "home" ? window.location.pathname + window.location.search : "#" + next); setViewState(next); };
@@ -108,7 +110,7 @@ export function AppShell() {
                   visibility: view === "home" ? "visible" : "hidden",
                 }}
               >
-                <Landing onEnter={() => setView("chat")} onStudy={() => setView("study")} onMaterials={() => setView("materials")} />
+                <Landing onEnter={() => setView("chat")} />
               </motion.div>
               <motion.div
                 className="absolute inset-0 flex flex-col"
@@ -164,6 +166,10 @@ export function AppShell() {
               {view === "reinforcement-demo" ? <motion.div className="absolute inset-0 flex min-h-0 flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.15 }}>
                 <header className="kimi-toolbar"><SidebarTrigger /><span>单筋与双筋</span></header>
                 <div className="min-h-0 flex-1 overflow-y-auto"><BeamDemoView /></div>
+              </motion.div> : null}
+              {beamVisited || view === "beam-lab" ? <motion.div className="absolute inset-0 flex min-h-0 flex-col" initial={{ opacity: 0 }} animate={{ opacity: view === "beam-lab" ? 1 : 0 }} style={{ visibility: view === "beam-lab" ? "visible" : "hidden", pointerEvents: view === "beam-lab" ? "auto" : "none" }} transition={{ duration: reduce ? 0 : 0.15 }}>
+                <header className="kimi-toolbar"><SidebarTrigger /><span>智能配筋</span></header>
+                <div className="min-h-0 flex flex-1"><BeamLabView active={view === "beam-lab"} /></div>
               </motion.div> : null}
             </div>
           </SidebarInset>

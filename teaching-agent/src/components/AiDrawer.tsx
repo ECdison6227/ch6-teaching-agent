@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { useHydratedReducedMotion } from "@/hooks/use-hydrated-reduced-motion";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { PanelRightClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -137,30 +137,35 @@ export function AiSidePanel() {
   const { open, close } = useAiDrawer();
   const isMobile = useIsMobile();
   const panel = useContext(PanelCtx);
-  if (!open || !panel) return null;
   return (
-    <motion.aside
-      initial={reduce ? false : { width: 0, opacity: 0 }}
-      animate={{ width: isMobile ? "100%" : 400, opacity: 1 }}
-      transition={{ duration: reduce ? 0 : 0.3, ease: "easeInOut" }}
-      className="flex h-full shrink-0 flex-col overflow-hidden border-l bg-background"
-    >
-      {/* 面板自己的收起入口：手机上面板占了大半屏，从里面也能退回去 */}
-      <div className="flex w-full shrink-0 items-center border-b border-paper-line px-2 py-1.5">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-8 gap-1.5 px-2 text-[12px] font-normal text-ink-soft hover:bg-paper-soft hover:text-ink"
-          onClick={close}
+    <AnimatePresence initial={false}>
+      {open && panel ? (
+        <motion.aside
+          key="ai-side-panel"
+          initial={reduce ? false : { width: 0, opacity: 0 }}
+          animate={{ width: isMobile ? "100%" : 400, opacity: 1 }}
+          exit={{ width: 0, opacity: 0 }}
+          transition={{ duration: reduce ? 0 : 0.3, ease: "easeInOut" }}
+          className="flex h-full shrink-0 flex-col overflow-hidden border-l bg-background"
         >
-          <PanelRightClose />
-          收起
-        </Button>
-      </div>
-      <div className="min-h-0 w-full flex-1">
-        <ChatView chat={panel.chat} compact />
-      </div>
-    </motion.aside>
+          {/* 面板自己的收起入口：手机上面板占了大半屏，从里面也能退回去 */}
+          <div className="flex w-full shrink-0 items-center border-b border-paper-line px-2 py-1.5">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1.5 px-2 text-[12px] font-normal text-ink-soft hover:bg-paper-soft hover:text-ink"
+              onClick={close}
+            >
+              <PanelRightClose />
+              收起
+            </Button>
+          </div>
+          <div className="min-h-0 w-full flex-1">
+            <ChatView chat={panel.chat} compact />
+          </div>
+        </motion.aside>
+      ) : null}
+    </AnimatePresence>
   );
 }

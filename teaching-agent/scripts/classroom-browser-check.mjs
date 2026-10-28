@@ -82,7 +82,7 @@ export async function classroomBrowserCheck({ context, page, origin, basePath, o
     await student.bringToFront(); await student.getByRole("region", { name: "当前课堂题目" }).getByText("标准答案：", { exact: false }).waitFor();
   }
   await page.bringToFront(); await page.goto(endpoint + "/", { waitUntil: "networkidle" });
-  await page.getByRole("button", { name: "引导学习", exact: true }).click();
+  await page.getByRole("button", { name: "开始学习", exact: true }).click();
   const chatDraft = page.locator("textarea:visible").first(); await chatDraft.fill("切换页面后保留的对话草稿");
   const shellUrl = page.url();
   async function navigate(label) {

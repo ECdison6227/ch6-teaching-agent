@@ -8,7 +8,7 @@ import questionsJson from "@/content/questions.json";
 import extraQuestionsJson from "@/content/k12-14-questions.json";
 import { normalizeFlatMath } from "@/lib/flat-math";
 import { layoutMath, type MathBox } from "@/lib/math-typeset";
-import { decodePng, downscale, type RasterImage } from "@/lib/png";
+import { decodePng } from "@/lib/png";
 import { loadPdfFont, type PdfFont, type SubsetFont } from "@/lib/ttf-font";
 
 const PAGE_W = 595;
@@ -480,21 +480,8 @@ function toUnicodeCMap(subset: SubsetFont) {
 
 const SLIDE_IMAGE_DICT = `/Type /XObject /Subtype /Image /Width ${IMAGE_W} /Height ${IMAGE_H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode /DecodeParms << /Predictor 15 /Colors 3 /BitsPerComponent 8 /Columns ${IMAGE_W} >>`;
 
-let logoPromise: Promise<RasterImage | null> | null = null;
-
-/** 校徽只读一次；读不到就退化成没有校徽的页眉，不让整份 PDF 生成失败 */
-function loadLogo(): Promise<RasterImage | null> {
-  if (!logoPromise) {
-    logoPromise = readFile(path.join(process.cwd(), "public", "seu-logo.png"))
-      .then((png) => downscale(decodePng(png), 160))
-      .catch(() => null);
-  }
-  return logoPromise;
-}
-
-/** 给每页加页眉（校徽 + 标题 + 右侧标注）和页脚（页码） */
+/** 给每页加页眉（标题 + 右侧标注）和页脚（页码） */
 async function decoratePages(writer: Writer, font: PdfFont, right: string) {
-  const logo = await loadLogo();
   const total = writer.pages.length;
   const ruleColor = "0.80 0.80 0.78";
   const softColor = "0.42 0.42 0.40";
@@ -505,23 +492,7 @@ async function decoratePages(writer: Writer, font: PdfFont, right: string) {
   writer.pages.forEach((page, index) => {
     const headerBaseline = PAGE_H - 34;
     const head: PageOp[] = [];
-    let textLeft = MARGIN;
-    if (logo) {
-      const height = 19;
-      const width = (logo.width / logo.height) * height;
-      head.push({
-        kind: "image",
-        name: "logo",
-        x: MARGIN,
-        y: headerBaseline - 4,
-        width,
-        height,
-        bytes: deflateSync(logo.rgb),
-        dict: `/Type /XObject /Subtype /Image /Width ${logo.width} /Height ${logo.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode`,
-      });
-      textLeft = MARGIN + width + 8;
-    }
-    head.push({ kind: "text", text: "东南大学", x: textLeft, y: headerBaseline, size: headerSize, color: softColor });
+    head.push({ kind: "text", text: "结构工程设计原理", x: MARGIN, y: headerBaseline, size: headerSize, color: softColor });
     if (right) {
       head.push({
         kind: "text",

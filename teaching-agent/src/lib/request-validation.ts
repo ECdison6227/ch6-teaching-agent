@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { MAX_IMAGE_URL_LENGTH, MAX_REQUEST_BYTES, MAX_MESSAGE_CHARS, MAX_HISTORY_CHARS } from "./request-limits";
 export const PageContextSchema = z.object({
+  mode: z.literal("beam-lab").optional(),
   page: z.number().int().min(0).max(148),
   section: z.string().max(100).optional(),
   title: z.string().max(1000).optional(),

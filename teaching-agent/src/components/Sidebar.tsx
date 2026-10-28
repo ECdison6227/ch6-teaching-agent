@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bookmark, BookOpen, BookOpenCheck, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, Network, Radio, SquareActivity, StickyNote, Trash2 } from "lucide-react";
+import { Bookmark, BookOpen, BookOpenCheck, Calculator, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, Radio, SquareActivity, StickyNote, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -224,7 +224,7 @@ function HelpDetail({ id }: { id: HelpId }) {
   );
 }
 
-export type AppView = "home" | "chat" | "study" | "materials" | "self-test" | "classroom" | "linked-practice" | "reinforcement-demo";
+export type AppView = "home" | "chat" | "study" | "materials" | "self-test" | "classroom" | "linked-practice" | "reinforcement-demo" | "beam-lab";
 
 export function Sidebar({
   view,
@@ -245,6 +245,7 @@ export function Sidebar({
     { id: "study", label: "自学天地", icon: BookOpen },
     { id: "self-test", label: "题库自测", icon: BookOpenCheck },
     { id: "classroom", label: "实时课堂", icon: Radio },
+    { id: "beam-lab", label: "智能配筋", icon: Calculator },
     { id: "materials", label: "资料下载", icon: Download },
   ];
   const help = HELP.find((item) => item.id === helpId) ?? null;
@@ -274,17 +275,12 @@ export function Sidebar({
         <div className="flex min-h-0 w-full flex-1 flex-col pt-3.5">
         <SidebarHeader className="group-data-[collapsible=icon]:px-0">
           <div className="flex min-w-0 items-center gap-2 px-1 py-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-1 group-data-[collapsible=icon]:px-0">
-            <img
-              src={appPath("/seu-logo.png")}
-              alt="东南大学"
-              width={32}
-              height={32}
-              style={{ width: 32, height: 32, minWidth: 32, minHeight: 32, flexShrink: 0 }}
-              className="size-8 max-h-8 min-h-8 max-w-8 min-w-8 shrink-0 grow-0 self-center aspect-square rounded-full object-contain"
-            />
+            <div aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
+              <BookOpen className="size-4" />
+            </div>
             <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
               <div className="truncate text-sm font-medium">第六章</div>
-              <div className="truncate text-xs text-muted-foreground">东南大学</div>
+              <div className="truncate text-xs text-muted-foreground">结构工程设计原理</div>
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -323,7 +319,7 @@ export function Sidebar({
             <SidebarMenu>
               {nav.map((n) => (
                 <SidebarMenuItem key={n.id}>
-                  <SidebarMenuButton isActive={view === n.id} tooltip={n.label} onClick={() => goView(n.id)}>
+                  <SidebarMenuButton isActive={view === n.id || (n.id === "self-test" && view === "linked-practice")} tooltip={n.label} onClick={() => goView(n.id)}>
                     <n.icon />
                     <span>{n.label}</span>
                   </SidebarMenuButton>
@@ -334,7 +330,6 @@ export function Sidebar({
           <SidebarGroup className="border-t border-border/60 pt-3">
             <SidebarGroupLabel>新增功能</SidebarGroupLabel>
             <SidebarMenu>
-              <SidebarMenuItem><SidebarMenuButton isActive={view === "linked-practice"} tooltip="关联练习" onClick={() => goView("linked-practice")}><Network /><span>关联练习</span></SidebarMenuButton></SidebarMenuItem>
               <SidebarMenuItem><SidebarMenuButton isActive={view === "reinforcement-demo"} tooltip="单筋与双筋" onClick={() => goView("reinforcement-demo")}><SquareActivity /><span>单筋与双筋</span></SidebarMenuButton></SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>

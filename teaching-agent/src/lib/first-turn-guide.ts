@@ -2,7 +2,7 @@ import slides from "@/content/slides.json";
 import type { StreamEvent } from "./chat-protocol";
 
 type Message = { role: string; content: string | { type: string; text?: string }[] };
-type Context = { section?: string } | null | undefined;
+type Context = { section?: string; mode?: "beam-lab" } | null | undefined;
 const topicOf = (text: string) => text.match(/\bK(?:1[0-4]|[1-9])\b/i)?.[0].toUpperCase();
 const topicHints: [string, RegExp][] = [
   ["K14", /裂缝宽度/], ["K13", /挠度|变形验算/], ["K12", /受扭|弯剪扭/],
@@ -13,7 +13,7 @@ const topicHints: [string, RegExp][] = [
 
 /** Enforce the existing first-lesson rule even when the model skips it. */
 export function createFirstTurnGuide(messages: Message[], context: Context, send: (event: StreamEvent) => void) {
-  const initial = !messages.some(message => message.role === "assistant");
+  const initial = context?.mode !== "beam-lab" && !messages.some(message => message.role === "assistant");
   const content = messages.findLast(message => message.role === "user")?.content;
   const question = typeof content === "string" ? content : content?.filter(part => part.type === "text").map(part => part.text || "").join("\n") || "";
   let text = "", cardTopic: string | undefined, figure = false, failed = false;

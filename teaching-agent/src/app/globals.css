@@ -313,6 +313,7 @@ button, input, textarea, select { font: inherit; }
 .kimi-overview .knowledge-card { border-radius: 20px; padding: 20px; gap: 12px; box-shadow: none; }
 .kimi-course-footer { margin: 0 24px 24px; text-align: center; font-size: 12px; color: var(--kimi-text-tertiary); }
 .kimi-chat-view { position: relative; }
+.kimi-chat-view > .kimi-messages, .kimi-chat-view > .kimi-composer-wrap, .kimi-chat-view > .kimi-shortcuts { position: relative; z-index: 1; }
 .kimi-chat-view[data-empty="true"][data-compact="false"] { justify-content: center; padding-bottom: min(10vh, 100px); overflow-y: auto; }
 .kimi-chat-view[data-empty="true"][data-compact="false"] .kimi-messages { flex: none; overflow: visible; }
 .kimi-chat-view[data-empty="true"][data-compact="false"] .kimi-message-column { min-height: 0; padding-top: 20px; padding-bottom: 32px; }
@@ -481,6 +482,21 @@ summary::-webkit-details-marker { display: none; }
 .kimi-check-select { margin-top: 16px; flex-shrink: 0; }
 .kimi-check-select[aria-pressed="true"] { background: var(--kimi-fill-selected); color: var(--kimi-accent); }
 .kimi-footnote { margin: 24px 0 0; color: var(--kimi-text-secondary); font-size: 12px; line-height: 20px; }
+
+/* D: the beam model uses the existing Kimi content rail, controls and result surfaces. */
+.kimi-beam-page .kimi-choice-pills { gap: 8px; }
+.kimi-beam-page .kimi-choice-pills > button { min-height: 40px; }
+.kimi-beam-page .kimi-footnote { margin-top: 12px; }
+.kimi-beam-fields { display: grid; gap: 24px; }
+.kimi-beam-fields > .sr-only { position: absolute; }
+.kimi-beam-fields > hr, .kimi-beam-fields > [data-orientation] { display: none; }
+.kimi-beam-submit { align-items: center; align-self: end; }
+.kimi-beam-page input, .kimi-beam-page [role="combobox"] { background: var(--kimi-paper); }
+.kimi-beam-page .kimi-disclosure > summary > span { font-size: 14px; }
+@media (min-width: 640px) {
+  .kimi-beam-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .kimi-beam-geometry { grid-column: 1 / -1; border-top: .5px solid var(--kimi-separator); padding-top: 20px; }
+}
 .kimi-feedback { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 20px 0; border: .5px solid var(--kimi-separator); border-radius: 12px; padding: 12px 16px; font-size: 14px; line-height: 24px; }
 .kimi-quiet-state { padding: 64px 16px; text-align: center; font-size: 14px; line-height: 24px; }
 .kimi-quiet-state p + p { margin-top: 8px; color: var(--kimi-text-secondary); font-size: 12px; }

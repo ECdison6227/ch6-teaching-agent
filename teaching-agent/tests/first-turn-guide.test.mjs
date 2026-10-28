@@ -23,3 +23,11 @@ test('后续作答保留判定与卡片，教材节和纯识图不编造 PPT',()
 test('上游报错或空回复时不追加看似成功的课件',()=>{
  const error={type:'error',message:'连接失败'};assert.deepEqual(run(first('双筋'),null,[text,error]),[text,error]);assert.deepEqual(run(first('双筋'),null,[]),[]);
 });
+
+test('模型结果讲解首轮直接解释真实结果，不追加课程PPT',()=>{
+ const output=[];
+ const guide=createFirstTurnGuide(first('讲解K5单筋模型预测1215.35'),{section:'K5 单筋矩形截面计算',mode:'beam-lab'},e=>output.push(e));
+ assert.equal(guide.instruction,'');
+ guide.emit({type:'text',delta:'模型预测1215.35，公式参考1212.38。'});guide.finish();
+ assert.deepEqual(output.map(e=>e.type),['text']);
+});

@@ -25,7 +25,7 @@ const outcomeText = (attempt: Attempt) => attempt.method === "self-report"
   ? attempt.outcome === "correct" ? "已掌握 · 自评" : "待巩固 · 自评"
   : attempt.outcome === "correct" ? "答对了" : "再巩固一下";
 
-export default function LinkedPracticeView() {
+export default function LinkedPracticeView({ embedded = false }: { embedded?: boolean }) {
   const saved = useSyncExternalStore(linkedStore.subscribe, linkedStore.getSnapshot, () => serverSnapshot);
   const state = saved.value;
   const question = currentQuestion(state);
@@ -68,14 +68,16 @@ export default function LinkedPracticeView() {
   const remaining = filterLinkedQuestions(state.profile).filter(item => !state.seenIds.includes(item.id)).length;
   const finished = !!state.currentId && !!result && remaining === 0;
   const history = state.screen === "history";
-  return <main className="kimi-page" aria-label="关联练习">
-    <header className="kimi-page-heading">
+  const actions = <div className="kimi-actions">
+    {state.screen === "practice" ? <Button variant="ghost" size="sm" onClick={() => { setProfile(state.profile); setSettingsOpen(true); }}><SlidersHorizontal />设置</Button> : null}
+    {!embedded ? <Button variant="ghost" size="sm" onClick={() => setInfoOpen(true)}>题库说明</Button> : null}
+  </div>;
+  const Shell = embedded ? "section" : "main";
+  return <Shell className={embedded ? "" : "kimi-page"} aria-label="关联练习">
+    {embedded ? state.screen === "practice" ? <div className="mb-3 flex justify-end">{actions}</div> : null : <header className="kimi-page-heading">
       <div><h1>关联练习</h1><p>从一道题开始，把相关知识串起来。</p></div>
-      <div className="kimi-actions">
-        {state.screen === "practice" ? <Button variant="ghost" size="sm" onClick={() => { setProfile(state.profile); setSettingsOpen(true); }}><SlidersHorizontal />设置</Button> : null}
-        <Button variant="ghost" size="sm" onClick={() => setInfoOpen(true)}>题库说明</Button>
-      </div>
-    </header>
+      {actions}
+    </header>}
     <div className="kimi-category-tabs" role="group" aria-label="关联练习页面">
       <Button variant="ghost" aria-pressed={!history} onClick={() => update(value => ({ ...value, screen: value.currentId && currentQuestion(value) ? "practice" : "start" }))}>练习</Button>
       <Button variant="ghost" aria-pressed={history} onClick={() => update(value => ({ ...value, screen: "history" }))}>学习记录<span className="text-xs text-muted-foreground">{state.attempts.length}</span></Button>
@@ -140,5 +142,5 @@ export default function LinkedPracticeView() {
     <Dialog open={confirmStart} onOpenChange={open => { setConfirmStart(open); if (!open) setPendingQuestionId(null); }}><DialogContent className="kimi-dialog"><DialogHeader><DialogTitle>{pendingQuestionId ? "切换练习？" : "开始新练习？"}</DialogTitle><DialogDescription>当前未提交的答案将被替换，已有学习记录保留。</DialogDescription></DialogHeader><DialogFooter><Button variant="ghost" onClick={() => { setConfirmStart(false); setPendingQuestionId(null); }}>取消</Button><Button onClick={() => { if (pendingQuestionId) { const id = pendingQuestionId; update(value => openQuestion(value, id)); setConfirmStart(false); setPendingQuestionId(null); } else start(); }}>{pendingQuestionId ? "切换练习" : "开始新练习"}</Button></DialogFooter></DialogContent></Dialog>
     <Dialog open={infoOpen} onOpenChange={setInfoOpen}><DialogContent className="kimi-dialog"><DialogHeader><DialogTitle>关于关联练习</DialogTitle><DialogDescription>独立练习，按已有知识关系补基础、换角度。</DialogDescription></DialogHeader><div className="space-y-3 text-sm leading-7 text-muted-foreground"><p>当前收录 {CATALOG_INFO.questionCount} 条结构完整记录，{CATALOG_INFO.quarantinedCount} 条待复核内容暂未开放。</p><p>判断、选择按资料答案核对；填空、计算对照解答后自评。关联推荐来自资料整理，同主题补练会另行标明。</p><p>记录保存在本机，与题库自测、实时课堂分别保存。可在学习记录中导出。</p></div></DialogContent></Dialog>
     <Dialog open={!!record} onOpenChange={open => { if (!open) setRecord(null); }}><DialogContent className="kimi-dialog"><DialogHeader><DialogTitle>学习记录</DialogTitle><DialogDescription>{record ? outcomeText(record) : ""}</DialogDescription></DialogHeader>{record ? <div className="space-y-5"><Markdown text={formatLinkedText(record.question.prompt)} /><p className="text-sm">你的答案：{record.answer || "对照解答后自评"}</p><div><p className="mb-2 text-xs text-muted-foreground">参考答案</p><Markdown text={formatLinkedText(record.question.answerRaw)} /></div><details className="kimi-disclosure"><summary>查看解析</summary><div className="pt-3"><Markdown text={formatLinkedText(record.question.analysis)} /></div></details><p className="text-xs text-muted-foreground">{record.question.sourceLabel}{record.question.sourceAlias ? " · " + record.question.sourceAlias : ""}</p></div> : null}<DialogFooter><Button variant="ghost" onClick={() => setRecord(null)}>关闭</Button>{record && getLinkedQuestion(record.question.id)?.contentHash === record.question.contentHash ? <Button onClick={() => { const id = record.question.id; setRecord(null); if (state.draft && !state.resultId) { setPendingQuestionId(id); setConfirmStart(true); } else update(value => openQuestion(value, id)); }}>再练一次<ArrowRight /></Button> : null}</DialogFooter></DialogContent></Dialog>
-  </main>;
+  </Shell>;
 }
