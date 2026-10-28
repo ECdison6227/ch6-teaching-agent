@@ -281,6 +281,7 @@ export function BeamLabView({ active = true }: { active?: boolean }) {
     bindSlide(null);
     const doubleResult = isDoubleResult(result);
     ask({
+      displayQuestion: `请讲解这次${TASK_LABELS[result.task]}结果，说明模型预测与公式参考的差异。`,
       question: doubleResult
         ? `请结合双筋矩形截面计算，用教学方式讲解下列实际模型调用结果。说明等级到材料设计值的映射、h₀与a′ₛ、规则分支、预测面积与公式参考差异。双筋A同时预测受拉和受压面积，双筋B的受压面积是输入。数值以结果为准；模型未调用或规则不适用时解释原因，不补造数值。双筋任务没有分类概率。等效矩形应力图数值复核不等于完整破坏模式、极限拉应变和实际排布验算，不宣称完整设计通过。\n\n${resultSummary(result)}`
         : `请结合 K5 单筋矩形截面计算，用教学方式讲解下列实际模型调用结果。说明输入、规则适用性、模型值和公式参考的差异。数值以这份结果为准；如果预测为空或规则不适用，请解释原因和下一步，不补造数值。设计状态分类 A 不代表实配梁破坏形态；分类 B 的适筋也不等于承载力满足。\n\n${resultSummary(result)}`,
