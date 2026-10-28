@@ -1,0 +1,42 @@
+{
+  "repository": "https://github.com/ECdison6227/rea-ui-library",
+  "ref": "main",
+  "commit": "c74175fddb9c0c82265d907b50454528a40f5c3b",
+  "profile": "platforms/web/kimi-web",
+  "version": "Live snapshot 2026-10-20; page release marker c42d8c1",
+  "files": [
+    {
+      "path": "design-package.json",
+      "sha256": "d3dd58025d5a71031e33c9308224ca38ab1de74b1c1881908ca5bd5b85b99b88"
+    },
+    {
+      "path": "DESIGN_SPEC.md",
+      "sha256": "a567eb6b8839155bd561c504299a34f897b2ec4b4ec066c73b512b7dd1a01815"
+    },
+    {
+      "path": "tokens/tokens.json",
+      "sha256": "fbc2cbb72b12c4ff954debc9a5c55539a07d161146cef92ef4e557880f9d36dd"
+    },
+    {
+      "path": "components/catalog.json",
+      "sha256": "458b74ec60c12660b94bb0e1944963a39263bc8537fb3187f0a4bd4db36c0d37"
+    },
+    {
+      "path": "patterns/layouts.json",
+      "sha256": "953f4cef6299899ded654668aca179c122ec1fd84e9e2c7ea84550bebd3884ea"
+    },
+    {
+      "path": "patterns/interactions.json",
+      "sha256": "ea46faf4843c43b7f1112b200547f9962a006ef90c3ce4e5ee62a54151bd2bb7"
+    },
+    {
+      "path": "motion/catalog.json",
+      "sha256": "de88da9f1b2858b553933fe87e9d18668f5866da55ac1671eb9dbce5d15449b3"
+    },
+    {
+      "path": "ADAPTATION_GUIDE.md",
+      "sha256": "5d02a8bbe7d0930ec9497f95344e004ea4243d6f68006225abf062fc7b0a04a5"
+    }
+  ],
+  "reuse": "Existing Teach Demo Kimi theme, shadcn/Radix controls, Lucide, Motion, AiDrawer and Markdown. No new UI library, font or icon files."
+}

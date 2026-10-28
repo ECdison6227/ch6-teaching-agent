@@ -10,6 +10,7 @@ import { request as httpRequest } from "node:http";
 import { networkInterfaces, tmpdir } from "node:os";
 import { classroomBrowserCheck } from "./classroom-browser-check.mjs";
 import { sectionExplorationBrowserCheck } from "./section-exploration-browser-check.mjs";
+import { beamLabBrowserCheck } from "./beam-lab-browser-check.mjs";
 import { DatabaseSync } from "node:sqlite";
 
 const platform = process.env.CI_BROWSER || "chromium";
@@ -71,7 +72,7 @@ try {
   }
   assert.ok(ready, "Production health endpoint did not become ready");
 
-  for (const view of ["self-test", "classroom", "linked-practice", "reinforcement-demo"]) {
+  for (const view of ["self-test", "classroom", "linked-practice", "reinforcement-demo", "beam-lab"]) {
     const response = await fetch(`${origin}${basePath}/${view}`, { redirect: "manual" });
     assert.equal(response.status, 307);
     assert.equal(response.headers.get("location"), `${basePath}/#${view}`, "Direct entry must contain the deployment prefix exactly once");
@@ -105,7 +106,7 @@ try {
     assert.match(await page.evaluate(() => navigator.userAgent), /Android/, "Mobile viewport emulation cannot replace an Android browser");
   }
   await page.getByRole("heading", { name: "钢筋混凝土梁承载力计算原理", exact: true }).waitFor();
-  await page.getByRole("button", { name: "引导学习", exact: true }).click();
+  await page.getByRole("button", { name: "开始学习", exact: true }).click();
   await page.getByText("先看资料，再做题。", { exact: true }).waitFor();
 
   async function navigate(label) {
@@ -284,6 +285,7 @@ try {
   await page.screenshot({ path: path.join(output, "self-test-fill-passed.png"), fullPage: true });
   await sectionExplorationBrowserCheck({ page, origin, basePath, output });
   assert.deepEqual(aiRequests, [], "Fixed exploration and preset audit must not call model APIs");
+  await beamLabBrowserCheck({ page, origin, basePath, output, navigate });
   assert.deepEqual(errors, [], "Browser must not report uncaught runtime or hydration errors");
   await page.screenshot({ path: path.join(output, "passed.png"), fullPage: true });
   console.log(`PASS ${platform}: production health, navigation, slides, notes persistence, self-test snapshots, fill input persistence, unanswered dialog, results and wrongbook (${basePath || "/"})`);

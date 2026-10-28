@@ -352,7 +352,6 @@ button, input, textarea, select { font: inherit; }
 .kimi-material-card { border-radius: 16px; box-shadow: none; transition: border-color 150ms ease, background-color 150ms ease; }
 .kimi-material-card:hover { border-color: var(--kimi-separator); background: var(--kimi-fill-hover); }
 .kimi-empty { border-style: dashed; background: var(--kimi-surface); box-shadow: none; }
-.kimi-beam-lab-frame { display: block; width: 100%; height: min(90vh, 900px); min-height: 720px; border: 0; border-top: .5px solid var(--kimi-separator); background: var(--background); }
 .kimi-note-editor { width: calc(100% - 32px); max-width: 560px; max-height: 86dvh; border-radius: 16px; padding: 24px; background: var(--kimi-paper); }
 .kimi-note-editor textarea { min-height: 180px; max-height: 45dvh; background: var(--kimi-surface); font-size: 14px; line-height: 24px; }
 .md-body { font-size: 16px; line-height: 26px; color: var(--kimi-text-primary); }
@@ -483,6 +482,21 @@ summary::-webkit-details-marker { display: none; }
 .kimi-check-select { margin-top: 16px; flex-shrink: 0; }
 .kimi-check-select[aria-pressed="true"] { background: var(--kimi-fill-selected); color: var(--kimi-accent); }
 .kimi-footnote { margin: 24px 0 0; color: var(--kimi-text-secondary); font-size: 12px; line-height: 20px; }
+
+/* D: the beam model uses the existing Kimi content rail, controls and result surfaces. */
+.kimi-beam-page .kimi-choice-pills { gap: 8px; }
+.kimi-beam-page .kimi-choice-pills > button { min-height: 40px; }
+.kimi-beam-page .kimi-footnote { margin-top: 12px; }
+.kimi-beam-fields { display: grid; gap: 24px; }
+.kimi-beam-fields > .sr-only { position: absolute; }
+.kimi-beam-fields > hr, .kimi-beam-fields > [data-orientation] { display: none; }
+.kimi-beam-submit { align-items: center; align-self: end; }
+.kimi-beam-page input, .kimi-beam-page [role="combobox"] { background: var(--kimi-paper); }
+.kimi-beam-page .kimi-disclosure > summary > span { font-size: 14px; }
+@media (min-width: 640px) {
+  .kimi-beam-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .kimi-beam-geometry { grid-column: 1 / -1; border-top: .5px solid var(--kimi-separator); padding-top: 20px; }
+}
 .kimi-feedback { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 20px 0; border: .5px solid var(--kimi-separator); border-radius: 12px; padding: 12px 16px; font-size: 14px; line-height: 24px; }
 .kimi-quiet-state { padding: 64px 16px; text-align: center; font-size: 14px; line-height: 24px; }
 .kimi-quiet-state p + p { margin-top: 8px; color: var(--kimi-text-secondary); font-size: 12px; }

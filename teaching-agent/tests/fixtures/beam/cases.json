@@ -1,0 +1,2039 @@
+[
+  {
+    "id": "01-single-design",
+    "task": "design",
+    "request": {
+      "b_mm": 250,
+      "h_mm": 500,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "M_design_kNm": 175
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "design",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 250,
+        "h_mm": 500,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "M_design_kNm": 175,
+        "h0_mm": null,
+        "environment_class": "I",
+        "design_life_years": 50,
+        "stirrup_d_mm": 8,
+        "assumed_longitudinal_d_mm": 20
+      },
+      "geometry": {
+        "environment_class": "I",
+        "design_life_years": 50,
+        "cover_table_mm": 20,
+        "cover_to_stirrup_mm": 20,
+        "stirrup_d_mm": 8,
+        "assumed_longitudinal_d_mm": 20,
+        "assumed_rows": 1,
+        "a_s_assumed_mm": 38,
+        "h0_mm": 462,
+        "h0_basis": "assumed_single_layer_cover_stirrup_diameter_v1",
+        "placement_status": "preliminary_not_checked",
+        "basis": "assumed_single_layer_cover_stirrup_diameter_v1"
+      },
+      "classification": {
+        "class_name": "适筋",
+        "label": "正常单筋受弯设计状态",
+        "probabilities": {
+          "少筋": 0.0005210473286843855,
+          "适筋": 0.9987954649959055,
+          "超筋": 0.0006834876754100158
+        }
+      },
+      "prediction": {
+        "value": 1215.3500269576261,
+        "unit": "mm²",
+        "model_key": "area"
+      },
+      "reference": {
+        "b_mm": 250,
+        "h_mm": 500,
+        "h0_mm": 462,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "M_design_kNm": 175,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "Es_MPa": 200000,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "a_s_given_mm": 38,
+        "xi_b": 0.5176470588235295,
+        "x_limit_mm": 239.15294117647062,
+        "M_limit_kNm": 292.76244921799315,
+        "alpha_s": 0.2293390723142789,
+        "xi_required": 0.26425421824420753,
+        "x_required_mm": 122.08544882882387,
+        "As_bending_mm2": 1212.3763321195704,
+        "rho_min": 0.002,
+        "As_min_mm2": 250,
+        "As_required_mm2": 1212.3763321195704,
+        "rho_required_gross": 0.009699010656956563,
+        "M_backcheck_kNm": 174.99999999999994,
+        "control": "bending",
+        "status": "ok",
+        "reason": "按给定 h0 完成正截面受弯与最小配筋面积计算。",
+        "method_version": "GB_rectangular_area_assumed_single_layer_v1",
+        "design_scope": "ordinary_nonseismic_rectangular_singly_reinforced",
+        "moment_basis": "design_moment_including_gamma0"
+      },
+      "comparison": {
+        "model_minus_reference": 2.973694838055735,
+        "relative_error_percent": 0.245278199456178
+      },
+      "warnings": [
+        "h0 按预估单排纵筋位置计算；尚未验证选筋、排数、净距及实际排布。",
+        "分类概率为模型原始概率，未经独立概率校准；不代表规范通过概率。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形单筋截面，不计受压钢筋贡献；C30/C35/C40、HRB400/HRB500；设计弯矩已包含应计入的结构重要性系数。模型与公式对照用于教学，不包含实际选筋、布置及完整梁设计。"
+    }
+  },
+  {
+    "id": "02-single-review",
+    "task": "review",
+    "request": {
+      "b_mm": 200,
+      "h_mm": 450,
+      "h0_mm": 414,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "As_provided_mm2": 603,
+      "M_design_kNm": 80
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "review",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 200,
+        "h_mm": 450,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "h0_mm": 414,
+        "As_provided_mm2": 603,
+        "M_design_kNm": 80
+      },
+      "geometry": {
+        "h0_mm": 414,
+        "basis": "provided_effective_height",
+        "a_s_given_mm": 36,
+        "placement_status": "provided_not_verified"
+      },
+      "classification": {
+        "class_name": "适筋",
+        "label": "实配面积位于最小配筋与单筋界限之间",
+        "probabilities": {
+          "少筋": 0.006507441352075268,
+          "适筋": 0.9883897391934953,
+          "超筋": 0.005102819454429539
+        }
+      },
+      "prediction": {
+        "value": 82.25017067719503,
+        "unit": "kN·m",
+        "model_key": "review"
+      },
+      "reference": {
+        "b_mm": 200,
+        "h_mm": 450,
+        "h0_mm": 414,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "Es_MPa": 200000,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "As_given_mm2": 603,
+        "M_design_kNm": 80,
+        "a_s_given_mm": 36,
+        "rho_given_gross": 0.0067,
+        "rho_min": 0.002,
+        "As_min_mm2": 180,
+        "xi_b": 0.5176470588235295,
+        "x_limit_mm": 214.30588235294118,
+        "As_yield_limit_mm2": 1702.5411764705884,
+        "x_yield_assumed_mm": 75.9020979020979,
+        "xi_yield_assumed": 0.1833384007297051,
+        "Mu_reference_kNm": 81.63270629370629,
+        "capacity_status": "ok",
+        "reference_bending_check": "meets",
+        "reason": "得到当前单筋简式下的规范正截面受弯承载力。",
+        "review_method_version": "GB_rectangular_review_given_As_h0_v1",
+        "design_scope": "ordinary_nonseismic_rectangular_singly_reinforced",
+        "moment_basis": "design_moment_including_gamma0"
+      },
+      "comparison": {
+        "model_minus_reference": 0.6174643834887377,
+        "relative_error_percent": 0.7563933765311697,
+        "model_meets": true,
+        "reference_meets": true,
+        "decision_disagrees": false
+      },
+      "warnings": [
+        "分类概率为模型原始概率，未经独立概率校准；不代表规范通过概率。",
+        "实配配筋状态与承载力满足性分别判断；“适筋”不直接表示满足设计弯矩。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形单筋截面，不计受压钢筋贡献；C30/C35/C40、HRB400/HRB500；设计弯矩已包含应计入的结构重要性系数。模型与公式对照用于教学，不包含实际选筋、布置及完整梁设计。"
+    }
+  },
+  {
+    "id": "03-double-a",
+    "task": "double-a",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 40,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "M_design_kNm": 600
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-a",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "compression_steel": "HRB400",
+        "M_design_kNm": 600
+      },
+      "materials": {
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": {
+        "As_required_mm2": {
+          "value": 3903.3336316515783,
+          "unit": "mm²",
+          "model_key": "double_a_tension"
+        },
+        "Asp_required_mm2": {
+          "value": 451.1443940665382,
+          "unit": "mm²",
+          "model_key": "double_a_compression"
+        }
+      },
+      "comparisons": {
+        "As_required_mm2": {
+          "model_minus_reference": 1.0667875383669525,
+          "relative_error_percent": 0.027337636839886062
+        },
+        "Asp_required_mm2": {
+          "model_minus_reference": 3.3089225023468316,
+          "relative_error_percent": 0.7388701236169365
+        }
+      },
+      "model_called": true,
+      "prediction_review": {
+        "status": "ok",
+        "reason": "等效矩形应力图力平衡数值复核；未作全过程极限状态分析",
+        "x_mm": 289.6942017553879,
+        "xi": 0.5173110745631927,
+        "sigma_c_prime_MPa": 360,
+        "epsilon_t": 0.0018033123584859736,
+        "epsilon_c_prime": 0.002935477688679573,
+        "Mu_kNm": 600.4013238780668,
+        "force_residual_N": -4.656612873077393e-10,
+        "tension_yielded": true,
+        "compression_yielded": true,
+        "equivalent_state_exceeds_steel_ultimate_strain": false,
+        "ultimate_strain_full_analysis_performed": false,
+        "capacity_margin_kNm": 0.4013238780668189,
+        "minimum_area_meets": true,
+        "numerical_checks_passed": true
+      },
+      "reference": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "M_design_kNm": 600,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000,
+        "scenario": "A",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "ok",
+        "branch": "limit_doubly_yielded",
+        "reason": "规范实用面积设计及等效矩形图力平衡数值复核通过",
+        "train_eligible": true,
+        "control": "bending",
+        "actual_layout_verified": false,
+        "As_required_mm2": 3902.2668441132114,
+        "Asp_required_mm2": 447.8354715641914,
+        "As_bending_mm2": 3902.2668441132114,
+        "Asp_design_mm2": 447.8354715641914,
+        "x_design_mm": 289.8823529411765,
+        "x_verified_mm": 289.88235294117646,
+        "xi_verified": 0.5176470588235293,
+        "M_ratio_capacity": 1,
+        "M_code_lower_kNm": null,
+        "M_capacity_limit_kNm": 600,
+        "Mu_verified_kNm": 600,
+        "capacity_margin_kNm": 0,
+        "equilibrium_force_residual_N": -2.3283064365386963e-10,
+        "sigma_c_prime_MPa": 360,
+        "epsilon_t": 0.0018,
+        "epsilon_c_prime": 0.002935714285714286,
+        "tension_yielded": true,
+        "compression_yielded": true,
+        "equivalent_state_exceeds_steel_ultimate_strain": false,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.5176470588235295,
+        "x_limit_mm": 289.8823529411765,
+        "rho_min": 0.002,
+        "As_min_mm2": 360,
+        "M_single_limit_kNm": 516.1651997231834,
+        "tension_scale_mm2": 6673.333333333333,
+        "compression_scale_mm2": 6673.333333333333,
+        "x_compression_yield_mm": 70.39999999999999,
+        "M_ratio_single": 1.1624185441439616
+      },
+      "warnings": [],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "04-double-b",
+    "task": "double-b",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 40,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "M_design_kNm": 300,
+      "Asp_given_mm2": 500
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-b",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "compression_steel": "HRB400",
+        "M_design_kNm": 300,
+        "Asp_given_mm2": 500
+      },
+      "materials": {
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": {
+        "As_required_mm2": {
+          "value": 1619.2452433571664,
+          "unit": "mm²",
+          "model_key": "double_b_tension"
+        }
+      },
+      "comparisons": {
+        "As_required_mm2": {
+          "model_minus_reference": 1.8936714529806977,
+          "relative_error_percent": 0.11708471342141075
+        }
+      },
+      "model_called": true,
+      "prediction_review": {
+        "status": "ok",
+        "reason": "等效矩形应力图力平衡数值复核；未作全过程极限状态分析",
+        "x_mm": 93.92267776423773,
+        "xi": 0.16771906743613882,
+        "sigma_c_prime_MPa": 360,
+        "epsilon_t": 0.012440607435736037,
+        "epsilon_c_prime": 0.0021756708974474265,
+        "Mu_kNm": 300.31778920122633,
+        "force_residual_N": 0,
+        "tension_yielded": true,
+        "compression_yielded": true,
+        "equivalent_state_exceeds_steel_ultimate_strain": true,
+        "ultimate_strain_full_analysis_performed": false,
+        "capacity_margin_kNm": 0.3177892012263328,
+        "minimum_area_meets": true,
+        "numerical_checks_passed": true
+      },
+      "reference": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "M_design_kNm": 300,
+        "Asp_given_mm2": 500,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000,
+        "scenario": "B",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "ok",
+        "branch": "compression_yielded",
+        "reason": "规范实用面积设计及等效矩形图力平衡数值复核通过",
+        "train_eligible": true,
+        "control": "bending",
+        "actual_layout_verified": false,
+        "As_required_mm2": 1617.3515719041857,
+        "Asp_required_mm2": null,
+        "As_bending_mm2": 1617.3515719041857,
+        "Asp_design_mm2": 500,
+        "x_design_mm": 93.76376827167991,
+        "x_verified_mm": 93.76376827167988,
+        "xi_verified": 0.16743530048514263,
+        "M_ratio_capacity": 0.4919926557569893,
+        "M_code_lower_kNm": 272.064,
+        "M_capacity_limit_kNm": 609.7651997231834,
+        "Mu_verified_kNm": 299.9999999999999,
+        "capacity_margin_kNm": -1.1368683772161603e-13,
+        "equilibrium_force_residual_N": -1.1641532182693481e-10,
+        "sigma_c_prime_MPa": 360,
+        "epsilon_t": 0.012467284391944937,
+        "epsilon_c_prime": 0.0021737654005753618,
+        "tension_yielded": true,
+        "compression_yielded": true,
+        "equivalent_state_exceeds_steel_ultimate_strain": true,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.5176470588235295,
+        "x_limit_mm": 289.8823529411765,
+        "rho_min": 0.002,
+        "As_min_mm2": 360,
+        "M_single_limit_kNm": 516.1651997231834,
+        "tension_scale_mm2": 6673.333333333333,
+        "compression_scale_mm2": 6673.333333333333,
+        "x_compression_yield_mm": 70.39999999999999,
+        "M_ratio_single": 0.5812092720719808,
+        "M_compression_yield_kNm": null
+      },
+      "warnings": [
+        "公式参考的等效状态反算受拉应变 εt>0.01；该标记不直接否定规范实用面积标签，完整全过程和极限拉应变分析未执行。",
+        "预测面积的等效状态反算受拉应变 εt>0.01；该标记不直接否定规范实用面积标签，完整全过程和极限拉应变分析未执行。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "05-minimum-control",
+    "task": "design",
+    "request": {
+      "b_mm": 250,
+      "h_mm": 500,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "M_design_kNm": 0
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "design",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 250,
+        "h_mm": 500,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "M_design_kNm": 0,
+        "h0_mm": null,
+        "environment_class": "I",
+        "design_life_years": 50,
+        "stirrup_d_mm": 8,
+        "assumed_longitudinal_d_mm": 20
+      },
+      "geometry": {
+        "environment_class": "I",
+        "design_life_years": 50,
+        "cover_table_mm": 20,
+        "cover_to_stirrup_mm": 20,
+        "stirrup_d_mm": 8,
+        "assumed_longitudinal_d_mm": 20,
+        "assumed_rows": 1,
+        "a_s_assumed_mm": 38,
+        "h0_mm": 462,
+        "h0_basis": "assumed_single_layer_cover_stirrup_diameter_v1",
+        "placement_status": "preliminary_not_checked",
+        "basis": "assumed_single_layer_cover_stirrup_diameter_v1"
+      },
+      "classification": {
+        "class_name": "少筋",
+        "label": "最小配筋控制的设计状态",
+        "probabilities": {
+          "少筋": 0.998160698597988,
+          "适筋": 0.0011920240249843571,
+          "超筋": 0.0006472773770278143
+        }
+      },
+      "prediction": {
+        "value": 252.192344717747,
+        "unit": "mm²",
+        "model_key": "area"
+      },
+      "reference": {
+        "b_mm": 250,
+        "h_mm": 500,
+        "h0_mm": 462,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "M_design_kNm": 0,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "Es_MPa": 200000,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "a_s_given_mm": 38,
+        "xi_b": 0.5176470588235295,
+        "x_limit_mm": 239.15294117647062,
+        "M_limit_kNm": 292.76244921799315,
+        "alpha_s": 0,
+        "xi_required": 0,
+        "x_required_mm": 0,
+        "As_bending_mm2": 0,
+        "rho_min": 0.002,
+        "As_min_mm2": 250,
+        "As_required_mm2": 250,
+        "rho_required_gross": 0.002,
+        "M_backcheck_kNm": 0,
+        "control": "minimum_reinforcement",
+        "status": "ok",
+        "reason": "按给定 h0 完成正截面受弯与最小配筋面积计算。",
+        "method_version": "GB_rectangular_area_assumed_single_layer_v1",
+        "design_scope": "ordinary_nonseismic_rectangular_singly_reinforced",
+        "moment_basis": "design_moment_including_gamma0"
+      },
+      "comparison": {
+        "model_minus_reference": 2.1923447177470052,
+        "relative_error_percent": 0.876937887098802
+      },
+      "warnings": [
+        "h0 按预估单排纵筋位置计算；尚未验证选筋、排数、净距及实际排布。",
+        "设计状态分类模型：设计弯矩 M=0 超出训练记录范围 [0.0096839, 2175.14]。",
+        "设计状态分类模型：弯矩强度比 M/(fc·b·h0²)=0 超出训练记录范围 [8.6519e-06, 0.441217]。",
+        "设计状态分类模型：配筋需求尺度 M/(fy·b·h·h0)=0 超出训练记录范围 [3.67392e-07, 0.0223037]。",
+        "分类概率为模型原始概率，未经独立概率校准；不代表规范通过概率。",
+        "配筋面积模型：设计弯矩 M=0 超出训练记录范围 [0.0096839, 1895.3]。",
+        "配筋面积模型：弯矩强度比 M/(fc·b·h0²)=0 超出训练记录范围 [8.6519e-06, 0.383668]。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形单筋截面，不计受压钢筋贡献；C30/C35/C40、HRB400/HRB500；设计弯矩已包含应计入的结构重要性系数。模型与公式对照用于教学，不包含实际选筋、布置及完整梁设计。"
+    }
+  },
+  {
+    "id": "06-single-redesign",
+    "task": "design",
+    "request": {
+      "b_mm": 250,
+      "h_mm": 500,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "M_design_kNm": 1000
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "design",
+      "status": "needs_redesign",
+      "inputs": {
+        "b_mm": 250,
+        "h_mm": 500,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "M_design_kNm": 1000,
+        "h0_mm": null,
+        "environment_class": "I",
+        "design_life_years": 50,
+        "stirrup_d_mm": 8,
+        "assumed_longitudinal_d_mm": 20
+      },
+      "geometry": {
+        "environment_class": "I",
+        "design_life_years": 50,
+        "cover_table_mm": 20,
+        "cover_to_stirrup_mm": 20,
+        "stirrup_d_mm": 8,
+        "assumed_longitudinal_d_mm": 20,
+        "assumed_rows": 1,
+        "a_s_assumed_mm": 38,
+        "h0_mm": 462,
+        "h0_basis": "assumed_single_layer_cover_stirrup_diameter_v1",
+        "placement_status": "preliminary_not_checked",
+        "basis": "assumed_single_layer_cover_stirrup_diameter_v1"
+      },
+      "classification": {
+        "class_name": "超筋",
+        "label": "超过当前单筋设计弯矩界限",
+        "probabilities": {
+          "少筋": 0.0006511711382123638,
+          "适筋": 0.002925448159147012,
+          "超筋": 0.9964233807026405
+        }
+      },
+      "prediction": null,
+      "reference": {
+        "b_mm": 250,
+        "h_mm": 500,
+        "h0_mm": 462,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "M_design_kNm": 1000,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "Es_MPa": 200000,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "a_s_given_mm": 38,
+        "xi_b": 0.5176470588235295,
+        "x_limit_mm": 239.15294117647062,
+        "M_limit_kNm": 292.76244921799315,
+        "alpha_s": null,
+        "xi_required": null,
+        "x_required_mm": null,
+        "As_bending_mm2": null,
+        "rho_min": 0.002,
+        "As_min_mm2": 250,
+        "As_required_mm2": null,
+        "rho_required_gross": null,
+        "M_backcheck_kNm": null,
+        "control": null,
+        "status": "needs_redesign",
+        "reason": "M 超过给定截面、材料和 h0 下的单筋受弯限值；需调整截面/材料或另做双筋设计。",
+        "method_version": "GB_rectangular_area_assumed_single_layer_v1",
+        "design_scope": "ordinary_nonseismic_rectangular_singly_reinforced",
+        "moment_basis": "design_moment_including_gamma0"
+      },
+      "comparison": null,
+      "warnings": [
+        "h0 按预估单排纵筋位置计算；尚未验证选筋、排数、净距及实际排布。",
+        "设计状态分类模型：弯矩强度比 M/(fc·b·h0²)=1.31051 超出训练记录范围 [8.6519e-06, 0.441217]。",
+        "设计状态分类模型：配筋需求尺度 M/(fy·b·h·h0)=0.0481 超出训练记录范围 [3.67392e-07, 0.0223037]。",
+        "分类概率为模型原始概率，未经独立概率校准；不代表规范通过概率。",
+        "M 超过给定截面、材料和 h0 下的单筋受弯限值；需调整截面/材料或另做双筋设计。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形单筋截面，不计受压钢筋贡献；C30/C35/C40、HRB400/HRB500；设计弯矩已包含应计入的结构重要性系数。模型与公式对照用于教学，不包含实际选筋、布置及完整梁设计。"
+    }
+  },
+  {
+    "id": "07-review-below-minimum",
+    "task": "review",
+    "request": {
+      "b_mm": 200,
+      "h_mm": 450,
+      "h0_mm": 414,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "As_provided_mm2": 100,
+      "M_design_kNm": 80
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "review",
+      "status": "below_minimum_reinforcement",
+      "inputs": {
+        "b_mm": 200,
+        "h_mm": 450,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "h0_mm": 414,
+        "As_provided_mm2": 100,
+        "M_design_kNm": 80
+      },
+      "geometry": {
+        "h0_mm": 414,
+        "basis": "provided_effective_height",
+        "a_s_given_mm": 36,
+        "placement_status": "provided_not_verified"
+      },
+      "classification": {
+        "class_name": "少筋",
+        "label": "实配面积低于最小配筋要求",
+        "probabilities": {
+          "少筋": 0.9896482436037692,
+          "适筋": 0.005175065523215427,
+          "超筋": 0.005176690873015278
+        }
+      },
+      "prediction": null,
+      "reference": {
+        "b_mm": 200,
+        "h_mm": 450,
+        "h0_mm": 414,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "Es_MPa": 200000,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "As_given_mm2": 100,
+        "M_design_kNm": 80,
+        "a_s_given_mm": 36,
+        "rho_given_gross": 0.0011111111111111111,
+        "rho_min": 0.002,
+        "As_min_mm2": 180,
+        "xi_b": 0.5176470588235295,
+        "x_limit_mm": 214.30588235294118,
+        "As_yield_limit_mm2": 1702.5411764705884,
+        "x_yield_assumed_mm": 12.587412587412587,
+        "xi_yield_assumed": 0.030404378230465184,
+        "Mu_reference_kNm": null,
+        "capacity_status": "below_minimum_reinforcement",
+        "reference_bending_check": "not_applicable",
+        "reason": "低于本版普通梁最小配筋要求，不生成正常Mu回归标签。",
+        "review_method_version": "GB_rectangular_review_given_As_h0_v1",
+        "design_scope": "ordinary_nonseismic_rectangular_singly_reinforced",
+        "moment_basis": "design_moment_including_gamma0"
+      },
+      "comparison": null,
+      "warnings": [
+        "分类概率为模型原始概率，未经独立概率校准；不代表规范通过概率。",
+        "实配配筋状态与承载力满足性分别判断；“适筋”不直接表示满足设计弯矩。",
+        "低于本版普通梁最小配筋要求，不生成正常Mu回归标签。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形单筋截面，不计受压钢筋贡献；C30/C35/C40、HRB400/HRB500；设计弯矩已包含应计入的结构重要性系数。模型与公式对照用于教学，不包含实际选筋、布置及完整梁设计。"
+    }
+  },
+  {
+    "id": "08-review-beyond-single",
+    "task": "review",
+    "request": {
+      "b_mm": 200,
+      "h_mm": 450,
+      "h0_mm": 414,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "As_provided_mm2": 1900,
+      "M_design_kNm": 80
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "review",
+      "status": "beyond_single_reinforced_method",
+      "inputs": {
+        "b_mm": 200,
+        "h_mm": 450,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "h0_mm": 414,
+        "As_provided_mm2": 1900,
+        "M_design_kNm": 80
+      },
+      "geometry": {
+        "h0_mm": 414,
+        "basis": "provided_effective_height",
+        "a_s_given_mm": 36,
+        "placement_status": "provided_not_verified"
+      },
+      "classification": {
+        "class_name": "超筋",
+        "label": "实配面积超过单筋屈服简式界限",
+        "probabilities": {
+          "少筋": 0.004941599064409581,
+          "适筋": 0.006486820768213865,
+          "超筋": 0.9885715801673765
+        }
+      },
+      "prediction": null,
+      "reference": {
+        "b_mm": 200,
+        "h_mm": 450,
+        "h0_mm": 414,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "Es_MPa": 200000,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "As_given_mm2": 1900,
+        "M_design_kNm": 80,
+        "a_s_given_mm": 36,
+        "rho_given_gross": 0.021111111111111112,
+        "rho_min": 0.002,
+        "As_min_mm2": 180,
+        "xi_b": 0.5176470588235295,
+        "x_limit_mm": 214.30588235294118,
+        "As_yield_limit_mm2": 1702.5411764705884,
+        "x_yield_assumed_mm": 239.16083916083917,
+        "xi_yield_assumed": 0.5776831863788385,
+        "Mu_reference_kNm": null,
+        "capacity_status": "beyond_single_reinforced_method",
+        "reference_bending_check": "not_applicable",
+        "reason": "超过单筋屈服简式界限；不能继续假定钢筋应力为fy，需另行受力计算。",
+        "review_method_version": "GB_rectangular_review_given_As_h0_v1",
+        "design_scope": "ordinary_nonseismic_rectangular_singly_reinforced",
+        "moment_basis": "design_moment_including_gamma0"
+      },
+      "comparison": null,
+      "warnings": [
+        "分类概率为模型原始概率，未经独立概率校准；不代表规范通过概率。",
+        "实配配筋状态与承载力满足性分别判断；“适筋”不直接表示满足设计弯矩。",
+        "超过单筋屈服简式界限；不能继续假定钢筋应力为fy，需另行受力计算。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形单筋截面，不计受压钢筋贡献；C30/C35/C40、HRB400/HRB500；设计弯矩已包含应计入的结构重要性系数。模型与公式对照用于教学，不包含实际选筋、布置及完整梁设计。"
+    }
+  },
+  {
+    "id": "09-a-single-sufficient",
+    "task": "double-a",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 40,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "M_design_kNm": 100
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-a",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "compression_steel": "HRB400",
+        "M_design_kNm": 100
+      },
+      "materials": {
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": null,
+      "comparisons": null,
+      "model_called": false,
+      "prediction_review": null,
+      "reference": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "M_design_kNm": 100,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000,
+        "scenario": "A",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "ok",
+        "branch": "single_sufficient",
+        "reason": "规范实用面积设计及等效矩形图力平衡数值复核通过",
+        "train_eligible": false,
+        "control": "bending",
+        "actual_layout_verified": false,
+        "As_required_mm2": 515.9794042979553,
+        "Asp_required_mm2": 0,
+        "As_bending_mm2": 515.9794042979553,
+        "Asp_design_mm2": 0,
+        "x_design_mm": 43.29897099003821,
+        "x_verified_mm": 43.2989709900382,
+        "xi_verified": 0.07731959105363964,
+        "M_ratio_capacity": 0.1937364240239936,
+        "M_code_lower_kNm": null,
+        "M_capacity_limit_kNm": 516.1651997231834,
+        "Mu_verified_kNm": 99.99999999999999,
+        "capacity_margin_kNm": -1.4210854715202004e-14,
+        "equilibrium_force_residual_N": -2.9103830456733704e-11,
+        "sigma_c_prime_MPa": 172.22859303379104,
+        "epsilon_t": 0.030843998487634628,
+        "epsilon_c_prime": 0.0008611429651689551,
+        "tension_yielded": true,
+        "compression_yielded": false,
+        "equivalent_state_exceeds_steel_ultimate_strain": true,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.5176470588235295,
+        "x_limit_mm": 289.8823529411765,
+        "rho_min": 0.002,
+        "As_min_mm2": 360,
+        "M_single_limit_kNm": 516.1651997231834,
+        "tension_scale_mm2": 6673.333333333333,
+        "compression_scale_mm2": 6673.333333333333,
+        "x_compression_yield_mm": 70.39999999999999,
+        "M_ratio_single": 0.1937364240239936
+      },
+      "warnings": [
+        "公式参考的等效状态反算受拉应变 εt>0.01；该标记不直接否定规范实用面积标签，完整全过程和极限拉应变分析未执行。",
+        "给定有效高度下单筋已能满足，本次仅展示公式参考，未调用双筋 A 模型；单筋预测可使用给定弯矩求配筋入口。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "10-a-geometry",
+    "task": "double-a",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 150,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "M_design_kNm": 600
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-a",
+      "status": "unsupported_geometry",
+      "inputs": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 150,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "compression_steel": "HRB400",
+        "M_design_kNm": 600
+      },
+      "materials": {
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 560,
+        "as_prime_mm": 150,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": null,
+      "comparisons": null,
+      "model_called": false,
+      "prediction_review": null,
+      "reference": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 150,
+        "M_design_kNm": 600,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000,
+        "scenario": "A",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "unsupported_geometry",
+        "branch": "",
+        "reason": "本版双筋方法要求 2a′ₛ≤ξb h0；请调整位置/截面",
+        "train_eligible": false,
+        "control": "",
+        "actual_layout_verified": false,
+        "As_required_mm2": null,
+        "Asp_required_mm2": null,
+        "As_bending_mm2": null,
+        "Asp_design_mm2": null,
+        "x_design_mm": null,
+        "x_verified_mm": null,
+        "xi_verified": null,
+        "M_ratio_capacity": null,
+        "M_code_lower_kNm": null,
+        "M_capacity_limit_kNm": null,
+        "Mu_verified_kNm": null,
+        "capacity_margin_kNm": null,
+        "equilibrium_force_residual_N": null,
+        "sigma_c_prime_MPa": null,
+        "epsilon_t": null,
+        "epsilon_c_prime": null,
+        "tension_yielded": null,
+        "compression_yielded": null,
+        "equivalent_state_exceeds_steel_ultimate_strain": null,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.5176470588235295,
+        "x_limit_mm": 289.8823529411765,
+        "rho_min": 0.002,
+        "As_min_mm2": 360,
+        "M_single_limit_kNm": 516.1651997231834,
+        "tension_scale_mm2": 6673.333333333333,
+        "compression_scale_mm2": 6673.333333333333,
+        "x_compression_yield_mm": 264,
+        "M_ratio_single": 1.1624185441439616
+      },
+      "warnings": [
+        "当前条件没有可用的面积参考标签，双筋模型未调用。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "11-b-insufficient",
+    "task": "double-b",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 40,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "M_design_kNm": 1000,
+      "Asp_given_mm2": 500
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-b",
+      "status": "needs_more_compression",
+      "inputs": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "compression_steel": "HRB400",
+        "M_design_kNm": 1000,
+        "Asp_given_mm2": 500
+      },
+      "materials": {
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": null,
+      "comparisons": null,
+      "model_called": false,
+      "prediction_review": null,
+      "reference": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "M_design_kNm": 1000,
+        "Asp_given_mm2": 500,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000,
+        "scenario": "B",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "needs_more_compression",
+        "branch": "",
+        "reason": "已知受压面积不足；需增加受压钢筋或调整截面/材料",
+        "train_eligible": false,
+        "control": "",
+        "actual_layout_verified": false,
+        "As_required_mm2": null,
+        "Asp_required_mm2": null,
+        "As_bending_mm2": null,
+        "Asp_design_mm2": null,
+        "x_design_mm": null,
+        "x_verified_mm": null,
+        "xi_verified": null,
+        "M_ratio_capacity": 1.6399755191899643,
+        "M_code_lower_kNm": 272.064,
+        "M_capacity_limit_kNm": 609.7651997231834,
+        "Mu_verified_kNm": null,
+        "capacity_margin_kNm": null,
+        "equilibrium_force_residual_N": null,
+        "sigma_c_prime_MPa": null,
+        "epsilon_t": null,
+        "epsilon_c_prime": null,
+        "tension_yielded": null,
+        "compression_yielded": null,
+        "equivalent_state_exceeds_steel_ultimate_strain": null,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.5176470588235295,
+        "x_limit_mm": 289.8823529411765,
+        "rho_min": 0.002,
+        "As_min_mm2": 360,
+        "M_single_limit_kNm": 516.1651997231834,
+        "tension_scale_mm2": 6673.333333333333,
+        "compression_scale_mm2": 6673.333333333333,
+        "x_compression_yield_mm": 70.39999999999999,
+        "M_ratio_single": 1.937364240239936,
+        "M_compression_yield_kNm": null
+      },
+      "warnings": [
+        "当前条件没有可用的面积参考标签，双筋模型未调用。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "12-b-small-x-raw-area",
+    "task": "double-b",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 40,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "M_design_kNm": 20,
+      "Asp_given_mm2": 500
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-b",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "compression_steel": "HRB400",
+        "M_design_kNm": 20,
+        "Asp_given_mm2": 500
+      },
+      "materials": {
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": {
+        "As_required_mm2": {
+          "value": 359.99814651370457,
+          "unit": "mm²",
+          "model_key": "double_b_tension"
+        }
+      },
+      "comparisons": {
+        "As_required_mm2": {
+          "model_minus_reference": -0.0018534862954311393,
+          "relative_error_percent": -0.0005148573042864275
+        }
+      },
+      "model_called": true,
+      "prediction_review": {
+        "status": "ok",
+        "reason": "等效矩形应力图力平衡数值复核；未作全过程极限状态分析",
+        "x_mm": 31.48008114528789,
+        "xi": 0.05621443061658552,
+        "sigma_c_prime_MPa": -10.900430736702678,
+        "epsilon_t": 0.04366303015156919,
+        "epsilon_c_prime": -0.000054502153683513385,
+        "Mu_kNm": 70.66794958527659,
+        "force_residual_N": 4.3655745685100555e-11,
+        "tension_yielded": true,
+        "compression_yielded": false,
+        "equivalent_state_exceeds_steel_ultimate_strain": true,
+        "ultimate_strain_full_analysis_performed": false,
+        "capacity_margin_kNm": 50.66794958527659,
+        "minimum_area_meets": false,
+        "numerical_checks_passed": false
+      },
+      "reference": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "M_design_kNm": 20,
+        "Asp_given_mm2": 500,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000,
+        "scenario": "B",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "ok",
+        "branch": "small_x_code_simplification",
+        "reason": "规范实用面积设计及等效矩形图力平衡数值复核通过",
+        "train_eligible": true,
+        "control": "minimum_reinforcement",
+        "actual_layout_verified": false,
+        "As_required_mm2": 360,
+        "Asp_required_mm2": null,
+        "As_bending_mm2": 106.83760683760684,
+        "Asp_design_mm2": 500,
+        "x_design_mm": null,
+        "x_verified_mm": 31.480125789869035,
+        "xi_verified": 0.05621451033905185,
+        "M_ratio_capacity": 0.03279951038379929,
+        "M_code_lower_kNm": 272.064,
+        "M_capacity_limit_kNm": 609.7651997231834,
+        "Mu_verified_kNm": 70.66829818968635,
+        "capacity_margin_kNm": 50.668298189686354,
+        "equilibrium_force_residual_N": -5.820766091346741e-11,
+        "sigma_c_prime_MPa": -10.89947927707643,
+        "epsilon_t": 0.043662963549395355,
+        "epsilon_c_prime": -0.000054497396385382156,
+        "tension_yielded": true,
+        "compression_yielded": false,
+        "equivalent_state_exceeds_steel_ultimate_strain": true,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.5176470588235295,
+        "x_limit_mm": 289.8823529411765,
+        "rho_min": 0.002,
+        "As_min_mm2": 360,
+        "M_single_limit_kNm": 516.1651997231834,
+        "tension_scale_mm2": 6673.333333333333,
+        "compression_scale_mm2": 6673.333333333333,
+        "x_compression_yield_mm": 70.39999999999999,
+        "M_ratio_single": 0.03874728480479872,
+        "M_compression_yield_kNm": null
+      },
+      "warnings": [
+        "公式参考的等效状态反算受拉应变 εt>0.01；该标记不直接否定规范实用面积标签，完整全过程和极限拉应变分析未执行。",
+        "预测面积未通过本次等效应力图的承载力、最小面积及受拉屈服数值条件；模型原值未被公式替换或修正。",
+        "预测面积的等效状态反算受拉应变 εt>0.01；该标记不直接否定规范实用面积标签，完整全过程和极限拉应变分析未执行。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "13-b-zero-compression",
+    "task": "double-b",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 40,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "M_design_kNm": 100,
+      "Asp_given_mm2": 0
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-b",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "compression_steel": "HRB400",
+        "M_design_kNm": 100,
+        "Asp_given_mm2": 0
+      },
+      "materials": {
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": {
+        "As_required_mm2": {
+          "value": 538.0357321387462,
+          "unit": "mm²",
+          "model_key": "double_b_tension"
+        }
+      },
+      "comparisons": {
+        "As_required_mm2": {
+          "model_minus_reference": 22.056327840790914,
+          "relative_error_percent": 4.274652758824916
+        }
+      },
+      "model_called": true,
+      "prediction_review": {
+        "status": "ok",
+        "reason": "等效矩形应力图力平衡数值复核；未作全过程极限状态分析",
+        "x_mm": 45.149851648006674,
+        "xi": 0.0806247350857262,
+        "sigma_c_prime_MPa": 192.2243766235624,
+        "epsilon_t": 0.029444293636350632,
+        "epsilon_c_prime": 0.000961121883117812,
+        "Mu_kNm": 104.09540157144083,
+        "force_residual_N": 0,
+        "tension_yielded": true,
+        "compression_yielded": false,
+        "equivalent_state_exceeds_steel_ultimate_strain": true,
+        "ultimate_strain_full_analysis_performed": false,
+        "capacity_margin_kNm": 4.095401571440831,
+        "minimum_area_meets": true,
+        "numerical_checks_passed": true
+      },
+      "reference": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "M_design_kNm": 100,
+        "Asp_given_mm2": 0,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000,
+        "scenario": "B",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "ok",
+        "branch": "zero_compression_single",
+        "reason": "规范实用面积设计及等效矩形图力平衡数值复核通过",
+        "train_eligible": true,
+        "control": "bending",
+        "actual_layout_verified": false,
+        "As_required_mm2": 515.9794042979553,
+        "Asp_required_mm2": null,
+        "As_bending_mm2": 515.9794042979553,
+        "Asp_design_mm2": 0,
+        "x_design_mm": 43.29897099003821,
+        "x_verified_mm": 43.2989709900382,
+        "xi_verified": 0.07731959105363964,
+        "M_ratio_capacity": 0.1937364240239936,
+        "M_code_lower_kNm": null,
+        "M_capacity_limit_kNm": 516.1651997231834,
+        "Mu_verified_kNm": 99.99999999999999,
+        "capacity_margin_kNm": -1.4210854715202004e-14,
+        "equilibrium_force_residual_N": -2.9103830456733704e-11,
+        "sigma_c_prime_MPa": 172.22859303379104,
+        "epsilon_t": 0.030843998487634628,
+        "epsilon_c_prime": 0.0008611429651689551,
+        "tension_yielded": true,
+        "compression_yielded": false,
+        "equivalent_state_exceeds_steel_ultimate_strain": true,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.5176470588235295,
+        "x_limit_mm": 289.8823529411765,
+        "rho_min": 0.002,
+        "As_min_mm2": 360,
+        "M_single_limit_kNm": 516.1651997231834,
+        "tension_scale_mm2": 6673.333333333333,
+        "compression_scale_mm2": 6673.333333333333,
+        "x_compression_yield_mm": 70.39999999999999,
+        "M_ratio_single": 0.1937364240239936
+      },
+      "warnings": [
+        "公式参考的等效状态反算受拉应变 εt>0.01；该标记不直接否定规范实用面积标签，完整全过程和极限拉应变分析未执行。",
+        "预测面积的等效状态反算受拉应变 εt>0.01；该标记不直接否定规范实用面积标签，完整全过程和极限拉应变分析未执行。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "14-material-mapping",
+    "task": "double-a",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 40,
+      "concrete": "C35",
+      "steel": "HRB400",
+      "compression_steel": "HRB500",
+      "M_design_kNm": 600
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-a",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "concrete": "C35",
+        "steel": "HRB400",
+        "compression_steel": "HRB500",
+        "M_design_kNm": 600
+      },
+      "materials": {
+        "fc_MPa": 16.7,
+        "ft_MPa": 1.57,
+        "fy_MPa": 360,
+        "fyp_MPa": 435,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": null,
+      "comparisons": null,
+      "model_called": false,
+      "prediction_review": null,
+      "reference": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 40,
+        "M_design_kNm": 600,
+        "fc_MPa": 16.7,
+        "ft_MPa": 1.57,
+        "fy_MPa": 360,
+        "fyp_MPa": 435,
+        "Es_MPa": 200000,
+        "scenario": "A",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "ok",
+        "branch": "single_sufficient",
+        "reason": "规范实用面积设计及等效矩形图力平衡数值复核通过",
+        "train_eligible": false,
+        "control": "bending",
+        "actual_layout_verified": false,
+        "As_required_mm2": 4005.5694078021293,
+        "Asp_required_mm2": 0,
+        "As_bending_mm2": 4005.5694078021293,
+        "Asp_design_mm2": 0,
+        "x_design_mm": 287.8253466684165,
+        "x_verified_mm": 287.8253466684165,
+        "xi_verified": 0.5139738333364581,
+        "M_ratio_capacity": 0.9953643821112962,
+        "M_code_lower_kNm": null,
+        "M_capacity_limit_kNm": 602.7943241522493,
+        "Mu_verified_kNm": 600,
+        "capacity_margin_kNm": 0,
+        "equilibrium_force_residual_N": 0,
+        "sigma_c_prime_MPa": 435,
+        "epsilon_t": 0.0018364482562515994,
+        "epsilon_c_prime": 0.0029331108388391714,
+        "tension_yielded": true,
+        "compression_yielded": true,
+        "equivalent_state_exceeds_steel_ultimate_strain": false,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.5176470588235295,
+        "x_limit_mm": 289.8823529411765,
+        "rho_min": 0.002,
+        "As_min_mm2": 360,
+        "M_single_limit_kNm": 602.7943241522493,
+        "tension_scale_mm2": 7793.333333333333,
+        "compression_scale_mm2": 6449.6551724137935,
+        "x_compression_yield_mm": 93.86666666666666,
+        "M_ratio_single": 0.9953643821112962
+      },
+      "warnings": [
+        "给定有效高度下单筋已能满足，本次仅展示公式参考，未调用双筋 A 模型；单筋预测可使用给定弯矩求配筋入口。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "15-compression-elastic",
+    "task": "double-a",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 125,
+      "concrete": "C30",
+      "steel": "HRB500",
+      "compression_steel": "HRB500",
+      "M_design_kNm": 600
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-a",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 125,
+        "concrete": "C30",
+        "steel": "HRB500",
+        "compression_steel": "HRB500",
+        "M_design_kNm": 600
+      },
+      "materials": {
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 435,
+        "fyp_MPa": 435,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 560,
+        "as_prime_mm": 125,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": {
+        "As_required_mm2": {
+          "value": 3235.7407231207612,
+          "unit": "mm²",
+          "model_key": "double_a_tension"
+        },
+        "Asp_required_mm2": {
+          "value": 599.7320572917806,
+          "unit": "mm²",
+          "model_key": "double_a_compression"
+        }
+      },
+      "comparisons": {
+        "As_required_mm2": {
+          "model_minus_reference": 3.6094292863754163,
+          "relative_error_percent": 0.11167334981907338
+        },
+        "Asp_required_mm2": {
+          "model_minus_reference": 4.0360040101211325,
+          "relative_error_percent": 0.6775274047707702
+        }
+      },
+      "model_called": true,
+      "prediction_review": {
+        "status": "ok",
+        "reason": "等效矩形应力图力平衡数值复核；未作全过程极限状态分析",
+        "x_mm": 270.00521964218217,
+        "xi": 0.4821521779324682,
+        "sigma_c_prime_MPa": 415.56028106617754,
+        "epsilon_t": 0.0021754497041176226,
+        "epsilon_c_prime": 0.002077801405330888,
+        "Mu_kNm": 600.6967913956667,
+        "force_residual_N": -2.3283064365386963e-10,
+        "tension_yielded": true,
+        "compression_yielded": false,
+        "equivalent_state_exceeds_steel_ultimate_strain": false,
+        "ultimate_strain_full_analysis_performed": false,
+        "capacity_margin_kNm": 0.6967913956666507,
+        "minimum_area_meets": true,
+        "numerical_checks_passed": true
+      },
+      "reference": {
+        "b_mm": 300,
+        "h_mm": 600,
+        "h0_mm": 560,
+        "as_prime_mm": 125,
+        "M_design_kNm": 600,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 435,
+        "fyp_MPa": 435,
+        "Es_MPa": 200000,
+        "scenario": "A",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "ok",
+        "branch": "limit_doubly_compression_elastic",
+        "reason": "规范实用面积设计及等效矩形图力平衡数值复核通过",
+        "train_eligible": true,
+        "control": "bending",
+        "actual_layout_verified": false,
+        "As_required_mm2": 3232.131293834386,
+        "Asp_required_mm2": 595.6960532816595,
+        "As_bending_mm2": 3232.131293834386,
+        "Asp_design_mm2": 595.6960532816595,
+        "x_design_mm": 270.027397260274,
+        "x_verified_mm": 270.0273972602739,
+        "xi_verified": 0.4821917808219177,
+        "M_ratio_capacity": 1,
+        "M_code_lower_kNm": null,
+        "M_capacity_limit_kNm": 600,
+        "Mu_verified_kNm": 600,
+        "capacity_margin_kNm": 0,
+        "equilibrium_force_residual_N": -2.3283064365386963e-10,
+        "sigma_c_prime_MPa": 415.58035714285705,
+        "epsilon_t": 0.002175000000000001,
+        "epsilon_c_prime": 0.0020779017857142854,
+        "tension_yielded": true,
+        "compression_yielded": false,
+        "equivalent_state_exceeds_steel_ultimate_strain": false,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.4821917808219178,
+        "x_limit_mm": 270.027397260274,
+        "rho_min": 0.002,
+        "As_min_mm2": 360,
+        "M_single_limit_kNm": 492.3115833214486,
+        "tension_scale_mm2": 5522.758620689655,
+        "compression_scale_mm2": 5522.758620689655,
+        "x_compression_yield_mm": 293.3333333333333,
+        "M_ratio_single": 1.2187403675371937
+      },
+      "warnings": [],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "16-raw-review-outside",
+    "task": "double-a",
+    "request": {
+      "b_mm": 200,
+      "h_mm": 500,
+      "h0_mm": 435,
+      "as_prime_mm": 40,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "M_design_kNm": 280
+    },
+    "model_http_status": 200,
+    "web_http_status": 200,
+    "response": {
+      "task": "double-a",
+      "status": "ok",
+      "inputs": {
+        "b_mm": 200,
+        "h_mm": 500,
+        "h0_mm": 435,
+        "as_prime_mm": 40,
+        "concrete": "C30",
+        "steel": "HRB400",
+        "compression_steel": "HRB400",
+        "M_design_kNm": 280
+      },
+      "materials": {
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000
+      },
+      "geometry": {
+        "h0_mm": 435,
+        "as_prime_mm": 40,
+        "basis": "provided_double_reinforcement_positions"
+      },
+      "classification": null,
+      "prediction": null,
+      "comparison": null,
+      "predictions": {
+        "As_required_mm2": {
+          "value": 2297.111273506827,
+          "unit": "mm²",
+          "model_key": "double_a_tension"
+        },
+        "Asp_required_mm2": {
+          "value": 505.54609798209697,
+          "unit": "mm²",
+          "model_key": "double_a_compression"
+        }
+      },
+      "comparisons": {
+        "As_required_mm2": {
+          "model_minus_reference": -0.6887625065860448,
+          "relative_error_percent": -0.029974867081167735
+        },
+        "Asp_required_mm2": {
+          "model_minus_reference": -3.351977247001912,
+          "relative_error_percent": -0.6586735950009043
+        }
+      },
+      "model_called": true,
+      "prediction_review": {
+        "status": "outside_tension_yield_domain",
+        "reason": "给定面积超过当前受拉屈服域",
+        "force_residual_N": -958.7573065496981,
+        "x_limit_mm": 225.1764705882353,
+        "capacity_margin_kNm": null,
+        "minimum_area_meets": true,
+        "numerical_checks_passed": false
+      },
+      "reference": {
+        "b_mm": 200,
+        "h_mm": 500,
+        "h0_mm": 435,
+        "as_prime_mm": 40,
+        "M_design_kNm": 280,
+        "fc_MPa": 14.3,
+        "ft_MPa": 1.43,
+        "fy_MPa": 360,
+        "fyp_MPa": 360,
+        "Es_MPa": 200000,
+        "scenario": "A",
+        "method_version": "double_area_strain_checked_v1",
+        "status": "ok",
+        "branch": "limit_doubly_yielded",
+        "reason": "规范实用面积设计及等效矩形图力平衡数值复核通过",
+        "train_eligible": true,
+        "control": "bending",
+        "actual_layout_verified": false,
+        "As_required_mm2": 2297.800036013413,
+        "Asp_required_mm2": 508.8980752290989,
+        "As_bending_mm2": 2297.800036013413,
+        "Asp_design_mm2": 508.8980752290989,
+        "x_design_mm": 225.1764705882353,
+        "x_verified_mm": 225.1764705882353,
+        "xi_verified": 0.5176470588235295,
+        "M_ratio_capacity": 1,
+        "M_code_lower_kNm": null,
+        "M_capacity_limit_kNm": 280,
+        "Mu_verified_kNm": 280,
+        "capacity_margin_kNm": 0,
+        "equilibrium_force_residual_N": 0,
+        "sigma_c_prime_MPa": 360,
+        "epsilon_t": 0.0018,
+        "epsilon_c_prime": 0.002831034482758621,
+        "tension_yielded": true,
+        "compression_yielded": true,
+        "equivalent_state_exceeds_steel_ultimate_strain": false,
+        "ultimate_strain_full_analysis_performed": false,
+        "alpha1": 1,
+        "beta1": 0.8,
+        "epsilon_cu": 0.0033,
+        "xi_limit": 0.5176470588235295,
+        "x_limit_mm": 225.1764705882353,
+        "rho_min": 0.002,
+        "As_min_mm2": 200,
+        "M_single_limit_kNm": 207.63469370242214,
+        "tension_scale_mm2": 3455.8333333333335,
+        "compression_scale_mm2": 3455.8333333333335,
+        "x_compression_yield_mm": 70.39999999999999,
+        "M_ratio_single": 1.3485222291477472
+      },
+      "warnings": [
+        "预测面积未通过本次等效应力图的承载力、最小面积及受拉屈服数值条件；模型原值未被公式替换或修正。"
+      ],
+      "model_versions": {
+        "area": "18600dc9d0f740c5990c6a893bf575ab:normalized_fine11",
+        "review": "8406fbae9e6e421197f3d819fbc9c5b6:normalized_quantized7",
+        "classify_a": "211e8ce946034986af9d9b929aedf201:physical10",
+        "classify_b": "16a8dc0e821d49a7a333e70dafa7a853:physical_balanced10",
+        "double_a_tension": "3822a8d4b323:normalized_fine",
+        "double_a_compression": "3822a8d4b323:normalized_fine",
+        "double_b_tension": "56519b8cf534:normalized_fine"
+      },
+      "scope": "普通非抗震、非预应力矩形梁，设计弯矩为非负幅值且底部受拉；h0、受压钢筋位置 a′ₛ 显式填写。C30/C35/C40，受拉与受压钢筋分别选择 HRB400/HRB500。连续面积用于教学；等效矩形应力图数值复核不等于完整规范验算，不包含实际选筋、布置、抗剪、裂缝、挠度或全过程极限拉应变分析。"
+    }
+  },
+  {
+    "id": "17-invalid-boolean",
+    "task": "design",
+    "request": {
+      "b_mm": true,
+      "h_mm": 500,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "M_design_kNm": 175
+    },
+    "model_http_status": 422,
+    "web_http_status": 400,
+    "response": {
+      "detail": [
+        {
+          "loc": [
+            "body",
+            "b_mm"
+          ],
+          "type": "value_error",
+          "msg": "必须填写数值，不能使用字符串或布尔值"
+        }
+      ]
+    }
+  },
+  {
+    "id": "18-invalid-material",
+    "task": "double-a",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 40,
+      "concrete": "C50",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "M_design_kNm": 600
+    },
+    "model_http_status": 422,
+    "web_http_status": 400,
+    "response": {
+      "detail": [
+        {
+          "loc": [
+            "body",
+            "concrete"
+          ],
+          "type": "literal_error",
+          "msg": "取值不在当前支持范围内"
+        }
+      ]
+    }
+  },
+  {
+    "id": "19-strength-override-rejected",
+    "task": "double-a",
+    "request": {
+      "b_mm": 300,
+      "h_mm": 600,
+      "h0_mm": 560,
+      "as_prime_mm": 40,
+      "concrete": "C30",
+      "steel": "HRB400",
+      "compression_steel": "HRB400",
+      "fc_MPa": 30,
+      "M_design_kNm": 600
+    },
+    "model_http_status": 422,
+    "web_http_status": 400,
+    "response": {
+      "detail": [
+        {
+          "loc": [
+            "body",
+            "fc_MPa"
+          ],
+          "type": "extra_forbidden",
+          "msg": "不允许额外字段"
+        }
+      ]
+    }
+  }
+]

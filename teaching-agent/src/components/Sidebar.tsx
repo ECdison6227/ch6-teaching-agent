@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bookmark, BookOpen, BookOpenCheck, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, Radio, SquareActivity, StickyNote, Trash2 } from "lucide-react";
+import { Bookmark, BookOpen, BookOpenCheck, Calculator, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, Radio, SquareActivity, StickyNote, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -224,7 +224,7 @@ function HelpDetail({ id }: { id: HelpId }) {
   );
 }
 
-export type AppView = "home" | "chat" | "study" | "materials" | "self-test" | "classroom" | "linked-practice" | "reinforcement-demo";
+export type AppView = "home" | "chat" | "study" | "materials" | "self-test" | "classroom" | "linked-practice" | "reinforcement-demo" | "beam-lab";
 
 export function Sidebar({
   view,
@@ -245,6 +245,7 @@ export function Sidebar({
     { id: "study", label: "自学天地", icon: BookOpen },
     { id: "self-test", label: "题库自测", icon: BookOpenCheck },
     { id: "classroom", label: "实时课堂", icon: Radio },
+    { id: "beam-lab", label: "智能配筋", icon: Calculator },
     { id: "materials", label: "资料下载", icon: Download },
   ];
   const help = HELP.find((item) => item.id === helpId) ?? null;

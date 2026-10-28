@@ -20,6 +20,7 @@ import { SelfTestView } from "./SelfTestView";
 import { ClassroomView } from "./ClassroomView";
 const LinkedPracticeView = dynamic(() => import("@/features/linked-practice/LinkedPracticeView"), { loading: () => <p className="kimi-quiet-state" role="status">正在读取关联练习…</p> });
 const BeamDemoView = dynamic(() => import("@/features/beam-demo/BeamDemoView"), { loading: () => <p className="kimi-quiet-state" role="status">正在读取演示…</p> });
+const BeamLabView = dynamic(() => import("./BeamLabView").then(module => module.BeamLabView), { loading: () => <p className="kimi-quiet-state" role="status">正在读取智能配筋…</p> });
 
 const SUGGESTIONS = [
   "帮我判断这个梁截面会不会超筋",
@@ -84,9 +85,11 @@ function Landing({ onEnter }: { onEnter: () => void }) {
 /** 各业务视图保留挂载和本地状态；课堂订阅仅在激活时运行。 */
 export function AppShell() {
   const [view, setViewState] = useState<AppView>("home");
+  const [beamVisited, setBeamVisited] = useState(false);
+  useEffect(() => { if (view === "beam-lab") setBeamVisited(true); }, [view]);
   const reduce = useHydratedReducedMotion();
   useEffect(() => {
-    const sync = () => { const next = window.location.hash.slice(1); setViewState((["home", "chat", "study", "materials", "self-test", "classroom", "linked-practice", "reinforcement-demo"] as string[]).includes(next) ? next as AppView : "home"); };
+    const sync = () => { const next = window.location.hash.slice(1); setViewState((["home", "chat", "study", "materials", "self-test", "classroom", "linked-practice", "reinforcement-demo", "beam-lab"] as string[]).includes(next) ? next as AppView : "home"); };
     sync(); window.addEventListener("hashchange", sync); return () => window.removeEventListener("hashchange", sync);
   }, []);
   const setView = (next: AppView) => { if (next !== view) window.history.pushState(null, "", next === "home" ? window.location.pathname + window.location.search : "#" + next); setViewState(next); };
@@ -163,6 +166,10 @@ export function AppShell() {
               {view === "reinforcement-demo" ? <motion.div className="absolute inset-0 flex min-h-0 flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.15 }}>
                 <header className="kimi-toolbar"><SidebarTrigger /><span>单筋与双筋</span></header>
                 <div className="min-h-0 flex-1 overflow-y-auto"><BeamDemoView /></div>
+              </motion.div> : null}
+              {beamVisited || view === "beam-lab" ? <motion.div className="absolute inset-0 flex min-h-0 flex-col" initial={{ opacity: 0 }} animate={{ opacity: view === "beam-lab" ? 1 : 0 }} style={{ visibility: view === "beam-lab" ? "visible" : "hidden", pointerEvents: view === "beam-lab" ? "auto" : "none" }} transition={{ duration: reduce ? 0 : 0.15 }}>
+                <header className="kimi-toolbar"><SidebarTrigger /><span>智能配筋</span></header>
+                <div className="min-h-0 flex flex-1"><BeamLabView active={view === "beam-lab"} /></div>
               </motion.div> : null}
             </div>
           </SidebarInset>

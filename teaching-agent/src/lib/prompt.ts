@@ -1,9 +1,11 @@
 import "server-only";
+import { buildBeamSystemPrompt } from "./beam-prompt";
 import { answerIndex, loadKnowledge } from "./content";
 import { KNOWLEDGE_SECTIONS } from "./sections";
 import slidesJson from "@/content/slides.json";
 
 export type PageContext = {
+  mode?: "beam-lab";
   page: number;
   section?: string;
   title?: string;
@@ -204,6 +206,7 @@ E. 正文里可以穿插 \`\`\`diagram（HTML 流程图）、\`\`\`slide（一�
 `;
 
 export async function buildSystemPrompt(pageContext?: PageContext | null): Promise<string> {
+  if (pageContext?.mode === "beam-lab") return buildBeamSystemPrompt(pageContext);
   // 讲 K12~K14 时才把那三节的全文拼进提示词，其余情况只拼索引，别让系统提示词太胖
   const knowledge = await loadKnowledge(pageContext?.section);
   let ctx = "";
