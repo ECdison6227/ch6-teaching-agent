@@ -352,6 +352,7 @@ button, input, textarea, select { font: inherit; }
 .kimi-material-card { border-radius: 16px; box-shadow: none; transition: border-color 150ms ease, background-color 150ms ease; }
 .kimi-material-card:hover { border-color: var(--kimi-separator); background: var(--kimi-fill-hover); }
 .kimi-empty { border-style: dashed; background: var(--kimi-surface); box-shadow: none; }
+.kimi-beam-lab-frame { display: block; width: 100%; height: min(90vh, 900px); min-height: 720px; border: 0; border-top: .5px solid var(--kimi-separator); background: var(--background); }
 .kimi-note-editor { width: calc(100% - 32px); max-width: 560px; max-height: 86dvh; border-radius: 16px; padding: 24px; background: var(--kimi-paper); }
 .kimi-note-editor textarea { min-height: 180px; max-height: 45dvh; background: var(--kimi-surface); font-size: 14px; line-height: 24px; }
 .md-body { font-size: 16px; line-height: 26px; color: var(--kimi-text-primary); }

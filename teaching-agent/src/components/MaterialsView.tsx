@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Download, Search, RefreshCw } from "lucide-react";
+import { Download, ExternalLink, Search, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,6 +50,18 @@ export function MaterialsView() {
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="kimi-page kimi-catalog">
         <div className="kimi-page-heading"><div><h1 >资料下载</h1><p >课件、讲解与练习，随时带走。</p></div><label className="relative w-full sm:w-64"><Search aria-hidden className="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground" /><Input aria-label="搜索资料" placeholder="搜索章节或资料" value={query} onChange={e => setQuery(e.target.value)} className="pl-9" /></label></div>
+        <Card className="kimi-stage overflow-hidden">
+          <CardHeader className="flex-row items-start justify-between gap-4 space-y-0 p-5">
+            <div className="min-w-0">
+              <CardTitle className="text-base font-medium">智能配筋实验室</CardTitle>
+              <CardDescription className="mt-2 text-xs leading-5">输入梁截面和材料参数，查看配筋面积、承载力与公式对照。</CardDescription>
+            </div>
+            <Button asChild variant="outline" size="sm" className="shrink-0 rounded-full">
+              <a href="/rc-beam/" target="_blank" rel="noreferrer">新窗口打开<ExternalLink /></a>
+            </Button>
+          </CardHeader>
+          <iframe className="kimi-beam-lab-frame" src="/rc-beam/" title="智能配筋实验室" loading="lazy" />
+        </Card>
         <div className="kimi-category-tabs" role="group" aria-label="资料分类">{[["all","全部资料"],["original","原版课件"],["explain","逐页讲解"],["questions","题目"]].map(([id,label]) => <Button key={id} variant="ghost" aria-pressed={category === id} onClick={() => setCategory(id)}>{label}</Button>)}</div>
         <div role="status" className="mb-4 text-xs text-muted-foreground">{notice || (downloading ? "正在准备文件…" : `共 ${results.length} 份资料`)}</div>
         {error ? <Card className="mb-5 border-destructive/30 bg-destructive/5 p-4"><p role="alert" className="text-sm text-destructive">{error}</p>{failed ? <Button className="mt-2" variant="outline" onClick={() => void downloadMaterial(failed)}><RefreshCw />重试下载</Button> : null}</Card> : null}
