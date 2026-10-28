@@ -42,6 +42,8 @@ export async function beamLabBrowserCheck({ page, origin, basePath, output, navi
     assert.equal(explanations.length,1);
     assert.equal(explanations[0].pageContext.mode,'beam-lab');
     assert.match(JSON.stringify(explanations[0].messages),/1619\.245243/);
+    await page.getByText('请讲解这次双筋设计 B结果，说明模型预测与公式参考的差异。',{exact:true}).filter({visible:true}).waitFor();
+    assert.equal(await page.getByRole('log').filter({visible:true}).getByText('请结合双筋矩形截面计算',{exact:false}).count(),0);
     await page.getByRole('button',{name:'收起',exact:true}).click();
     await navigate('资料下载');
     await page.getByRole('heading',{name:'资料下载',exact:true}).waitFor();

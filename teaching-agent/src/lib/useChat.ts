@@ -12,6 +12,8 @@ export type Msg = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  /** Human-readable question for tool-driven requests; full content remains in model history. */
+  displayContent?: string;
   card?: Card;
   answered?: boolean;
   verdict?: { correct: boolean; reason?: string };
@@ -208,7 +210,7 @@ export function useChat(context?: PageCtx | null) {
   );
 
   const send = useCallback(
-    async (raw: string, extraImages?: string[], pageContext?: PageCtx | null) => {
+    async (raw: string, extraImages?: string[], pageContext?: PageCtx | null, displayContent?: string) => {
       const text = raw.trim();
       if (text.length > MAX_MESSAGE_CHARS) { setError("单条消息不能超过 20000 字，请分段发送"); return false; }
       const images = extraImages?.length ? extraImages : pendingImages;
@@ -221,6 +223,7 @@ export function useChat(context?: PageCtx | null) {
           id: uid(),
           role: "user" as const,
           content: text || "（我上传了一张图片）",
+          ...(displayContent?.trim() ? { displayContent: displayContent.trim() } : {}),
           ...(images.length ? { images } : {}),
         },
       ]);

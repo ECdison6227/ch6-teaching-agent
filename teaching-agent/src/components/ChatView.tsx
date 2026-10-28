@@ -195,7 +195,7 @@ export function ChatView({
             m.role === "user" ? (
               <div key={m.id} className="mb-5 flex justify-end">
                 <div className="max-w-[85%] rounded-2xl bg-paper px-4 py-2.5 text-[14px] ring-1 ring-paper-line">
-                  <Markdown text={m.content} />
+                  <Markdown text={m.displayContent ?? m.content} />
                   {m.images?.length ? (
                     <div className="mt-2 flex flex-wrap justify-end gap-1.5">
                       {m.images.map((src, i) => (

@@ -17,7 +17,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ChatView } from "./ChatView";
 import { useChat, type PageCtx } from "@/lib/useChat";
 
-type AskPayload = { question?: string; context?: PageCtx | null };
+type AskPayload = { question?: string; displayQuestion?: string; context?: PageCtx | null };
 
 type AttachPayload = { text?: string; image?: string };
 
@@ -100,7 +100,7 @@ export function AiDrawerProvider({ children }: { children: ReactNode }) {
       const image = slide ? await urlToDataUrl(slide.src) : null;
       if (sequence !== askSequence.current) return;
       if (question) {
-        await sendRef.current(question, image ? [image] : undefined, p.context ?? null);
+        await sendRef.current(question, image ? [image] : undefined, p.context ?? null, p.displayQuestion);
         return;
       }
       if (image) queueRef.current([image]);

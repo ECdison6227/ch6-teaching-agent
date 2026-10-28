@@ -175,6 +175,19 @@ test('实际 HTTP 模型适配：CRLF、协议解析、断开连接和超时释�
 
 function chatHook(){const runtime=hooks();const {useChat}=loadHook('src/lib/useChat.ts',{'react':runtime.react});return{render:()=>runtime.render(()=>useChat(null))};}
 const doneResponse=()=>new Response('data: {"type":"done"}\n\n');
+test('模型结果讲解展示短提问，完整结果仍保留在请求历史中',async()=>{
+  const original=globalThis.fetch;let packed;
+  globalThis.fetch=async(_url,options)=>{packed=JSON.parse(options.body);return doneResponse();};
+  try{
+    const hook=chatHook();
+    const raw='模型预测记录：'+JSON.stringify({value:1215.3500269576261,model_versions:{area:'fixed-release'}});
+    await hook.render().send(raw,undefined,{page:0,mode:'beam-lab'},'请讲解这次单筋设计结果。');
+    const user=hook.render().msgs.find(message=>message.role==='user');
+    assert.equal(user.displayContent,'请讲解这次单筋设计结果。');
+    assert.equal(user.content,raw);
+    assert.equal(packed.messages.at(-1).content,raw);
+  }finally{globalThis.fetch=original;}
+});
 test('Hook 显式传递本次上下文；失败可以重试',async()=>{
   const original=globalThis.fetch;let packed,calls=0;
   globalThis.fetch=async(url,options)=>{calls++;packed=JSON.parse(options.body);return calls===1?new Response('data: {"type":"text","delta":"partial"}\n\n'):doneResponse();};
