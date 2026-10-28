@@ -1,6 +1,6 @@
 # 第六章 · 教学 Agent
 
-面向《土木工程结构工程设计原理》第六章的引导式学习应用，涵盖钢筋混凝土梁的受弯、受剪与相关知识。
+面向《工程结构设计原理》第六章的引导式学习应用，涵盖钢筋混凝土梁的受弯、受剪与相关知识。
 
 应用源码和运行说明位于 [teaching-agent](teaching-agent/README.md)。使用 Next.js、React、TypeScript，以及现有 shadcn/Radix、Lucide 和 Motion 组件。
 

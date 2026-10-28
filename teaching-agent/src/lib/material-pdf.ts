@@ -492,7 +492,7 @@ async function decoratePages(writer: Writer, font: PdfFont, right: string) {
   writer.pages.forEach((page, index) => {
     const headerBaseline = PAGE_H - 34;
     const head: PageOp[] = [];
-    head.push({ kind: "text", text: "结构工程设计原理", x: MARGIN, y: headerBaseline, size: headerSize, color: softColor });
+    head.push({ kind: "text", text: "工程结构设计原理", x: MARGIN, y: headerBaseline, size: headerSize, color: softColor });
     if (right) {
       head.push({
         kind: "text",
