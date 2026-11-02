@@ -12,7 +12,7 @@ import { useHydratedReducedMotion } from "@/hooks/use-hydrated-reduced-motion";
 import { beamStore } from "./store";
 import SectionExplorationView from "./SectionExplorationView";
 import { explorationStore, type ExplorationState } from "./exploration-store";
-import { beamOutline, beamY, casesForKind, clampProgress, compressionOutline, crackPoints, getBeamCase, getBeamFrame, steelPath, type BeamCase, type CaseId, type DiagramView } from "./model";
+import { beamOutline, beamSectionLines, beamSectionPoint, beamY, casesForKind, clampProgress, compressionOutline, crackPoints, getBeamCase, getBeamFrame, steelPath, type BeamCase, type CaseId, type DiagramView } from "./model";
 
 const serverSnapshot = beamStore.getSnapshot();
 const explorationServerSnapshot = explorationStore.getSnapshot();
@@ -34,24 +34,40 @@ function BeamFigure({ scenario, frame, view }: { scenario: BeamCase; frame: Fram
     aria-label={(scenario.kind === "single" ? "单筋梁" : "双筋梁") + "，" + scenario.label + "，" + frame.stage.label + (view === "beam" ? "，梁的变形示意" : "，截面与线性应变分布示意")}>
     <title>{scenario.label} · {frame.stage.label}</title>
     {view === "beam" ? <>
-      <defs><clipPath id={id}><path d={beamOutline(frame.sag)} /></clipPath></defs>
-      <path d={beamOutline(frame.sag)} fill={MUTED} stroke={INK} strokeOpacity=".35" strokeWidth="1.5" />
+      <defs>
+        <clipPath id={id}><path d={beamOutline(frame.sag)} /></clipPath>
+        <linearGradient id={id + "-shade"} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={MUTED} />
+          <stop offset="1" stopColor={MUTED} stopOpacity=".8" />
+        </linearGradient>
+      </defs>
+      <path d={beamOutline(frame.sag)} fill={`url(#${id}-shade)`} stroke={INK} strokeOpacity=".35" strokeWidth="1.5" strokeLinejoin="round" />
+      <g clipPath={"url(#" + id + ")"}>
+        {beamSectionLines(frame.sag).map(([x1, y1, x2, y2]) => <line key={x1} x1={x1} y1={y1} x2={x2} y2={y2} stroke={INK} strokeOpacity={Math.min(.14, frame.sag / 90)} strokeWidth="1" />)}
+      </g>
       <path d={compressionOutline(frame.sag, frame.neutralDepth)} fill={INK} opacity={frame.progress > 0 ? .09 : 0} />
       <g clipPath={"url(#" + id + ")"}>
         {frame.crackExtent > 0 ? cracks.map((x, index) => <polyline key={x}
           points={crackPoints(x, frame.crackExtent * (index === Math.floor(cracks.length / 2) ? 1 : .75), frame.neutralDepth, frame.sag)}
           fill="none" stroke={DAMAGE} strokeWidth={frame.crackWidth} strokeLinecap="round" strokeLinejoin="round" />) : null}
-        {frame.damage > 0 ? <g stroke={DAMAGE} strokeWidth="3" opacity={frame.damage}>{[-20, 0, 20].map(offset => <path key={offset} d={"M" + (300 + offset - 8) + " " + beamY(300, 0, frame.sag) + " l16 12 m-16 0 l16 -12"} />)}</g> : null}
+        {frame.damage > 0 ? <g stroke={DAMAGE} strokeWidth={frame.crackWidth} opacity={frame.damage * .8} strokeLinecap="round">
+          {[268, 277, 286, 295, 304, 313, 322].map(x => { const y = beamY(x, 0, frame.sag); return <path key={x} d={"M" + x + " " + (y + 2) + " l7 11" + (frame.damage > .5 ? " M" + x + " " + (y + 15) + " l7 11" : "")} />; })}
+        </g> : null}
         <path d={steelPath(.85, frame.sag)} fill="none" stroke={steelColor} strokeWidth={scenario.id === "single-low" ? 3 : scenario.id === "single-high" ? 8 : 5} strokeLinecap="round" />
         {scenario.kind === "double" ? <path d={steelPath(.15, frame.sag)} fill="none" stroke={compressionColor} strokeWidth="5" strokeLinecap="round" /> : null}
         {frame.progress > 0 ? <path d={steelPath(frame.neutralDepth, frame.sag)} fill="none" stroke={INK} strokeOpacity=".35" strokeWidth="1" strokeDasharray="6 6" /> : null}
       </g>
-      <g stroke={INK} strokeOpacity=".55" fill="none" strokeWidth="1.5">
-        <path d="M62 182 l-14 23 h28 Z M538 182 l-14 23 h28 Z M40 211 h44 M516 218 h44" />
-        <circle cx="530" cy="211" r="4" /><circle cx="546" cy="211" r="4" />
-      </g>
+      {(() => {
+        const leftBase = beamSectionPoint(62, 1, frame.sag), rightBase = beamSectionPoint(538, 1, frame.sag);
+        const groundY = Math.max(leftBase[1], rightBase[1]) + 32;
+        return <g stroke={INK} strokeOpacity=".55" fill="none" strokeWidth="1.5">
+          <path d={"M" + leftBase[0] + " " + (leftBase[1] + 1) + " l-15 22 h30 Z M" + (leftBase[0] - 24) + " " + (groundY - 6) + " h48"} />
+          <path d={"M" + rightBase[0] + " " + (rightBase[1] + 1) + " l-15 22 h30 Z M" + (rightBase[0] - 24) + " " + (groundY - 6) + " h48"} />
+          <circle cx={rightBase[0] - 8} cy={groundY - 6} r="4" /><circle cx={rightBase[0] + 8} cy={groundY - 6} r="4" />
+        </g>;
+      })()}
       <g opacity={frame.progress > 0 ? .65 : .2} fill={INK} stroke={INK} strokeWidth="2">
-        {[205, 395].map(x => { const y = beamY(x, 0, frame.sag) - 8; return <g key={x}><path d={"M" + x + " 42 V" + y} /><path d={"M" + (x - 5) + " " + (y - 9) + " L" + x + " " + y + " L" + (x + 5) + " " + (y - 9)} fill="none" /></g>; })}
+        {[205, 395].map(x => { const y = beamY(x, 0, frame.sag) - 8; return <g key={x}><path d={"M" + x + " 42 V" + (y - 9)} fill="none" /><path d={"M" + (x - 5) + " " + (y - 10) + " L" + x + " " + y + " L" + (x + 5) + " " + (y - 10) + " Z"} stroke="none" /></g>; })}
       </g>
       <text x="300" y="26" textAnchor="middle" fill={INK} className="text-[24px] sm:text-[17px]">向下加载</text>
       <text x="300" y="278" textAnchor="middle" fill={INK} opacity=".55" className="text-[24px] sm:text-[15px]">上缘受压 · 下缘受拉</text>
@@ -64,7 +80,7 @@ function BeamFigure({ scenario, frame, view }: { scenario: BeamCase; frame: Fram
       {Array.from({ length: scenario.bars }, (_, i) => <circle key={i} cx={100 + i * 90 / Math.max(1, scenario.bars - 1)} cy={220} r={scenario.id === "single-low" ? 5 : 7} fill={steelColor} />)}
       {scenario.kind === "double" ? <>{[107, 183].map(x => <circle key={x} cx={x} cy={74} r="7" fill={compressionColor} />)}</> : null}
       {frame.crackExtent > 0 ? <g stroke={DAMAGE} strokeWidth={frame.crackWidth} fill="none">{[115, 165].map(x => <path key={x} d={"M" + x + " 252 l5 -" + ((1 - frame.neutralDepth) * 95 * frame.crackExtent) + " l-6 -" + ((1 - frame.neutralDepth) * 65 * frame.crackExtent)} />)}</g> : null}
-      {frame.damage > 0 ? <g opacity={frame.damage} stroke={DAMAGE} strokeWidth="3">{[100, 125, 150, 175].map(x => <path key={x} d={"M" + x + " 43 l13 13 m-13 0 l13 -13"} />)}</g> : null}
+      {frame.damage > 0 ? <g opacity={frame.damage * .8} stroke={DAMAGE} strokeWidth="2.5" strokeLinecap="round">{[96, 112, 128, 144, 160, 176].flatMap(x => frame.neutralDepth * 210 > 36 ? [["M" + x + " 46 l8 9"], ["M" + x + " 62 l8 9"]] : [["M" + x + " 46 l8 9"]]).map((d, i) => <path key={i} d={d[0]} />)}</g> : null}
       <path d="M400 40 V257 M290 252 H515" stroke={INK} strokeOpacity=".35" strokeWidth="1" />
       <path d={"M" + strainX(0) + " 42 L" + strainX(1) + " 252"} fill="none" stroke={INK} strokeWidth="2.5" />
       <circle cx={strainX(.85)} cy={42 + .85 * 210} r="6" fill={steelColor} />

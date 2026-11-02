@@ -84,8 +84,29 @@ export function beamY(x: number, depth: number, sag: number) {
   const t = (x - 62) / 476;
   return 112 + 70 * depth + 4 * sag * t * (1 - t);
 }
+/** 梁侧视图某处截面的局部倾角正切（中心线斜率）。 */
+export function beamSlope(x: number, sag: number) {
+  const t = (x - 62) / 476;
+  return 4 * sag * (1 - 2 * t) / 476;
+}
+/** 挠曲后截面上一点的坐标：随局部斜率绕截面中心转动（平截面假定）。 */
+export function beamSectionPoint(x: number, depth: number, sag: number) {
+  const a = beamSlope(x, sag);
+  const n = Math.sqrt(1 + a * a);
+  const c = beamY(x, .5, sag);
+  return [x + (.5 - depth) * 70 * (a / n), c + (depth - .5) * 70 / n] as const;
+}
+/** 若干截面的上下端点连线，随挠曲逐渐倾斜。 */
+export function beamSectionLines(sag: number) {
+  return [122, 182, 242, 362, 422, 478].map(x => [...beamSectionPoint(x, 0, sag), ...beamSectionPoint(x, 1, sag)] as const);
+}
 export function beamOutline(sag: number) {
-  return "M62 112 Q300 " + (112 + sag * 2) + " 538 112 L538 182 Q300 " + (182 + sag * 2) + " 62 182 Z";
+  const lt = beamSectionPoint(62, 0, sag), lb = beamSectionPoint(62, 1, sag);
+  const rt = beamSectionPoint(538, 0, sag), rb = beamSectionPoint(538, 1, sag);
+  const mt = beamSectionPoint(300, 0, sag), mb = beamSectionPoint(300, 1, sag);
+  const ctl = (a: readonly number[], b: readonly number[], m: readonly number[]) => 2 * m[1] - (a[1] + b[1]) / 2;
+  return "M" + lt[0] + " " + lt[1] + " Q300 " + ctl(lt, rt, mt) + " " + rt[0] + " " + rt[1]
+    + " L" + rb[0] + " " + rb[1] + " Q300 " + ctl(lb, rb, mb) + " " + lb[0] + " " + lb[1] + " Z";
 }
 export function steelPath(depth: number, sag: number) {
   const y = 112 + 70 * depth;
