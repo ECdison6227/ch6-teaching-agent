@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useHydratedReducedMotion } from "@/hooks/use-hydrated-reduced-motion";
 import { beamStore } from "./store";
 import SectionExplorationView from "./SectionExplorationView";
+import { StressBlock } from "./StressBlock";
 import { explorationStore, type ExplorationState } from "./exploration-store";
 import {
   STIRRUP_XS, beamOutline, beamY, casesForKind, clampProgress, compressionOutline, concreteSpeckles,
@@ -21,7 +22,7 @@ import {
 const serverSnapshot = beamStore.getSnapshot();
 const explorationServerSnapshot = explorationStore.getSnapshot();
 const INK = "hsl(var(--foreground))";
-const ACCENT = "var(--kimi-accent)";
+const ACCENT = "var(--seu-gold)";
 const DAMAGE = "hsl(var(--destructive))";
 /** 示意图用的混凝土/钢筋色，与主题 ink 解耦，贴近线上手改版。 */
 const STONE = "#78716c";
@@ -182,6 +183,8 @@ export default function BeamDemoView() {
   const scenario = getBeamCase(saved.value.caseId);
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(false);
+  /** 对比模式：单筋适筋梁与双筋梁同步播放 */
+  const [compare, setCompare] = useState(false);
   const [runId, setRunId] = useState(0);
   const progressRef = useRef(0);
   const caseRef = useRef<CaseId>(saved.value.caseId);
@@ -259,17 +262,32 @@ export default function BeamDemoView() {
     {!saved.ready ? <div role="status" aria-label="正在读取演示"><Skeleton className="mt-6 h-72 w-full rounded-2xl" /></div> : <>
       <div className="kimi-row mt-6">
         <div className="kimi-choice-pills" role="group" aria-label="构件形式">
-          <Button variant="ghost" aria-pressed={scenario.kind === "single"} disabled={!saved.writable} onClick={() => { if (scenario.kind !== "single") selectCase("single-normal"); }}>单筋梁</Button>
-          <Button variant="ghost" aria-pressed={scenario.kind === "double"} disabled={!saved.writable} onClick={() => { if (scenario.kind !== "double") selectCase("double-yield"); }}>双筋梁</Button>
+          <Button variant="ghost" aria-pressed={!compare && scenario.kind === "single"} disabled={!saved.writable} onClick={() => { setCompare(false); if (scenario.kind !== "single") selectCase("single-normal"); }}>单筋梁</Button>
+          <Button variant="ghost" aria-pressed={!compare && scenario.kind === "double"} disabled={!saved.writable} onClick={() => { setCompare(false); if (scenario.kind !== "double") selectCase("double-yield"); }}>双筋梁</Button>
+          <Button variant="ghost" aria-pressed={compare} disabled={!saved.writable} onClick={() => { if (!compare) { selectCase("single-normal"); setCompare(true); } }}>对比</Button>
         </div>
-        <Select value={scenario.id} disabled={!saved.writable} onValueChange={value => selectCase(value as CaseId)}><SelectTrigger className="w-full sm:w-52" aria-label="观察情形"><SelectValue /></SelectTrigger><SelectContent>{casesForKind(scenario.kind).map(item => <SelectItem key={item.id} value={item.id}>{item.label}</SelectItem>)}</SelectContent></Select>
+        {compare ? null : <Select value={scenario.id} disabled={!saved.writable} onValueChange={value => selectCase(value as CaseId)}><SelectTrigger className="w-full sm:w-52" aria-label="观察情形"><SelectValue /></SelectTrigger><SelectContent>{casesForKind(scenario.kind).map(item => <SelectItem key={item.id} value={item.id}>{item.label}</SelectItem>)}</SelectContent></Select>}
       </div>
       <Card className="kimi-stage"><CardContent className="px-4 py-5 sm:px-7">
         <div className="kimi-row"><p className="text-sm font-medium">{scenario.label}</p><div className="kimi-choice-pills" role="group" aria-label="观察视图">{([["beam", "梁变形"], ["section", "截面应变"]] as const).map(([view, label]) => <Button key={view} variant="ghost" size="sm" aria-pressed={saved.value.view === view} onClick={() => { stop(); void beamStore.update(previous => ({ ...previous, view: view as DiagramView })); }}>{label}</Button>)}</div></div>
-        <div className="my-4" data-animation-case={scenario.id} data-animation-progress={Math.round(progress * 100)}>
-          <BeamFigure scenario={scenario} frame={frame} view={saved.value.view} />
-        </div>
-        <div className="kimi-row text-xs leading-6 text-muted-foreground">
+        {compare ? (
+          <div className="demo-compare my-4" data-animation-progress={Math.round(progress * 100)}>
+            {(["single-normal", "double-yield"] as const).map(id => {
+              const c = getBeamCase(id); const f = getBeamFrame(id, progress);
+              return <div key={id} className="demo-compare-col">
+                <p className="demo-compare-label">{c.kind === "single" ? "单筋" : "双筋"} · {f.stage.label}</p>
+                <BeamFigure scenario={c} frame={f} view={saved.value.view} />
+                <p className="demo-compare-status"><span style={{ color: f.tensionYielded ? ACCENT : undefined }}>受拉筋 {f.tensionStatus}</span>{c.kind === "double" ? <span style={{ color: f.compressionYielded ? ACCENT : undefined }}>受压筋 {f.compressionStatus}</span> : null}<span>混凝土 {f.concreteStatus}</span></p>
+              </div>;
+            })}
+          </div>
+        ) : (
+          <div className={`my-4 ${saved.value.view === "section" ? "demo-with-stress" : ""}`} data-animation-case={scenario.id} data-animation-progress={Math.round(progress * 100)}>
+            <BeamFigure scenario={scenario} frame={frame} view={saved.value.view} />
+            {saved.value.view === "section" ? <StressBlock progress={progress} neutralDepth={frame.neutralDepth} crackAt={scenario.crackAt} /> : null}
+          </div>
+        )}
+        <div className="kimi-row text-xs leading-6 text-muted-foreground" style={compare ? { display: "none" } : undefined}>
           <span style={{ color: frame.tensionYielded ? ACCENT : undefined }}>受拉筋 · {frame.tensionStatus}</span>
           {scenario.kind === "double" ? <span style={{ color: frame.compressionYielded ? ACCENT : undefined }}>受压筋 · {frame.compressionStatus}</span> : null}
           <span>混凝土 · {frame.concreteStatus}</span>
@@ -284,7 +302,7 @@ export default function BeamDemoView() {
         </div>
       </CardContent></Card>
       <section className="mt-6" aria-live="polite"><h2 className="text-sm font-medium">{progress === 0 ? "准备加载" : frame.stage.label}</h2><p className="mt-2 text-sm leading-7 text-muted-foreground">{frame.stage.explanation}</p></section>
-      <p className="mt-5 text-xs leading-6 text-muted-foreground">{reduced ? "已按系统设置减弱动态，可拖动进度或逐阶段查看。" : "蓝色表示钢筋达到屈服；变形与裂缝已放大。"} 只显示参与受弯的纵筋，进度不代表荷载或真实时间。</p>
+      <p className="mt-5 text-xs leading-6 text-muted-foreground">{reduced ? "已按系统设置减弱动态，可拖动进度或逐阶段查看。" : "金色表示钢筋达到屈服；变形与裂缝已放大。"} 只显示参与受弯的纵筋，进度不代表荷载或真实时间。</p>
       <details className="kimi-disclosure mt-3"><summary>演示说明</summary><div className="space-y-2 pt-3 text-sm leading-7 text-muted-foreground"><p>单筋只计受拉纵筋的受弯作用；双筋同时考虑受拉、受压纵筋。图中箍筋仅作示意，省略了架立筋。</p><p>双筋的两个情形用于说明：配置受压钢筋并不代表它必然屈服，应结合截面变形和应变判断。</p><p>这是受力过程的教学示意，未进行工程参数求解。动画中的变形、裂缝宽度和阶段时长均不用于实际设计计算。</p></div></details>
     </>}
     </>}
