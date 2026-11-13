@@ -308,7 +308,16 @@ export function useChat(context?: PageCtx | null) {
     await callApi(previous.history, previous.context);
   }, [commit, callApi]);
 
+  /** 整体替换消息（切换本机会话时用）；生成中不允许替换 */
+  const replaceMessages = useCallback((next: Msg[]) => {
+    if (requestRef.current) return;
+    lastRequestRef.current = null;
+    commit(() => next);
+    setError(null);
+  }, [commit]);
+
   return {
+    replaceMessages,
     msgs,
     busy,
     stop,

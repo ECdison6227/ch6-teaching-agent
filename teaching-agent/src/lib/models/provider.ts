@@ -69,6 +69,15 @@ function readAgnes(): ProviderBundle | null {
   } };
 }
 
+/** DeepSeek：只做文字，作为备用通道（主通道出错时自动切换）。不支持读图。 */
+function readDeepseek(): ProviderBundle | null {
+  const key = process.env.DEEPSEEK_API_KEY;
+  if (!key) return null;
+  const base = trim(process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com");
+  const model = process.env.DEEPSEEK_MODEL || "deepseek-v4-flash";
+  return { id: "deepseek", cfg: { baseUrl: base, chatModel: model, chatApiKey: key, visionBaseUrl: "", visionModel: "", visionApiKey: "" } };
+}
+
 /** 凭证齐了才返回。缺配置时返回 null，不把没接上的模型放进可选列表。 */
 function readStepfun(): ProviderBundle | null {
   const key = process.env.STEPFUN_API_KEY;
@@ -105,7 +114,7 @@ function readSchool(): ProviderBundle | null {
 }
 
 function readProvider(id: ProviderId): ProviderBundle | null {
-  return id === "agnes" ? readAgnes() : id === "stepfun" ? readStepfun() : readSchool();
+  return id === "agnes" ? readAgnes() : id === "stepfun" ? readStepfun() : id === "deepseek" ? readDeepseek() : readSchool();
 }
 
 /** 按环境变量解析出当前使用的模型通道 */
@@ -122,7 +131,7 @@ export function resolveProviderConfig(): ProviderBundle {
  */
 export function listChatModels(): { models: ChatModelOption[]; defaultId: string } {
   const preferred = preferredProviderId();
-  const order: ProviderId[] = [preferred, ...(["school", "stepfun", "agnes"] as const).filter(id => id !== preferred)];
+  const order: ProviderId[] = [preferred, ...(["school", "stepfun", "agnes", "deepseek"] as const).filter(id => id !== preferred)];
   const models: ChatModelOption[] = [];
   for (const id of order) {
     const found = readProvider(id);
@@ -215,6 +224,20 @@ class OpenAICompatProvider implements ModelProvider {
     }
   }
 
+}
+
+/**
+ * 备用通道：主通道之外第一个凭证齐全的通道。带图片的请求跳过不支持读图的通道。
+ */
+export function getFallbackProvider(primary: ProviderId, needsVision: boolean): { provider: ModelProvider; model: string } | null {
+  for (const id of ["deepseek", "agnes", "stepfun", "school"] as ProviderId[]) {
+    if (id === primary) continue;
+    const found = readProvider(id);
+    if (!found || !found.cfg.chatModel) continue;
+    if (needsVision && !found.cfg.visionModel) continue;
+    return { provider: new OpenAICompatProvider(found.id, found.cfg), model: found.cfg.chatModel };
+  }
+  return null;
 }
 
 export function getProvider(providerId?: ProviderId): ModelProvider {

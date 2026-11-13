@@ -2,6 +2,7 @@
 
 import { FirstHint } from "@/components/FirstHint";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "motion/react";
 import { Bookmark, BookmarkX, ChevronDown, ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -119,6 +120,8 @@ export function StudyView() {
   const [bookSel, setBookSel] = useState<string | null>(null);
   const [chaptersOpen, setChaptersOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
+  /** 检查点作答结果：undefined 未答，true/false 判定，null 待核对 */
+  const [checkpoint, setCheckpoint] = useState<boolean | null | undefined>(undefined);
   const [chapterGate, setChapterGate] = useState(false);
   const [beta, setBeta] = useState(false);
   const notesRef = useRef<HTMLDivElement>(null);
@@ -315,6 +318,7 @@ export function StudyView() {
 
   useEffect(() => {
     setNotesOpen(false);
+    setCheckpoint(undefined);
   }, [pos, bookSel]);
 
   useEffect(() => {
@@ -422,8 +426,8 @@ export function StudyView() {
         </div>
       ) : null}
 
-      <div className="flex w-full flex-1 flex-col justify-center">
-      <div className="mx-auto w-full max-w-[864px] px-4 py-6 sm:px-8">
+      <div className="study-wrap flex w-full flex-1 flex-col justify-center">
+      <div className="study-col mx-auto w-full px-4 py-6 sm:px-8">
         {chapterGate && nextLabel ? (
           <div className="relative flex aspect-[4/3] w-full items-center justify-center rounded-2xl border border-paper-line bg-paper">
             <Button
@@ -457,7 +461,7 @@ export function StudyView() {
             ) : null}
           </div>
         ) : slide ? (
-          <>
+          <div className="study-grid"><div className="study-main min-w-0">
             <div className={`mb-3 flex items-center gap-3 ${onQuiz ? "justify-end" : "justify-between"}`}>
               {/* 随堂题页不再显示位置说明，只留右上的「这页没看懂」 */}
               <DeckScrubber
@@ -484,12 +488,20 @@ export function StudyView() {
               {onLab ? (
                 <ReinforcementLab />
               ) : onQuiz ? (
-                <div className="flex min-h-[24rem] flex-col justify-center rounded-2xl border border-paper-line bg-paper px-12 py-6 sm:px-16">
+                <div className="checkpoint">
+                  <p className="checkpoint-kicker"><span className="checkpoint-diamond" />检查点 · 看完 P.{String(anchorPage).padStart(3, "0")}</p>
                   <PracticePanel
                     key={`quiz:${anchorPage}:${quizQuestions[0]?.id ?? ""}`}
                     questions={quizQuestions}
                     context={pageCtx}
+                    onGraded={setCheckpoint}
                   />
+                  {checkpoint !== undefined ? (
+                    <motion.div className="checkpoint-next" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                      {checkpoint === false ? <Button variant="outline" onClick={() => { setCheckpoint(undefined); setPos(`s:${anchorPage}`); }}>回看第 {anchorPage} 页</Button> : null}
+                      <Button className="kimi-primary" onClick={() => { setCheckpoint(undefined); goNext(); }}>{checkpoint ? "答对了，继续" : "继续"}<ChevronRight /></Button>
+                    </motion.div>
+                  ) : null}
                 </div>
               ) : (
               <div className="relative">
@@ -531,14 +543,14 @@ export function StudyView() {
                   type="button"
                   aria-label="本页要点"
                   onClick={() => setNotesOpen((v) => !v)}
-                  className="flex h-7 w-7 items-center justify-center rounded-md bg-white/85 text-ink-faint shadow-sm ring-1 ring-black/5 hover:text-ink"
+                  className="study-notes-btn flex h-7 w-7 items-center justify-center rounded-md bg-white/85 text-ink-faint shadow-sm ring-1 ring-black/5 hover:text-ink"
                 >
                   <StickyNote className="h-3.5 w-3.5" />
                 </button>
               </div>
               )}
               {notesOpen && !onLab && !onQuiz ? (
-                <div className="absolute right-2 top-12 z-20 max-h-72 w-72 overflow-y-auto rounded-xl border bg-card p-3 shadow-md">
+                <div className="study-notes-pop absolute right-2 top-12 z-20 max-h-72 w-72 overflow-y-auto rounded-xl border bg-card p-3 shadow-md">
                   <StudyNotes title={noteBlock.title} points={noteBlock.points} keys={noteBlock.keys} />
                 </div>
               ) : null}
@@ -555,7 +567,17 @@ export function StudyView() {
                 <ChevronRight />
               </Button>
             </div>
-          </>
+          </div>
+          <aside className="study-aside" aria-label="本页要点">
+            {onLab || onQuiz ? null : (
+              <motion.div key={slide.page} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+                <p className="study-aside-kicker">本页要点 · P.{String(slide.page).padStart(3, "0")}</p>
+                <StudyNotes title={noteBlock.title} points={noteBlock.points} keys={noteBlock.keys} />
+                <button type="button" className="study-aside-ask" onClick={() => ask({ question: `帮我讲讲第 ${slide.page} 页的 ${noteBlock.title}`, context: pageCtx })}>问 AI 这一页</button>
+              </motion.div>
+            )}
+          </aside>
+          </div>
         ) : null}
 
         {bookSel && !chapterGate && bookQuestions.length ? (

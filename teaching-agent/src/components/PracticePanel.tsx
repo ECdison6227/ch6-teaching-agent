@@ -40,9 +40,12 @@ const EMPTY: QState = { value: "", submitted: false, correct: null, showAnswer: 
 export function PracticePanel({
   questions,
   context,
+  onGraded,
 }: {
   questions: Question[];
   context: PageCtx;
+  /** 判完一道题时回调（课件检查点用来决定「继续」还是「回看」） */
+  onGraded?: (correct: boolean | null) => void;
 }) {
   const { ask } = useAiDrawer();
   const { add } = useNotes();
@@ -67,6 +70,7 @@ export function PracticePanel({
           const correct = grade(q, s.value);
           patch(q.id, { submitted: true, correct });
           if (correct !== null) trackAttempt(q.id, correct);
+          onGraded?.(correct);
         };
         const reset = () => patch(q.id, EMPTY);
 

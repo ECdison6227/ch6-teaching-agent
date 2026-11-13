@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { motion } from "motion/react";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { celebrate } from "@/lib/celebrate";
 import dynamic from "next/dynamic";
@@ -18,7 +19,9 @@ import { applySessionErrors, sessionWrongRecords } from "@/lib/wrongbook/model";
 import { wrongbookStore } from "@/lib/wrongbook/store";
 import { exportMarkdown, selectExportRecords, SCOPE_LABELS, TEMPLATE_LABELS, type ExportScope, type ExportTemplate } from "@/lib/wrongbook/export";
 import { downloadMarkdown, printWrongbook } from "@/lib/wrongbook/browser-export";
-import { trackAttempts } from "@/lib/progress/store";
+import { kOfQuestion, trackAttempts, useMastery } from "@/lib/progress/store";
+import { MasteryRing } from "@/components/progress/MasteryRing";
+import { KNOWLEDGE_SECTIONS } from "@/lib/sections";
 import { PRACTICE_START_EVENT, PRACTICE_TAB_EVENT } from "@/lib/practice-nav";
 import { PracticeHome } from "@/components/practice/PracticeHome";
 
@@ -42,6 +45,9 @@ export function SelfTestView() {
   const book = useSyncExternalStore(wrongbookStore.subscribe, wrongbookStore.getSnapshot, wrongbookStore.getSnapshot);
   const session = saved.value;
   const [tab, setTab] = useState<"test" | "wrongbook" | "linked">("test");
+  const mastery = useMastery();
+  /** 交卷前各知识点的掌握度快照，用来展示「这次练完变化了多少」 */
+  const [masteryBefore, setMasteryBefore] = useState<Record<string, number | null> | null>(null);
   /** 整组全对：撒一次彩带（每次交卷只撒一次） */
   const celebrated = useRef<string | null>(null);
   useEffect(() => {
@@ -95,6 +101,10 @@ export function SelfTestView() {
   }, []);
   const start = () => { const count = parseQuestionCount(settings.countText); if (count && !settingError) replace(createSession(sampleQuestions(available, count))); };
   const submit = () => {
+    if (session) {
+      const ks = [...new Set(session.questions.map(q => kOfQuestion(q.id)).filter((k): k is string => !!k))];
+      setMasteryBefore(Object.fromEntries(ks.map(k => [k, mastery.byK[k]?.score ?? null])));
+    }
     void sessionStore.update(current => {
       if (!current) return current;
       const next = submitSession(current);
@@ -157,7 +167,10 @@ export function SelfTestView() {
       /> : session.status === "answering" && question ? <>
         <Card className="kimi-stage"><CardContent className="kimi-question-content" ref={questionRef} tabIndex={-1} aria-label={`第 ${session.cursor + 1} 题`}>
           <div className="kimi-row"><p className="text-sm">第 {session.cursor + 1} <span className="text-muted-foreground">/ {session.questions.length} 题</span></p>{session.cursor < session.questions.length - 1 ? <Button variant="ghost" size="sm" disabled={!saved.writable} onClick={() => unanswered.length ? setConfirmation({ kind: "submit" }) : submit()}>交卷</Button> : null}</div>
-          <div className="kimi-progress" role="progressbar" aria-label="自测进度" aria-valuemin={0} aria-valuemax={summary!.total} aria-valuenow={summary!.answered}><span style={{ width: percent(summary!.completion) }} /></div>
+          <div className="q-dots" role="progressbar" aria-label="自测进度" aria-valuemin={0} aria-valuemax={summary!.total} aria-valuenow={summary!.answered}>
+            <span className="q-dots-label">{session.cursor + 1}<span> / {session.questions.length}</span></span>
+            <span className="q-dots-row">{session.questions.map((q, i) => <button key={q.id} type="button" className="q-dot" aria-label={`第 ${i + 1} 题`} data-answered={!!session.answers[q.id]?.trim() || undefined} data-current={i === session.cursor || undefined} onClick={() => move(i)} disabled={!saved.writable}>{i === session.cursor ? <motion.span layoutId="q-cur" className="q-dot-cur" transition={{ type: "spring", stiffness: 500, damping: 36 }} /> : null}</button>)}</span>
+          </div>
           <p className="kimi-eyebrow">{QUESTION_TYPE_LABELS[question.type]} · {DIFFICULTY_LABELS[question.difficulty]}<span className="ml-3">{question.id}</span></p>
           <Markdown text={displayPrompt(question)} className="kimi-question-prompt" />
           {question.type === "fill" ? <label className="kimi-field">我的答案<Input aria-label="我的答案" placeholder="多空用分号分隔" autoComplete="off" value={session.answers[question.id] ?? ""} onChange={e => { const value = e.target.value; void sessionStore.update(s => s ? answerSession(s, question.id, value) : s); }} disabled={!saved.writable} /></label> : <div className="kimi-answer-options" role="group" aria-label="答案选项">{(question.type === "judge" ? [{ id: "T", text: "正确" }, { id: "F", text: "错误" }] : question.options).map(option => <Button key={option.id} variant="outline" aria-pressed={session.answers[question.id] === option.id} onClick={() => void sessionStore.update(s => s ? answerSession(s, question.id, option.id) : s)} disabled={!saved.writable}><span className="kimi-option-key">{option.id}</span><Markdown text={option.text} className="md-inline min-w-0" />{session.answers[question.id] === option.id ? <Check className="ml-auto text-[var(--kimi-accent)]" /> : null}</Button>)}</div>}
@@ -167,6 +180,24 @@ export function SelfTestView() {
         {session.source === "wrongbook-snapshot" ? <p className="kimi-footnote">正在重练错题保存的版本，原记录会保留。</p> : null}
       </> : <>
         <Card className="kimi-stage"><CardContent className="kimi-result-summary"><div><p className="kimi-eyebrow">本次正确率</p><p className="kimi-score">{summary!.accuracy === null ? "—" : <><NumberTicker value={Math.round(summary!.accuracy * 100)} className="kimi-score-num" />%</>}</p><p className="text-xs text-muted-foreground">共 {summary!.total} 题 · 答对 {summary!.correct} · 答错 {summary!.wrong}{summary!.pending ? ` · 待核对 ${summary!.pending}` : ""}{summary!.unanswered ? ` · 未答 ${summary!.unanswered}` : ""}</p></div><Button className="kimi-primary" disabled={!saved.writable || !canReplace} onClick={() => replace(createSession(session.questions, session.source))}>再练一次<ArrowRight /></Button></CardContent></Card>
+        {(() => {
+          const ks = [...new Set(session.questions.map(q => kOfQuestion(q.id)).filter((k): k is string => !!k))];
+          if (!ks.length) return null;
+          return <div className="k-delta">
+            <p className="k-delta-title">知识点变化</p>
+            {ks.map((k, i) => {
+              const m = mastery.byK[k]; const before = masteryBefore?.[k]; const after = m?.score ?? null;
+              const delta = before !== undefined && before !== null && after !== null ? Math.round((after - before) * 100) : null;
+              return <motion.div key={k} className="k-delta-row" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.06 }}>
+                {m ? <MasteryRing m={m} size={20} /> : null}
+                <span className="k-delta-code">K{k.slice(1).padStart(2, "0")}</span>
+                <span className="k-delta-name">{KNOWLEDGE_SECTIONS.find(x => x.id === k)?.name}</span>
+                <span className="k-delta-val">{after === null ? `待练 · 已做 ${m?.answered ?? 0}` : `${Math.round(after * 100)}%`}</span>
+                {delta !== null && delta !== 0 ? <span className="k-delta-chg" data-up={delta > 0 || undefined}>{delta > 0 ? "+" : ""}{delta}</span> : null}
+              </motion.div>;
+            })}
+          </div>;
+        })()}
         <div className="kimi-row my-6"><p className="text-xs text-muted-foreground">{summary!.wrong ? `${summary!.wrong} 道错题${canReplace ? "已收录" : "待保存"}，展开查看解析。` : "展开题目，核对答案与解析。"}</p><Button variant="ghost" size="sm" aria-pressed={onlyErrors} onClick={() => setOnlyErrors(value => !value)}>{onlyErrors ? "查看全部" : "待复习"}</Button></div>
         <div className="kimi-review-list">{session.questions.map((q, index) => { const result = session.results[index]; if (onlyErrors && result.status === "correct") return null; return <details key={`${session.id}:${q.id}`} className="kimi-review-item" open={result.status !== "correct" ? true : undefined}><summary><span className="kimi-eyebrow">{String(index + 1).padStart(2, "0")}</span><div className="min-w-0 flex-1"><Markdown text={displayPrompt(q)} /><span className="kimi-eyebrow">{q.id} · {STATUS_LABELS[result.status]}</span></div><ChevronDown className="size-4 shrink-0" /></summary><div className="kimi-review-body">{q.type === "choice" ? q.options.map(o => <Markdown key={o.id} text={`${o.id}．${o.text}`} />) : null}<div className="kimi-answer-comparison"><div><p>我的答案</p><Markdown text={answerLabel(q, result.answer)} /></div><div><p>标准答案</p><Markdown text={answerLabel(q)} /></div></div><Markdown text={q.analysis?.trim() || "暂无解析"} /></div></details>; })}</div>
         

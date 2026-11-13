@@ -1,4 +1,4 @@
-import { getProvider, resolveChatModel } from "@/lib/models/provider";
+import { getFallbackProvider, getProvider, resolveChatModel } from "@/lib/models/provider";
 import { buildSystemPrompt } from "@/lib/prompt";
 import { createChatParser, type StreamEvent } from "@/lib/chat-protocol";
 import { ChatRequestSchema, readJson, RequestValidationError } from "@/lib/request-validation";
@@ -38,15 +38,25 @@ export async function POST(req: Request) {
           else {
             const guide = createFirstTurnGuide(body.messages, body.pageContext, send);
             const parser = createChatParser(guide.emit);
-            const provider = getProvider(choice.provider);
-            for await (const delta of provider.chat(
-              [{ role: "system", content: system + guide.instruction }, ...body.messages],
-              scope.signal,
-              choice.model,
-              { effort: body.effort },
-            )) {
-              scope.signal.throwIfAborted();
-              parser.push(delta);
+            const messages = [{ role: "system" as const, content: system + guide.instruction }, ...body.messages];
+            let emitted = false;
+            try {
+              const provider = getProvider(choice.provider);
+              for await (const delta of provider.chat(messages, scope.signal, choice.model, { effort: body.effort })) {
+                scope.signal.throwIfAborted();
+                emitted = true;
+                parser.push(delta);
+              }
+            } catch (error) {
+              // 主通道还没吐出任何内容就失败：换备用通道重试一次，学生端无感
+              const needsVision = body.messages.some(m => Array.isArray(m.content) && m.content.some(p => p.type === "image_url"));
+              const fallback = !emitted && !scope.signal.aborted ? getFallbackProvider(choice.provider, needsVision) : null;
+              if (!fallback) throw error;
+              console.warn(`[chat] ${choice.provider} 失败，切换备用通道：`, error instanceof Error ? error.message : error);
+              for await (const delta of fallback.provider.chat(messages, scope.signal, fallback.model)) {
+                scope.signal.throwIfAborted();
+                parser.push(delta);
+              }
             }
             parser.end();
             guide.finish();

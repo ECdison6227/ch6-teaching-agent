@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, MotionConfig } from "motion/react";
@@ -19,6 +19,11 @@ import { SelfTestView } from "./SelfTestView";
 import { ClassroomView } from "./ClassroomView";
 import { StudentClassroom } from "./StudentClassroom";
 import { CourseHome } from "./home/CourseHome";
+import { ChatHistoryMenu } from "./chat/ChatHistoryMenu";
+import { useChatHistory } from "@/lib/chat-history";
+import { useMastery } from "@/lib/progress/store";
+import { readStudyPosition, type StudyPosition } from "@/lib/study-nav";
+import { KNOWLEDGE_SECTIONS } from "@/lib/sections";
 import { CommandSearch } from "./search/CommandSearch";
 import { MobileTabBar } from "./MobileTabBar";
 import { Toaster } from "@/components/ui/sonner";
@@ -32,11 +37,26 @@ const Loading = ({ label }: { label: string }) => (
 const BeamDemoView = dynamic(() => import("@/features/beam-demo/BeamDemoView"), { loading: () => <Loading label="正在载入演示…" /> });
 const BeamLabView = dynamic(() => import("./BeamLabView").then(module => module.BeamLabView), { loading: () => <Loading label="正在载入配筋计算…" /> });
 
-const SUGGESTIONS = [
+const DEFAULT_SUGGESTIONS = [
   "帮我判断这个梁截面会不会超筋",
   "讲讲适筋梁受弯的三个受力阶段",
   "斜截面受剪有哪几种破坏形态",
 ];
+
+/** 推荐问题跟着学习进度走：最近学到的知识点、错得最多的知识点优先 */
+function useSuggestions(): string[] {
+  const mastery = useMastery();
+  const [last, setLast] = useState<StudyPosition | null>(null);
+  useEffect(() => { setLast(readStudyPosition()); }, [mastery.pagesViewed]);
+  return useMemo(() => {
+    const out: string[] = [];
+    const weak = [...mastery.list].filter(m => m.wrongOpen > 0 || (m.score !== null && m.score < 0.6)).sort((a, b) => b.wrongOpen - a.wrongOpen)[0];
+    if (weak) out.push(`我在「${KNOWLEDGE_SECTIONS.find(s => s.id === weak.k)?.name}」上总出错，帮我理一理思路`);
+    if (last?.page) out.push(`讲讲第 ${last.page} 页「${last.name}」的关键一步`);
+    for (const d of DEFAULT_SUGGESTIONS) if (out.length < 3) out.push(d);
+    return out;
+  }, [mastery, last]);
+}
 
 /** 每个工作视图顶上的同一条工具栏：侧栏开关 + 视图名，右侧可放操作。 */
 export function PaneHeader({ title, children }: { title: string; children?: ReactNode }) {
@@ -51,13 +71,17 @@ export function PaneHeader({ title, children }: { title: string; children?: Reac
 
 function ChatPane() {
   const chat = useChat(null);
+  const history = useChatHistory(chat.msgs, chat.busy, chat.replaceMessages);
+  const suggestions = useSuggestions();
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <PaneHeader title="AI 助教" />
+      <PaneHeader title="AI 助教">
+        <ChatHistoryMenu sessions={history.sessions} currentId={history.currentId} onOpen={history.open} onNew={history.startNew} onRemove={history.remove} disabled={chat.busy} />
+      </PaneHeader>
       <div className="min-h-0 flex-1">
         <ChatView
           chat={chat}
-          suggestions={SUGGESTIONS}
+          suggestions={suggestions}
           welcome={
             <div className="kimi-chat-welcome">
               <p className="mono-kicker">AI 助教 · 第六章</p>
