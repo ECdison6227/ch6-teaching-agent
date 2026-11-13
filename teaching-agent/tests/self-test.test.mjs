@@ -25,12 +25,13 @@ test("150 题元数据逐题覆盖，难度分布真实，原题库未被改写"
   assert.deepEqual(catalog.reduce((a, q) => (a[q.difficulty]++, a), { easy: 0, medium: 0, hard: 0 }), { easy: 47, medium: 79, hard: 24 });
   catalog.forEach(({ difficulty, ...q }, i) => assert.deepEqual(q, questions[i]));
 });
-test("结构门禁如实排除24道缺损或泄题的已复核题", () => {
+test("题库补全后仅排除两道缺题干数据的计算题", () => {
   const usable = catalog.filter(isUsableQuestion);
-  assert.equal(usable.length, 91);
-  assert.deepEqual(usable.reduce((a, q) => (a[q.type]++, a), { choice: 0, judge: 0, fill: 0 }), { choice: 44, judge: 44, fill: 3 });
+  assert.equal(usable.length, 148);
+  assert.deepEqual(usable.reduce((a, q) => (a[q.type]++, a), { choice: 0, judge: 0, fill: 0 }), { choice: 91, judge: 49, fill: 8 });
   for (const q of usable) assert.equal(grade(q, q.answer), true, q.id);
-  for (const id of ["SC-20", "SC-25", "SC-30", "SC-67", "TF-24", "TF-29"]) assert.equal(isUsableQuestion(catalog.find(q => q.id === id)), false, id);
+  for (const id of ["SC-47", "SC-57"]) assert.equal(isUsableQuestion(catalog.find(q => q.id === id)), false, id);
+  for (const id of ["SC-20", "SC-25", "SC-30", "SC-61", "SC-67", "TF-24", "TF-29"]) assert.equal(isUsableQuestion(catalog.find(q => q.id === id)), true, id);
   for (const id of ["SC-27", "TF-14", "TF-16"]) assert.equal(isUsableQuestion(catalog.find(q => q.id === id)), true, id);
 });
 test("可用性独立于难度，标准答案各空及选择结构必须有效", () => {

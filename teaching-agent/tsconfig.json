@@ -31,9 +31,10 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".next-kimi/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-kimi/types/**/*.ts"
+    ".next-seuedu/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
