@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Markdown } from "./Markdown";
+import { ClassroomJoin } from "./classroom/ClassroomJoin";
 import { appPath } from "@/lib/app-path";
 import type { StudentSnapshot } from "@/lib/classroom/types";
 import { classroomFetch, classroomRequestId, useClassroom } from "@/hooks/use-classroom";
@@ -63,13 +64,7 @@ export function StudentClassroom({ code: initialCode = "", embedded = false }: {
     {embedded ? null : <header className="kimi-toolbar"><span>第六章 · 课堂</span><Button variant="ghost" size="sm" className="ml-auto" asChild><a href={appPath("/classroom")}><ChevronLeft />返回学习</a></Button></header>}
     <main className="kimi-page" aria-label="学生课堂">
       {!ready ? <p role="status" className="kimi-quiet-state">正在恢复课堂…</p> : !id ? <>
-        <header className="kimi-page-heading"><div><h1>加入课堂</h1></div></header>
-        <Card className="kimi-stage mt-8"><CardContent className="kimi-auth-content"><form onSubmit={join} className="space-y-5">
-          <label className="kimi-field">课堂码<Input name="code" placeholder="6 位数字" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={e => setCode(e.target.value)} autoComplete="off" /></label>
-          <label className="kimi-field">姓名<Input name="name" placeholder="让老师认出你" maxLength={60} required value={name} onChange={e => setName(e.target.value)} autoComplete="name" /></label>
-          <details className="kimi-disclosure"><summary>填写学号<span className="text-xs text-muted-foreground">选填<ChevronDown /></span></summary><label className="sr-only" htmlFor="student-number">学号</label><Input id="student-number" name="studentNo" className="mt-3" maxLength={80} value={studentNo} onChange={e => setStudentNo(e.target.value)} /></details>
-          <Button type="submit" className="kimi-primary w-full" disabled={busy || !name.trim() || !/^\d{6}$/.test(code)}>{busy ? "加入中…" : "加入课堂"}<ArrowRight /></Button>
-        </form></CardContent></Card>
+        <ClassroomJoin initialCode={initialCode} onJoined={(classroomId) => setId(classroomId)} />
       </> : <>
         <header className="kimi-page-heading"><div><h1>{live.state?.classroom.title || "课堂"}</h1><p>{live.state ? `${live.state.participant.name} · 课堂码 ${live.state.classroom.code}` : "正在连接课堂…"}</p></div><Button variant="ghost" size="icon" aria-label="重新同步" title="重新同步" onClick={live.refresh}><RefreshCw /></Button></header>
         <p className="kimi-eyebrow my-6" role="status">{live.connection}</p>

@@ -159,6 +159,13 @@ export class ClassroomStore {
     });
   }
   bump(id: string) { this.run("UPDATE classrooms SET version=version+1 WHERE id=?", id); }
+  /** 学生输入课堂码后先查一下：只返回课堂名和人数，不泄露其他信息 */
+  lookup(code: string) {
+    const classroom = this.get("SELECT * FROM classrooms WHERE code=? AND status!='ended'", code);
+    if (!classroom) throw new ClassroomError("没有找到这个课堂，或课堂已结束", 404);
+    const n = Number(this.get("SELECT COUNT(*) AS n FROM participants WHERE classroom_id=?", classroom.id)?.n ?? 0);
+    return { title: String(classroom.title), status: String(classroom.status), participants: n };
+  }
   join(code: string, name: string, studentNo: string, previous?: string) {
     return this.tx(() => {
       const classroom = this.get("SELECT * FROM classrooms WHERE code=? AND status!='ended'", code);

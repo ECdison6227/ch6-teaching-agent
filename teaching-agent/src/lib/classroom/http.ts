@@ -67,6 +67,11 @@ export async function classroomHttp(req: Request, paths: string[], student: bool
       const raw = store.login(accessCode, teacherToken);
       return json({ authenticated: true }, 200, { "Set-Cookie": setCookie(TEACHER_COOKIE, raw, TEACHER_AGE) });
     }
+    if (student && paths.join("/") === "lookup" && method === "POST") {
+      store.limit("lookup:" + ip, 120);
+      const { code } = await body(req, z.object({ code: z.string().regex(/^\d{6}$/) }).strict());
+      return json(store.lookup(code));
+    }
     if (student && paths.join("/") === "join" && method === "POST") {
       store.limit("join:" + ip, 600);
       const { code, name, studentNo } = await body(req, joinBody);
