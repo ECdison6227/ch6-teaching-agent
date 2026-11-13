@@ -15,7 +15,7 @@ type Found = { title: string; status: string; participants: number };
 /** 一个数字格：数字从上方落进来，当前格有光标 */
 function CodeSlot({ slot, index }: { slot: SlotProps; index: number }) {
   return (
-    <div className="code-slot" data-active={slot.isActive || undefined} data-filled={!!slot.char || undefined}>
+    <div className="code-slot" data-active={slot.isActive || undefined} data-filled={!!slot.char || undefined} style={{ "--off": 2.5 - index, "--side": index < 3 ? 1 : -1 } as React.CSSProperties}>
       <AnimatePresence mode="popLayout" initial={false}>
         {slot.char ? (
           <motion.span key={slot.char + index} initial={{ y: -18, opacity: 0, scale: 0.7 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 10, opacity: 0 }} transition={{ type: "spring", stiffness: 600, damping: 26 }}>
@@ -39,6 +39,7 @@ export function ClassroomJoin({ initialCode = "", onJoined }: { initialCode?: st
   const [code, setCode] = useState(initialCode);
   const [found, setFound] = useState<Found | null>(null);
   const [checking, setChecking] = useState(false);
+  const [merging, setMerging] = useState(false);
   const [error, setError] = useState("");
   const [name, setName] = useState("");
   const [studentNo, setStudentNo] = useState("");
@@ -50,7 +51,10 @@ export function ClassroomJoin({ initialCode = "", onJoined }: { initialCode?: st
     setChecking(true); setError("");
     try {
       const result = await classroomFetch<Found>("/api/classroom-participation/lookup", { code: value });
+      // 六个格子先向中间收拢合成一枚，再盖下印章
+      if (!reduce) { setMerging(true); await new Promise(r => window.setTimeout(r, 430)); }
       setFound(result);
+      setMerging(false);
       window.setTimeout(() => nameRef.current?.focus(), reduce ? 0 : 900);
     } catch (e) {
       setError(e instanceof Error ? e.message : "没有找到这个课堂");
@@ -77,7 +81,7 @@ export function ClassroomJoin({ initialCode = "", onJoined }: { initialCode?: st
     <div className="join-flow">
       <AnimatePresence mode="wait" initial={false}>
         {!found ? (
-          <motion.section key="code" className="join-step" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, filter: "blur(4px)" }} transition={{ duration: 0.28 }}>
+          <motion.section key="code" className="join-step" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.28 }}>
             <h1 className="join-title font-serif-cn">加入课堂</h1>
             <motion.div animate={shake}>
               <OTPInput
@@ -90,7 +94,7 @@ export function ClassroomJoin({ initialCode = "", onJoined }: { initialCode?: st
                 autoFocus
                 disabled={checking}
                 aria-label="六位课堂码"
-                containerClassName="code-row"
+                containerClassName={merging ? "code-row is-merging" : "code-row"}
                 render={({ slots }) => <>{slots.slice(0, 3).map((slot, i) => <CodeSlot key={i} slot={slot} index={i} />)}<span className="code-dash" />{slots.slice(3).map((slot, i) => <CodeSlot key={i + 3} slot={slot} index={i + 3} />)}</>}
               />
             </motion.div>

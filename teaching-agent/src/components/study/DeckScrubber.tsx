@@ -1,19 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, type PointerEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { appPath } from "@/lib/app-path";
 
 export type ScrubItem = { id: string; kind: "slide" | "quiz" | "lab"; page: number };
 
-/** 本节页码条：每页一个点，看过的实心；悬停出缩略图，点击跳页 */
+/** 本节页码条：每页一个点，看过的实心；悬停或按住拖动出缩略图，松手跳到那一页 */
 export function DeckScrubber({ items, index, viewed, onJump, label }: { items: ScrubItem[]; index: number; viewed: Set<number>; onJump: (id: string) => void; label: React.ReactNode }) {
   const [hover, setHover] = useState<number | null>(null);
+  const [drag, setDrag] = useState(false);
+  const track = useRef<HTMLDivElement>(null);
+  const suppressClick = useRef(false);
   const h = hover !== null ? items[hover] : null;
+  const indexAt = (clientX: number) => {
+    const dots = track.current?.querySelectorAll<HTMLElement>(".scrubber-dot");
+    if (!dots?.length) return null;
+    let best = 0, dist = Infinity;
+    dots.forEach((d, i) => { const r = d.getBoundingClientRect(); const c = Math.abs(r.left + r.width / 2 - clientX); if (c < dist) { dist = c; best = i; } });
+    return best;
+  };
+  const down = (e: PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    track.current?.setPointerCapture(e.pointerId);
+    setDrag(true);
+    setHover(indexAt(e.clientX));
+  };
+  const move = (e: PointerEvent<HTMLDivElement>) => { if (drag) setHover(indexAt(e.clientX)); };
+  const up = (e: PointerEvent<HTMLDivElement>) => {
+    if (!drag) return;
+    setDrag(false);
+    const i = indexAt(e.clientX);
+    suppressClick.current = true;
+    window.setTimeout(() => { suppressClick.current = false; }, 0);
+    if (e.pointerType !== "mouse") setHover(null);
+    if (i !== null && i !== index) onJump(items[i].id);
+  };
   return (
     <div className="scrubber">
       <span className="scrubber-label">{label}</span>
-      <div className="scrubber-track" onMouseLeave={() => setHover(null)}>
+      <div
+        ref={track} className="scrubber-track" data-drag={drag || undefined}
+        onMouseLeave={() => { if (!drag) setHover(null); }}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={() => { setDrag(false); setHover(null); }}
+      >
         {items.map((it, i) => (
           <button
             key={it.id}
@@ -23,9 +53,10 @@ export function DeckScrubber({ items, index, viewed, onJump, label }: { items: S
             data-current={i === index || undefined}
             data-seen={(it.kind === "slide" && viewed.has(it.page)) || undefined}
             aria-label={it.kind === "slide" ? `第 ${it.page} 页` : it.kind === "quiz" ? "随堂题" : "配筋率互动"}
-            onMouseEnter={() => setHover(i)}
+            onMouseEnter={() => { if (!drag) setHover(i); }}
             onFocus={() => setHover(i)}
-            onClick={() => onJump(it.id)}
+            onBlur={() => setHover(null)}
+            onClick={() => { if (!suppressClick.current) onJump(it.id); }}
           >
             {i === index ? <motion.span layoutId="scrub-cur" className="scrubber-cur" transition={{ type: "spring", stiffness: 500, damping: 36 }} /> : null}
           </button>

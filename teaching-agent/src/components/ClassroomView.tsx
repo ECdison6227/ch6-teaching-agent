@@ -11,6 +11,7 @@ import { Markdown } from "./Markdown";
 import { AnimatePresence, motion } from "motion/react";
 import { MonitorUp, ListPlus } from "lucide-react";
 import { ProjectorView } from "./classroom/ProjectorView";
+import { createPortal } from "react-dom";
 import { ClassroomReport } from "./classroom/ClassroomReport";
 import { copyText } from "@/lib/clipboard";
 import { appPath } from "@/lib/app-path";
@@ -37,6 +38,9 @@ export function ClassroomView({ active = true }: { active?: boolean }) {
   const c = live.state?.classroom, current = live.state?.rounds.at(-1);
   const [roundId, setRoundId] = useState("");
   const [projector, setProjector] = useState(false);
+  /** 投影层挂到 body：不受视图图层的 transform / z-index 影响，全屏被拒时也能盖住整页 */
+  const [portalReady, setPortalReady] = useState(false);
+  useEffect(() => { setPortalReady(true); }, []);
   /** 本节课的题目队列：只存在老师本机，按顺序一键发下一题 */
   const queueKey = `ch6-teacher-queue:${appPath("/")}:${id ?? ""}`;
   const [queue, setQueue] = useState<string[]>([]);
@@ -163,6 +167,6 @@ export function ClassroomView({ active = true }: { active?: boolean }) {
       {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}<DialogFooter><Button variant="ghost" onClick={() => setPickerOpen(false)}>取消</Button><Button variant="outline" disabled={!questionId || queue.includes(questionId)} onClick={() => { saveQueue([...queue, questionId]); setQuestionId(""); }}><ListPlus />{queue.includes(questionId) ? "已在队列" : "加入队列"}</Button><Button disabled={busy || !questionId || current?.status === "open"} onClick={() => command("rounds", { questionId })}>{busy ? "发布中…" : "发布题目"}<ArrowRight /></Button></DialogFooter>
     </DialogContent></Dialog>
     <Dialog open={confirmEnd} onOpenChange={setConfirmEnd}><DialogContent className="kimi-dialog" onCloseAutoFocus={event => { event.preventDefault(); endRef.current?.focus(); }}><DialogHeader><DialogTitle>结束课堂？</DialogTitle><DialogDescription>停止加入和作答，课堂记录会保留。</DialogDescription></DialogHeader><DialogFooter><Button variant="ghost" onClick={() => setConfirmEnd(false)}>继续上课</Button><Button disabled={busy} onClick={() => command("end")}>确认结束</Button></DialogFooter></DialogContent></Dialog>
-    <AnimatePresence>{projector && live.state ? <ProjectorView state={live.state} round={current ?? null} qrSvg={invite?.svg ?? null} onClose={() => setProjector(false)} /> : null}</AnimatePresence>
+    {portalReady ? createPortal(<AnimatePresence>{projector && live.state ? <ProjectorView state={live.state} round={current ?? null} qrSvg={invite?.svg ?? null} onClose={() => setProjector(false)} /> : null}</AnimatePresence>, document.body) : null}
   </main>;
 }

@@ -3,8 +3,8 @@
 import { motion } from "motion/react";
 import type { Mastery } from "@/lib/progress/model";
 
-/** 小号掌握度圆环：待练时画虚线圈；有分数时弧线转着填满。 */
-export function MasteryRing({ m, size = 18 }: { m: Mastery; size?: number }) {
+/** 小号掌握度圆环：待练时画虚线圈；有分数时弧线转着填满（可从旧值 from 长到新值）。 */
+export function MasteryRing({ m, size = 18, from, delay = 0 }: { m: Mastery; size?: number; from?: number | null; delay?: number }) {
   const r = size / 2 - 1.6;
   const value = m.score ?? 0;
   const pending = m.score === null;
@@ -15,10 +15,10 @@ export function MasteryRing({ m, size = 18 }: { m: Mastery; size?: number }) {
         <motion.circle
           cx={size / 2} cy={size / 2} r={r}
           className={value >= 0.8 ? "ring-value ring-done" : "ring-value"}
-          initial={{ pathLength: 0 }}
+          initial={{ pathLength: Math.max(0.04, from ?? 0) }}
           whileInView={{ pathLength: Math.max(0.04, value) }}
           viewport={{ once: true }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay }}
           style={{ rotate: -90, transformOrigin: "50% 50%" }}
         />
       ) : null}

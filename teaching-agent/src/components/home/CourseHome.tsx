@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { BlurFade } from "@/components/ui/blur-fade";
@@ -18,6 +18,9 @@ import { BeamHero } from "./BeamHero";
 import { linkedCountForK, pickQuestionsForK, useMastery } from "@/lib/progress/store";
 import { requestPractice, requestPracticeTab } from "@/lib/practice-nav";
 import { MasteryRing, masteryLabel } from "@/components/progress/MasteryRing";
+import { prereqOf } from "@/lib/knowledge-graph";
+import { flyTitle } from "@/lib/fly-title";
+import type { Mastery } from "@/lib/progress/model";
 
 const slides = slidesData as { page: number; section: string }[];
 
@@ -110,38 +113,14 @@ export function CourseHome({ active, onView }: { active: boolean; onView: (view:
             <h2 className="font-serif-cn">知识地图</h2>
             <span className="mono-kicker">K01 — K14</span>
           </div>
-          <div className="kmap">
-            {GROUPS.map((group, gi) => (
-              <BlurFade key={group.title} delay={0.05 * gi} inView className="kmap-group">
-                <h3 className="kmap-group-title">
-                  <span className="font-serif-cn">{group.title}</span>
-                  {"book" in group ? <span className="kmap-tag">教材</span> : null}
-                </h3>
-                <ol>
-                  {group.ids.map(kid => {
-                    const s = KNOWLEDGE_SECTIONS.find(x => x.id === kid)!;
-                    const here = last?.kid === kid;
-                    return (
-                      <li key={kid}>
-                        <button type="button" className="kmap-row" data-here={here || undefined} onClick={() => openSection(kid)}>
-                          <span className="kmap-code">{pad(kid)}</span>
-                          <span className="kmap-name">{s.name}</span>
-                          <span className="kmap-meta">{here ? <><span className="kmap-here" />上次学到</> : masteryLabel(mastery.byK[kid], pages.get(kid))}</span>
-                          <MasteryRing m={mastery.byK[kid]} />
-                          {canPractice[kid] ? <span
-                            role="button" tabIndex={0} className="kmap-practice"
-                            onClick={e => { e.stopPropagation(); practiceK(kid); }}
-                            onKeyDown={e => { if (e.key === "Enter") { e.stopPropagation(); practiceK(kid); } }}
-                          >练 3 题</span> : null}
-                          <ArrowRight className="kmap-arrow" />
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </BlurFade>
-            ))}
-          </div>
+          <KnowledgeMap
+            last={last}
+            byK={mastery.byK}
+            pages={pages}
+            canPractice={canPractice}
+            onOpen={openSection}
+            onPractice={practiceK}
+          />
         </div>
       </section>
 
@@ -221,5 +200,122 @@ function MiniStrain() {
       <motion.line x1="12" x2="206" className="art-na" initial={{ y1: na[0], y2: na[0] }} animate={{ y1: na, y2: na }} transition={t} />
       <text x="112" y="20" className="art-text">ε<tspan dy="3" fontSize="7">cu</tspan></text>
     </svg>
+  );
+}
+
+type Conn = { d: string; k: string };
+
+/** 站点状态：看过 → 墨色实心；掌握 → 校徽金 */
+const stationState = (m: Mastery | undefined) =>
+  !m ? "idle" : m.score !== null && m.score >= 0.8 ? "done" : (m.coverage ?? 0) > 0 || m.answered > 0 ? "seen" : "idle";
+
+/**
+ * 知识地图：每组是一条线路，滚动到这里时线路自上而下画出、站点依次点亮；
+ * 悬停一个知识点，从它连出曲线到前置知识点。
+ */
+function KnowledgeMap({ last, byK, pages, canPractice, onOpen, onPractice }: {
+  last: StudyPosition | null; byK: Record<string, Mastery>; pages: Map<string, number>; canPractice: Record<string, boolean>;
+  onOpen: (k: string) => void; onPractice: (k: string) => void;
+}) {
+  const wrap = useRef<HTMLDivElement>(null);
+  const [hover, setHover] = useState<string | null>(null);
+  const [conns, setConns] = useState<Conn[]>([]);
+  const pre = hover ? prereqOf(hover) : [];
+
+  const draw = useCallback((k: string | null) => {
+    setHover(k);
+    const root = wrap.current;
+    if (!k || !root || !window.matchMedia("(hover: hover)").matches) { setConns([]); return; }
+    const box = root.getBoundingClientRect();
+    const at = (id: string) => {
+      const el = root.querySelector<HTMLElement>(`[data-station="${id}"]`);
+      const r = el?.getBoundingClientRect();
+      const row = el?.closest(".kmap-row")?.getBoundingClientRect();
+      return r && row ? { x: r.left + r.width / 2 - box.left, y: r.top + r.height / 2 - box.top, right: row.right - box.left } : null;
+    };
+    const a = at(k);
+    if (!a) { setConns([]); return; }
+    setConns(prereqOf(k).flatMap(p => {
+      const b = at(p);
+      if (!b) return [];
+      // 同一列：沿线路左侧鼓出一道弧；跨列：穿过两列之间的空隙，接到前置知识点那一行的右端，不压文字
+      if (Math.abs(a.x - b.x) < 8) {
+        const bow = Math.min(64, 18 + Math.abs(a.y - b.y) * 0.18);
+        return [{ k: p, d: `M${a.x},${a.y} C${a.x - bow},${a.y} ${b.x - bow},${b.y} ${b.x},${b.y}` }];
+      }
+      const ex = b.x < a.x ? b.right - 4 : b.x;
+      const c = Math.max(24, Math.abs(a.x - ex) * 0.5);
+      return [{ k: p, d: `M${a.x},${a.y} C${a.x - c},${a.y} ${ex + c},${b.y} ${ex},${b.y}` }];
+    }));
+  }, []);
+
+  return (
+    <div ref={wrap} className="kmap-wrap" onMouseLeave={() => draw(null)}>
+      <div className="kmap">
+        {GROUPS.map((group, gi) => (
+          <BlurFade key={group.title} delay={0.05 * gi} inView className="kmap-group">
+            <h3 className="kmap-group-title">
+              <span className="font-serif-cn">{group.title}</span>
+              {"book" in group ? <span className="kmap-tag">教材</span> : null}
+            </h3>
+            <ol className="kmap-line">
+              {group.ids.length > 1 ? (
+                <motion.span
+                  className="kmap-rail" aria-hidden
+                  initial={{ scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.25 * group.ids.length, ease: [0.4, 0, 0.2, 1], delay: 0.15 }}
+                />
+              ) : null}
+              {group.ids.map((kid, i) => {
+                const s = KNOWLEDGE_SECTIONS.find(x => x.id === kid)!;
+                const here = last?.kid === kid;
+                const isPre = pre.includes(kid);
+                return (
+                  <li key={kid}>
+                    <button
+                      type="button" className="kmap-row"
+                      data-here={here || undefined} data-pre={isPre || undefined} data-focus={hover === kid || undefined}
+                      onClick={e => {
+                        const name = e.currentTarget.querySelector<HTMLElement>(".kmap-name");
+                        if (name) flyTitle(name, s.name);
+                        onOpen(kid);
+                      }}
+                      onMouseEnter={() => draw(kid)}
+                      onFocus={() => draw(kid)}
+                    >
+                      <motion.span
+                        className="kmap-station" data-station={kid} data-state={stationState(byK[kid])} aria-hidden
+                        initial={{ scale: 0.3, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} viewport={{ once: true, amount: 0.6 }}
+                        transition={{ type: "spring", stiffness: 420, damping: 22, delay: 0.15 + i * 0.25 }}
+                      />
+                      <span className="kmap-code">{pad(kid)}</span>
+                      <span className="kmap-name">{s.name}</span>
+                      <span className="kmap-meta">{isPre ? <span className="kmap-pre">前置</span> : here ? <><span className="kmap-here" />上次学到</> : masteryLabel(byK[kid], pages.get(kid))}</span>
+                      <MasteryRing m={byK[kid]} />
+                      {canPractice[kid] ? <span
+                        role="button" tabIndex={0} className="kmap-practice"
+                        onClick={e => { e.stopPropagation(); onPractice(kid); }}
+                        onKeyDown={e => { if (e.key === "Enter") { e.stopPropagation(); onPractice(kid); } }}
+                      >练 3 题</span> : null}
+                      <ArrowRight className="kmap-arrow" />
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </BlurFade>
+        ))}
+      </div>
+      <svg className="kmap-links" aria-hidden>
+        <AnimatePresence>
+          {conns.map(c => (
+            <motion.g key={`${hover}-${c.k}`} initial={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.15 } }}>
+              <motion.path d={c.d} className="kmap-link" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} />
+              <path d={c.d} className="kmap-link-beam" pathLength={1} />
+            </motion.g>
+          ))}
+        </AnimatePresence>
+      </svg>
+    </div>
   );
 }

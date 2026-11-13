@@ -54,7 +54,7 @@ export function SelfTestView() {
     if (session?.status !== "submitted") return;
     const key = `${session.questions.length}:${session.questions[0]?.id ?? ""}`;
     const s = summarizeSession(session);
-    if (s.accuracy === 1 && s.total > 0 && celebrated.current !== key) { celebrated.current = key; celebrate(); }
+    if (s.accuracy === 1 && s.total > 0 && celebrated.current !== key) { celebrated.current = key; window.setTimeout(celebrate, 950); }
   }, [session]);
   /** /practice?tab=linked|wrongbook 直达对应页签 */
   useEffect(() => { const t = new URLSearchParams(window.location.search).get("tab"); if (t === "linked" || t === "wrongbook") setTab(t); }, []);
@@ -188,12 +188,14 @@ export function SelfTestView() {
             {ks.map((k, i) => {
               const m = mastery.byK[k]; const before = masteryBefore?.[k]; const after = m?.score ?? null;
               const delta = before !== undefined && before !== null && after !== null ? Math.round((after - before) * 100) : null;
-              return <motion.div key={k} className="k-delta-row" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.06 }}>
-                {m ? <MasteryRing m={m} size={20} /> : null}
+              // 节奏：分数先滚上来（约 1 秒），再逐个知识点圆环从交卷前长到现在，最后弹出变化值
+              const at = 0.85 + i * 0.12;
+              return <motion.div key={k} className="k-delta-row" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: at }}>
+                {m ? <MasteryRing m={m} size={20} from={before ?? 0} delay={at + 0.1} /> : null}
                 <span className="k-delta-code">K{k.slice(1).padStart(2, "0")}</span>
                 <span className="k-delta-name">{KNOWLEDGE_SECTIONS.find(x => x.id === k)?.name}</span>
                 <span className="k-delta-val">{after === null ? `待练 · 已做 ${m?.answered ?? 0}` : `${Math.round(after * 100)}%`}</span>
-                {delta !== null && delta !== 0 ? <span className="k-delta-chg" data-up={delta > 0 || undefined}>{delta > 0 ? "+" : ""}{delta}</span> : null}
+                {delta !== null && delta !== 0 ? <motion.span className="k-delta-chg" data-up={delta > 0 || undefined} initial={{ opacity: 0, scale: 0.6, y: 4 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ type: "spring", stiffness: 520, damping: 20, delay: at + 0.75 }}>{delta > 0 ? "+" : ""}{delta}</motion.span> : null}
               </motion.div>;
             })}
           </div>;

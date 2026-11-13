@@ -367,7 +367,7 @@ export function StudyView() {
           onClick={() => setChaptersOpen((v) => !v)}
           className="study-section-picker min-w-0 max-w-[60%] justify-start gap-1.5"
         >
-          <span className="truncate">{bookSel ? activeSection : slide?.section}</span>
+          <span className="truncate" data-fly-target>{bookSel ? activeSection : slide?.section}</span>
           <ChevronDown className={`size-3.5 shrink-0 opacity-60 transition-transform ${chaptersOpen ? "rotate-180" : ""}`} />
         </Button>
         <span className="flex-1" />

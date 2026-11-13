@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { animate, motion, useInView, useMotionValue, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
 import { RotateCcw } from "lucide-react";
 import { useHydratedReducedMotion } from "@/hooks/use-hydrated-reduced-motion";
@@ -64,10 +64,12 @@ export function BeamHero({ active }: { active: boolean }) {
   const inView = useInView(ref, { amount: 0.4 });
   const t = useMotionValue(0);
   const [stage, setStage] = useState(-1);
-  const ratio = useTransform(t, [0.08, 0.92], [0, 1], { clamp: true });
   const ratioText = useRef<HTMLSpanElement>(null);
   const [run, setRun] = useState(0);
   const played = useRef(false);
+  const anim = useRef<ReturnType<typeof animate> | null>(null);
+  const slider = useRef<HTMLInputElement>(null);
+  const [probe, setProbe] = useState((P1 + P2) / 2);
 
   useEffect(() => {
     if (!active || !inView) return;
@@ -76,6 +78,7 @@ export function BeamHero({ active }: { active: boolean }) {
     if (reduce) { t.set(1); return; }
     t.set(0);
     const controls = animate(t, 1, { duration: DURATION, ease: "linear", delay: 0.35 });
+    anim.current = controls;
     return () => controls.stop();
   }, [active, inView, run, reduce, t]);
 
@@ -83,8 +86,35 @@ export function BeamHero({ active }: { active: boolean }) {
     let s = -1;
     STAGES.forEach((st, i) => { if (v >= st.at) s = i; });
     setStage(s);
-    if (ratioText.current) ratioText.current.textContent = ratio.get().toFixed(2);
+    const r = ratioOf(v);
+    if (ratioText.current) ratioText.current.textContent = r.toFixed(2);
+    if (slider.current && document.activeElement !== slider.current) slider.current.value = String(r);
   });
+
+  /** 拖动荷载滑杆：停掉自动播放，直接设定 P / P_u */
+  const onLoad = (v: number) => {
+    anim.current?.stop();
+    played.current = true;
+    t.set(0.08 + v * 0.84);
+  };
+
+  /** 指针沿梁移动：探针跟到该截面 */
+  const moveProbe = useCallback((e: PointerEvent<SVGSVGElement>) => {
+    const svg = ref.current;
+    if (!svg) return;
+    if (e.pointerType !== "mouse" && e.buttons === 0 && e.type === "pointermove") return;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const m = svg.getScreenCTM();
+    if (!m) return;
+    const x = pt.matrixTransform(m.inverse()).x;
+    setProbe(Math.min(R, Math.max(L, x)));
+  }, []);
+  const keyProbe = (e: KeyboardEvent<SVGSVGElement>) => {
+    const step = e.shiftKey ? 40 : 10;
+    if (e.key === "ArrowLeft") { e.preventDefault(); setProbe(p => Math.max(L, p - step)); }
+    if (e.key === "ArrowRight") { e.preventDefault(); setProbe(p => Math.min(R, p + step)); }
+  };
 
   const deflect = useTransform(t, DEFLECT_T, DEFLECT_V);
   const top = useTransform(deflect, d => beamPath(d, TOP));
@@ -120,14 +150,18 @@ export function BeamHero({ active }: { active: boolean }) {
             {stage >= 0 ? STAGES[stage].name : "等待加载"}
           </motion.span>
         </div>
-        <div className="beam-ratio" aria-hidden>
+        <label className="beam-ratio">
           <span>P / P<sub>u</sub></span>
-          <span className="beam-ratio-track"><motion.span style={{ scaleX: ratio }} /></span>
+          <input ref={slider} type="range" min={0} max={1} step={0.01} defaultValue={0} className="beam-slider" aria-label="荷载 P / Pu" onChange={e => onLoad(Number(e.target.value))} />
           <span ref={ratioText} className="tabular-nums">0.00</span>
-        </div>
+        </label>
       </div>
 
-      <svg ref={ref} viewBox={`0 0 ${W} 336`} className="beam-hero-svg" role="img" aria-label="简支梁三分点加载：弹性阶段、带裂缝工作阶段、破坏阶段，以及对应的弯矩图">
+      <svg
+        ref={ref} viewBox={`0 0 ${W} 336`} className="beam-hero-svg" tabIndex={0}
+        role="img" aria-label="简支梁三分点加载：弹性阶段、带裂缝工作阶段、破坏阶段，以及对应的弯矩图。左右方向键移动截面探针"
+        onPointerMove={moveProbe} onPointerDown={moveProbe} onKeyDown={keyProbe}
+      >
         <defs>
           <pattern id="beam-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
             <line x1="0" y1="0" x2="0" y2="7" stroke="currentColor" strokeWidth="1" opacity="0.22" />
@@ -204,7 +238,11 @@ export function BeamHero({ active }: { active: boolean }) {
             </g>
           ))}
         </motion.g>
+
+        <Probe x={probe} t={t} mh={mh} deflect={deflect} />
       </svg>
+
+      <ProbeReadout x={probe} t={t} />
 
       <figcaption className="beam-hero-foot">
         <span>图 6-1　适筋梁三分点加载</span>
@@ -219,4 +257,101 @@ export function BeamHero({ active }: { active: boolean }) {
 function StirrupLine({ x, deflect }: { x: number; deflect: MotionValue<number> }) {
   const y = useTransform(deflect, d => sag(x, d));
   return <motion.line x1={x} y1={TOP + 5} x2={x} y2={BOT - 5} style={{ y }} />;
+}
+
+/* ───────── 截面探针 ───────── */
+
+const CR = (0.36 - 0.08) / 0.84; // 开裂时的 M/Mu
+const YD = (0.66 - 0.08) / 0.84; // 钢筋屈服
+const CRUSH = (0.86 - 0.08) / 0.84;
+const H0 = 0.88;
+
+/** 三分点加载的弯矩分布形状：剪跨段线性，纯弯段为常数 */
+function shape(x: number) {
+  if (x <= P1) return (x - L) / (P1 - L);
+  if (x <= P2) return 1;
+  return (R - x) / (R - P2);
+}
+const ratioOf = (t: number) => Math.min(1, Math.max(0, (t - 0.08) / 0.84));
+
+/** 截面状态（定性）：受压区高度 xn/h、钢筋应变 εs/εy、顶面压应变 */
+function sectionAt(m: number) {
+  let xn: number, es: number;
+  if (m < CR) { xn = 0.5; es = (m / CR) * 0.3; }
+  else if (m < YD) { const k = (m - CR) / (YD - CR); xn = 0.42 - k * 0.1; es = 0.3 + k * 0.7; }
+  else { const k = (m - YD) / (1 - YD); xn = 0.32 - k * 0.12; es = 1 + k * 2.5; }
+  const ec = (es * xn) / (H0 - xn);
+  const state = m < 0.002 ? "未加载" : m < CR ? "未开裂" : m < YD ? "已开裂" : m < CRUSH ? "钢筋屈服" : "受压区压碎";
+  return { xn, es, ec, state, cracked: m >= CR, yielded: m >= YD };
+}
+
+function useLive(t: MotionValue<number>) {
+  const [v, setV] = useState(t.get());
+  useMotionValueEvent(t, "change", setV);
+  return v;
+}
+
+function Probe({ x, t, mh, deflect }: { x: number; t: MotionValue<number>; mh: MotionValue<number>; deflect: MotionValue<number> }) {
+  const tv = useLive(t);
+  if (tv <= 0.02) return null;
+  const y1 = BOT - 9 + sag(x, deflect.get());
+  const y2 = MBASE + mh.get() * shape(x);
+  return (
+    <g className="beam-probe" pointerEvents="none">
+      <line x1={x} y1={TOP - 74} x2={x} y2={MBASE + 66} className="beam-probe-line" />
+      <circle cx={x} cy={TOP - 74} r={5} className="beam-probe-grip" />
+      <circle cx={x} cy={y1} r={4} className="beam-probe-dot" />
+      <circle cx={x} cy={y2} r={4} className="beam-probe-dot" />
+    </g>
+  );
+}
+
+function ProbeReadout({ x, t }: { x: number; t: MotionValue<number> }) {
+  const tv = useLive(t);
+  const r = ratioOf(tv);
+  const m = r * shape(x);
+  const pure = x > P1 + 0.5 && x < P2 - 0.5;
+  const onSupport = x <= L + 0.5 || x >= R - 0.5;
+  const v = pure ? 0 : onSupport || x < P1 || x > P2 ? r : 0;
+  const sec = sectionAt(m);
+  // 剪跨段到了后期出现弯剪斜裂缝，和图上的斜裂缝对应
+  const diagonal = !pure && tv >= 0.62 && ((x >= L + 70 && x <= P1 - 20) || (x >= P2 + 20 && x <= R - 70));
+  const state = diagonal && !sec.yielded ? "出现斜裂缝" : sec.state;
+  return (
+    <div className="beam-readout" aria-live="off">
+      <StrainSketch sec={sec} />
+      <dl>
+        <div><dt>截面</dt><dd>{((x - L) / (R - L)).toFixed(2)} l<sub>0</sub><span className="beam-readout-tag">{pure ? "纯弯段" : "剪跨段"}</span></dd></div>
+        <div><dt>弯矩</dt><dd>{m.toFixed(2)} M<sub>u</sub></dd></div>
+        <div><dt>剪力</dt><dd>{v === 0 ? "0" : <>{v.toFixed(2)} P<sub>u</sub></>}</dd></div>
+      </dl>
+      <span className="beam-readout-state" data-state={state}>{state}</span>
+    </div>
+  );
+}
+
+/** 截面 + 应变分布：平截面假定下一条直线过中和轴 */
+function StrainSketch({ sec }: { sec: ReturnType<typeof sectionAt> }) {
+  const top = 8, h = 60, ax = 72;
+  const na = top + sec.xn * h;
+  const steelY = top + H0 * h;
+  // 显示用压缩刻度：弹性段的小应变也看得见；仍是一条过中和轴的直线
+  const esAtSteel = 44 * Math.sqrt(sec.es / 3.5);
+  const slope = esAtSteel / (steelY - na);
+  const bottomX = ax + slope * (top + h - na);
+  const topX = ax - slope * (na - top);
+  return (
+    <svg viewBox="0 0 150 76" className="beam-strain" aria-hidden>
+      <rect x={10} y={top} width={30} height={h} className="bs-concrete" />
+      {sec.cracked ? <rect x={10} y={na} width={30} height={top + h - na} className="bst-cracked" /> : null}
+      <rect x={10} y={top} width={30} height={na - top} className="bst-comp" />
+      <circle cx={18} cy={steelY} r={2.6} className={sec.yielded ? "bst-bar bst-yield" : "bst-bar"} />
+      <circle cx={32} cy={steelY} r={2.6} className={sec.yielded ? "bst-bar bst-yield" : "bst-bar"} />
+      <line x1={4} x2={146} y1={na} y2={na} className="bst-na" />
+      <line x1={ax} x2={ax} y1={top - 2} y2={top + h + 2} className="bst-axis" />
+      <path d={`M${ax},${top} L${topX.toFixed(1)},${top} L${bottomX.toFixed(1)},${top + h} L${ax},${top + h} Z`} className="bst-strain" />
+      <text x={Math.min(topX, ax - 4) - 2} y={top + 4} className="bst-text" textAnchor="end">ε<tspan baselineShift="sub" fontSize="6">c</tspan></text>
+      <text x={ax + (bottomX - ax) * ((steelY - na) / (top + h - na)) + 4} y={steelY + 3} className={sec.yielded ? "bst-text bst-text-yield" : "bst-text"}>ε<tspan baselineShift="sub" fontSize="6">s</tspan></text>
+    </svg>
+  );
 }

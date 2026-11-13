@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { Markdown } from "@/components/Markdown";
+import { RollingNumber } from "@/components/ui/rolling-number";
 import type { TeacherRound, TeacherSnapshot } from "@/lib/classroom/types";
 
 const optionsOf = (r: TeacherRound) => (r.question.type === "judge" ? [{ id: "T", text: "正确" }, { id: "F", text: "错误" }] : r.question.options);
@@ -37,7 +38,7 @@ export function ProjectorView({ state, round, qrSvg, onClose }: { state: Teacher
       <button type="button" className="projector-close" aria-label="退出投影" onClick={onClose}><X /></button>
       <div className="projector-top">
         <span className="font-serif-cn">{c.title}</span>
-        <span className="projector-count"><motion.b key={total} initial={{ y: -14, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>{total}</motion.b> 人在课堂</span>
+        <span className="projector-count"><b><RollingNumber value={total} /></b> 人在课堂</span>
       </div>
       <AnimatePresence mode="wait">
         {!showRound ? (
@@ -48,6 +49,7 @@ export function ProjectorView({ state, round, qrSvg, onClose }: { state: Teacher
               <p className="projector-hint">打开 {typeof window === "undefined" ? "" : window.location.host}/classroom 输入课堂码，或扫右侧二维码</p>
             </div>
             {qrSvg ? <img className="projector-qr" alt="入课二维码" src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(qrSvg)}`} /> : null}
+            <NameStream className="projector-roster" people={[...state.participants].sort((a, b) => b.joinedAt - a.joinedAt).slice(0, 36).map(p => ({ id: p.id, name: p.name }))} />
           </motion.div>
         ) : (
           <motion.div key={round.id} className="projector-round" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ type: "spring", stiffness: 220, damping: 26 }}>
@@ -63,20 +65,45 @@ export function ProjectorView({ state, round, qrSvg, onClose }: { state: Teacher
                       <motion.span className="projector-fill" initial={false} animate={{ width: `${total ? (n / total) * 100 : 0}%` }} transition={{ type: "spring", stiffness: 120, damping: 20 }} />
                       <span className="projector-key">{o.id}</span>
                       <Markdown text={o.text} className="md-inline min-w-0 flex-1" />
-                      <span className="projector-n">{n}</span>
+                      <span className="projector-n"><RollingNumber value={n} /></span>
                     </div>
                   );
                 })}
               </div>
             ) : null}
             <div className="projector-progress">
-              <span>已答 <b>{round.stats.submitted}</b> / {total}</span>
+              <span>已答 <b><RollingNumber value={round.stats.submitted} /></b> / {total}</span>
               <span className="projector-track"><motion.span initial={false} animate={{ scaleX: total ? round.stats.submitted / total : 0 }} /></span>
             </div>
+            {round.status === "open" ? (
+              <NameStream className="projector-stream" people={[...round.submissions].sort((a, b) => b.submittedAt - a.submittedAt).slice(0, 14).map(s => ({ id: s.participantId, name: s.name }))} />
+            ) : null}
             {round.status === "revealed" ? <p className="projector-answer">答案 {round.answer}</p> : null}
           </motion.div>
         )}
       </AnimatePresence>
     </motion.div>
+  );
+}
+
+/** 名字卡片流：新加入 / 刚交卷的同学从左侧弹入，其余卡片顺势让位。只显示名字，不显示答案。 */
+function NameStream({ people, className }: { people: { id: string; name: string }[]; className: string }) {
+  if (!people.length) return null;
+  return (
+    <ul className={className} aria-label="最新动态">
+      <AnimatePresence initial={false} mode="popLayout">
+        {people.map(p => (
+          <motion.li
+            key={p.id} layout
+            initial={{ opacity: 0, scale: 0.6, x: -24 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ type: "spring", stiffness: 420, damping: 30 }}
+          >
+            <span className="projector-avatar">{p.name.slice(0, 1)}</span>{p.name}
+          </motion.li>
+        ))}
+      </AnimatePresence>
+    </ul>
   );
 }
