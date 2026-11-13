@@ -1028,3 +1028,37 @@ summary::-webkit-details-marker { display: none; }
 .chat-history-del { position: absolute; right: 6px; padding: 5px; border-radius: 6px; color: var(--kimi-text-tertiary); opacity: 0; }
 .chat-history li:hover .chat-history-del { opacity: 1; }
 .chat-history-del:hover { color: hsl(var(--destructive)); background: var(--kimi-paper); }
+
+/* ===== 配筋计算：结论卡 ===== */
+.beam-conclusion { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 24px; align-items: center; margin-bottom: 16px; padding: 22px 24px; border-radius: 18px; border: 1px solid var(--kimi-separator); background: var(--kimi-paper); box-shadow: 0 16px 40px -28px #00000066; }
+.bc-kicker { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; color: var(--kimi-text-tertiary); }
+.bc-big { margin-top: 6px; font-family: var(--mono); font-size: 34px; line-height: 42px; letter-spacing: -.01em; }
+.bc-big sub { font-size: .5em; }
+.bc-big span { font-size: 15px; color: var(--kimi-text-tertiary); }
+.bc-pick { margin-top: 6px; font-size: 14px; color: var(--kimi-text-secondary); }
+.bc-pick b { font-family: var(--mono); font-size: 17px; color: var(--kimi-text-primary); }
+.bc-pick[data-ok] { color: #1f7a52; }
+.bc-model { margin-top: 12px; font-size: 12.5px; color: var(--kimi-text-tertiary); }
+.bc-slides { display: inline-flex; align-items: center; gap: 4px; margin-top: 12px; font-size: 12.5px; color: var(--kimi-text-secondary); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--kimi-separator); }
+.bc-slides:hover { color: var(--kimi-text-primary); }
+.xi-gauge { margin-top: 18px; }
+.xi-track { position: relative; height: 8px; border-radius: 8px; background: var(--kimi-surface); margin: 26px 0 10px; }
+.xi-zone { position: absolute; top: 0; bottom: 0; border-radius: 8px; }
+.xi-ok { left: 0; background: #11111124; }
+.xi-over { background: repeating-linear-gradient(45deg, #dc262626 0 4px, transparent 4px 8px); }
+.xi-b { position: absolute; top: -6px; bottom: -6px; width: 1.5px; background: var(--kimi-text-primary); }
+.xi-b i, .xi-needle i { position: absolute; bottom: calc(100% + 4px); translate: -50% 0; white-space: nowrap; font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--kimi-text-tertiary); }
+.xi-needle { position: absolute; top: 50%; width: 14px; height: 14px; translate: -50% -50%; border-radius: 99px; background: var(--kimi-text-primary); box-shadow: 0 0 0 4px var(--kimi-paper), 0 2px 8px #00000040; }
+.xi-needle i { bottom: auto; top: calc(100% + 8px); color: var(--kimi-text-primary); }
+.xi-state { display: inline-flex; align-items: center; gap: 6px; margin-top: 22px; font-size: 13px; font-weight: 500; }
+.xi-state[data-state="适筋"] { color: #1f7a52; }
+.xi-state:not([data-state="适筋"]) { color: hsl(var(--destructive)); }
+.beam-section { width: 100%; color: var(--kimi-text-primary); }
+.bs-concrete { fill: var(--kimi-surface); stroke: currentColor; stroke-width: 1.4; }
+.bs-comp { fill: #11111114; }
+.bs-na { stroke: currentColor; stroke-width: 1; stroke-dasharray: 4 3; opacity: .6; }
+.bs-stirrup { fill: none; stroke: currentColor; stroke-width: 1; opacity: .45; }
+.bs-bar { fill: currentColor; }
+.bs-dim line { stroke: currentColor; stroke-width: .7; opacity: .5; }
+.bs-dim text { font-family: var(--mono); font-size: 10px; fill: currentColor; opacity: .7; text-anchor: middle; }
+@media (max-width: 640px) { .beam-conclusion { grid-template-columns: 1fr; } .beam-section { max-width: 220px; margin: 0 auto; } }

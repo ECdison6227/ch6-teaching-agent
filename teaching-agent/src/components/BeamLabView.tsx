@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { AlertTriangle, ArrowRight, Calculator, CheckCircle2, ChevronDown, Download, Layers3, LoaderCircle, MessageSquare, RotateCcw, Ruler, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { BeamConclusion } from "@/components/lab/BeamConclusion";
+import { requestStudySection } from "@/lib/study-nav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -40,7 +43,7 @@ const EXAMPLES: Record<BeamTask, BeamForm> = {
   design: DESIGN_EXAMPLE, review: REVIEW_EXAMPLE, "double-a": DOUBLE_A_EXAMPLE, "double-b": DOUBLE_B_EXAMPLE,
 };
 const TASK_LABELS: Record<BeamTask, string> = {
-  design: "单筋设计", review: "单筋复核", "double-a": "双筋设计 A", "double-b": "双筋设计 B",
+  design: "已知弯矩求配筋", review: "已知配筋验算承载力", "double-a": "双筋：同时求受拉和受压钢筋", "double-b": "双筋：已知受压钢筋求受拉钢筋",
 };
 const TASK_OPTIONS = [
   { key: "design", Icon: Calculator },
@@ -200,6 +203,7 @@ function DoubleResults({ result, explain, download }: { result: BeamDoubleResult
 
 /** 表单和结果属于本视图；AI 对话沿用全站 AiDrawerProvider。 */
 export function BeamLabView({ active = true }: { active?: boolean }) {
+  const router = useRouter();
   const [task, setTask] = useState<BeamTask>("design");
   const [forms, setForms] = useState<Record<BeamTask, BeamForm>>({ design: { ...DESIGN_EXAMPLE }, review: { ...REVIEW_EXAMPLE }, "double-a": { ...DOUBLE_A_EXAMPLE }, "double-b": { ...DOUBLE_B_EXAMPLE } });
   const [result, setResult] = useState<BeamResult | null>(null);
@@ -418,6 +422,7 @@ export function BeamLabView({ active = true }: { active?: boolean }) {
 
               {result && isDoubleResult(result) ? <DoubleResults result={result} explain={explain} download={download} /> : null}
               {result && !isDoubleResult(result) ? <>
+                <BeamConclusion result={result} onSlides={() => { requestStudySection("K5"); router.push("/slides"); }} />
                 <Card className="overflow-hidden rounded-[20px] border-border/60 bg-card shadow-none ">
                   <CardHeader className="space-y-3 border-b border-border/60 px-5 py-4">
                     <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-xs font-medium tracking-normal text-foreground">实验结果</p><span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${result.status === "ok" ? "bg-muted/50 text-foreground" : "bg-amber-50 text-amber-800"}`}>{result.status === "ok" ? <CheckCircle2 className="size-3" aria-hidden /> : <AlertTriangle className="size-3" aria-hidden />}{STATUS_LABELS[result.status] ?? result.status}</span></div>
