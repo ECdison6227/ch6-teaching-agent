@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Markdown } from "./Markdown";
-import { getQuestionCatalog, DIFFICULTY_LABELS, QUESTION_TYPE_LABELS, type QuestionDifficulty } from "@/lib/question-catalog";
+import { getQuestionCatalog, isUsableQuestion, DIFFICULTY_LABELS, QUESTION_TYPE_LABELS, type QuestionDifficulty } from "@/lib/question-catalog";
 import type { Question } from "@/lib/questions";
 import { answerLabel, answerSession, createSession, DEFAULT_SETTINGS, displayPrompt, filterQuestions, parseQuestionCount, sampleQuestions, submitSession, summarizeSession, type TestSession } from "@/lib/self-test/model";
 import { sessionStore } from "@/lib/self-test/store";
@@ -18,6 +18,8 @@ import { applySessionErrors, sessionWrongRecords } from "@/lib/wrongbook/model";
 import { wrongbookStore } from "@/lib/wrongbook/store";
 import { exportMarkdown, selectExportRecords, SCOPE_LABELS, TEMPLATE_LABELS, type ExportScope, type ExportTemplate } from "@/lib/wrongbook/export";
 import { downloadMarkdown, printWrongbook } from "@/lib/wrongbook/browser-export";
+import { trackAttempts } from "@/lib/progress/store";
+import { PRACTICE_START_EVENT, PRACTICE_TAB_EVENT } from "@/lib/practice-nav";
 
 const TYPES = Object.keys(QUESTION_TYPE_LABELS) as Question["type"][];
 const LEVELS = Object.keys(DIFFICULTY_LABELS) as QuestionDifficulty[];
@@ -76,8 +78,30 @@ export function SelfTestView() {
     if (session?.status === "answering") setConfirmation({ kind: "replace", next });
     else { void sessionStore.update(() => next); setTab("test"); setOnlyErrors(false); }
   };
+  /** 外部请求用指定题目开一组（搜索结果 / 首页建议） */
+  const replaceRef = useRef(replace);
+  replaceRef.current = replace;
+  useEffect(() => {
+    const onStart = (event: Event) => {
+      const ids = new Set((event as CustomEvent<string[]>).detail);
+      const picked = getQuestionCatalog().filter(q => ids.has(q.id) && isUsableQuestion(q));
+      if (picked.length) replaceRef.current(createSession(picked));
+    };
+    const onTab = (event: Event) => { const t = (event as CustomEvent<string>).detail; if (t === "test" || t === "wrongbook" || t === "linked") setTab(t); };
+    window.addEventListener(PRACTICE_START_EVENT, onStart);
+    window.addEventListener(PRACTICE_TAB_EVENT, onTab);
+    return () => { window.removeEventListener(PRACTICE_START_EVENT, onStart); window.removeEventListener(PRACTICE_TAB_EVENT, onTab); };
+  }, []);
   const start = () => { const count = parseQuestionCount(settings.countText); if (count && !settingError) replace(createSession(sampleQuestions(available, count))); };
-  const submit = () => { void sessionStore.update(current => current ? submitSession(current) : current); setConfirmation(null); setOnlyErrors(false); };
+  const submit = () => {
+    void sessionStore.update(current => {
+      if (!current) return current;
+      const next = submitSession(current);
+      trackAttempts(next.results.filter(r => r.status === "correct" || r.status === "wrong").map(r => ({ questionId: r.questionId, ok: r.status === "correct" })));
+      return next;
+    });
+    setConfirmation(null); setOnlyErrors(false);
+  };
   const runExport = async (print: boolean) => {
     setMessage(null); setExporting(true);
     try { const result = exportMarkdown(exportRecords, template, scope); if (print) await printWrongbook(result.markdown, result.filename); else downloadMarkdown(result.markdown, result.filename); }

@@ -12,6 +12,7 @@ import { Markdown } from "@/components/Markdown";
 import { downloadMarkdown } from "@/lib/wrongbook/browser-export";
 import { linkedStore } from "./store";
 import { formatLinkedText } from "./text";
+import { trackAttemptAt } from "@/lib/progress/store";
 import {
   CATALOG_INFO, FILTER_LABELS, TOPIC_LABELS, TYPE_LABELS,
   chooseNextQuestion, currentQuestion, currentResult, exportLinkedMarkdown, filterLinkedQuestions,
@@ -32,6 +33,10 @@ export default function LinkedPracticeView({ embedded = false }: { embedded?: bo
   const result = currentResult(state);
   const recommendations = recommendLinkedQuestions(state);
   const summary = summarizeLinkedAttempts(state.attempts);
+  const lastAttempt = state.attempts.at(-1);
+  useEffect(() => {
+    if (lastAttempt) trackAttemptAt(lastAttempt.question.id, lastAttempt.outcome === "correct", lastAttempt.at);
+  }, [lastAttempt]);
   const [profile, setProfile] = useState<Profile>(state.profile);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [confirmStart, setConfirmStart] = useState(false);

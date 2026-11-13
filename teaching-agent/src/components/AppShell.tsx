@@ -19,8 +19,16 @@ import { SelfTestView } from "./SelfTestView";
 import { ClassroomView } from "./ClassroomView";
 import { StudentClassroom } from "./StudentClassroom";
 import { CourseHome } from "./home/CourseHome";
+import { CommandSearch } from "./search/CommandSearch";
+import { MobileTabBar } from "./MobileTabBar";
+import { Toaster } from "@/components/ui/sonner";
 
-const Loading = ({ label }: { label: string }) => <p className="kimi-quiet-state" role="status">{label}</p>;
+/** 统一的加载骨架：用形状提示即将出现的内容，不用“正在读取…”文字 */
+const Loading = ({ label }: { label: string }) => (
+  <div className="pane-skeleton" role="status" aria-label={label}>
+    <span className="sk sk-title" /><span className="sk sk-line" /><span className="sk sk-card" /><span className="sk sk-line short" />
+  </div>
+);
 const BeamDemoView = dynamic(() => import("@/features/beam-demo/BeamDemoView"), { loading: () => <Loading label="正在载入演示…" /> });
 const BeamLabView = dynamic(() => import("./BeamLabView").then(module => module.BeamLabView), { loading: () => <Loading label="正在载入配筋计算…" /> });
 
@@ -158,7 +166,10 @@ export function AppShell() {
                 </Pane>
               ) : null}
             </div>
+            <MobileTabBar view={view} onView={go} />
           </SidebarInset>
+          <CommandSearch onView={go} />
+          <Toaster position="top-center" />
         </SidebarProvider>
       </AiDrawerProvider>
     </NotesProvider></MotionConfig>

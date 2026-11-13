@@ -24,9 +24,9 @@ export function writeStudyPosition(position: Omit<StudyPosition, "at">) {
   }
 }
 
-/** 让课件视图跳到某个知识点（K1–K14）。课件视图常驻挂载，事件一定有人接。 */
-export function requestStudySection(kid: string) {
-  window.dispatchEvent(new CustomEvent<string>(STUDY_GOTO_EVENT, { detail: kid }));
+/** 让课件视图跳到某个知识点（K1–K14），可指定页码。课件视图常驻挂载，事件一定有人接。 */
+export function requestStudySection(kid: string, page?: number) {
+  window.dispatchEvent(new CustomEvent<string>(STUDY_GOTO_EVENT, { detail: page ? `${kid}@${page}` : kid }));
 }
 
 /** "K5 单筋矩形截面计算" → "K5"；"封面/导读" → "K0" */

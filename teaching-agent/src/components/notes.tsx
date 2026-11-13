@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import elementsJson from "@/content/slide-elements.json";
 import slidesJson from "@/content/slides.json";
@@ -103,7 +104,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     void store.initialize();
     return unsubscribe;
   }, [store]);
-  const add = useCallback((input: string | NoteDraft) => { void store.add(input); }, [store]);
+  const add = useCallback((input: string | NoteDraft) => { void store.add(input).then(() => toast.success("已收藏到笔记")); }, [store]);
   const update = useCallback((id: string, patch: Partial<Pick<Note, "title" | "text">>) => { void store.update(id, patch); }, [store]);
   const remove = useCallback((id: string) => { void store.remove(id); }, [store]);
   const retrySave = useCallback(() => { void store.retry(); }, [store]);

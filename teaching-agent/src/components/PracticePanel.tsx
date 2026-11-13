@@ -15,6 +15,7 @@ export { pickQuestions } from "@/lib/questions";
 export type { Question } from "@/lib/questions";
 import { grade, normLetter } from "@/lib/grading";
 import type { Question } from "@/lib/questions";
+import { trackAttempt } from "@/lib/progress/store";
 
 const TYPE_LABEL: Record<Question["type"], string> = { choice: "选择", judge: "判断", fill: "填空" };
 
@@ -62,7 +63,11 @@ export function PracticePanel({
         const hasAnswer = Boolean(q.answer);
         const opts = q.options ?? [];
 
-        const submit = () => patch(q.id, { submitted: true, correct: grade(q, s.value) });
+        const submit = () => {
+          const correct = grade(q, s.value);
+          patch(q.id, { submitted: true, correct });
+          if (correct !== null) trackAttempt(q.id, correct);
+        };
         const reset = () => patch(q.id, EMPTY);
 
         return (

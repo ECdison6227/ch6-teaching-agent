@@ -1,0 +1,2442 @@
+{
+"MY-BANK-DOUBLE-CALCULATION-001": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-002": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-003": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-004": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-005": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-006": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-007": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-008": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-009": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-010": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-011": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-012": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-013": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-015": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-017": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-018": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-019": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-020": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-021": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-022": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-024": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-025": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-026": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-027": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-028": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-029": {
+"c": 0.96,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-030": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CALCULATION-031": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-001": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-002": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-CHOICE-003": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-DOUBLE-CHOICE-004": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-CHOICE-005": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-DOUBLE-CHOICE-006": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-007": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-CHOICE-008": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-CHOICE-009": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-010": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-011": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-012": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-013": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-014": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-015": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-016": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-017": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-018": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-019": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-020": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-021": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-022": {
+"c": 0.75,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-023": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-024": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-025": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-026": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-027": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-028": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-029": {
+"c": 0.75,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-030": {
+"c": 0.65,
+"k": "K1"
+},
+"MY-BANK-DOUBLE-CHOICE-031": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-032": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-033": {
+"c": 0.99,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-034": {
+"c": 0.99,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-035": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-036": {
+"c": 0.99,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-037": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-038": {
+"c": 0.99,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-039": {
+"c": 0.99,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-040": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-DOUBLE-CHOICE-041": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-042": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-043": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-044": {
+"c": 0.75,
+"k": "K3"
+},
+"MY-BANK-DOUBLE-CHOICE-045": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-046": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-047": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-048": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-049": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-050": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-051": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-052": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-053": {
+"c": 0.8,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-054": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-055": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-056": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-057": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-058": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-059": {
+"c": 0.8,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-060": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-CHOICE-061": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-062": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-063": {
+"c": 0.96,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-064": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-065": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-066": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-067": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-068": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-069": {
+"c": 0.82,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-CHOICE-070": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-071": {
+"c": 0.96,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-072": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-073": {
+"c": 0.93,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-074": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-075": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-076": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-077": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-CHOICE-078": {
+"c": 0.8,
+"k": "K14"
+},
+"MY-BANK-DOUBLE-CHOICE-079": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-001": {
+"c": 0.99,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-002": {
+"c": 0.99,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-003": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-004": {
+"c": 0.8,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-005": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-006": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-FILL-007": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-FILL-008": {
+"c": 0.8,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-009": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-010": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-011": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-012": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-013": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-014": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-015": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-016": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-017": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-018": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-FILL-019": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-020": {
+"c": 0.8,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-021": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-022": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-024": {
+"c": 0.65,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-025": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-026": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-027": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-028": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-029": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-FILL-030": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-031": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-032": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-033": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-034": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-035": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-036": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-037": {
+"c": 0.75,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-039": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-040": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-041": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-042": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-043": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-044": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-045": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-046": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-047": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-048": {
+"c": 0.8,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-049": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-050": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-051": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-052": {
+"c": 0.8,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-FILL-053": {
+"c": 0.8,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-FILL-054": {
+"c": 0.8,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-FILL-055": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-FILL-056": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-FILL-057": {
+"c": 0.8,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-058": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-FILL-059": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-FILL-060": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-FILL-061": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-062": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-063": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-064": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-065": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-066": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-067": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-068": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-069": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-070": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-071": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-072": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-073": {
+"c": 0.88,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-074": {
+"c": 0.88,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-075": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-076": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-077": {
+"c": 0.88,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-078": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-079": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-FILL-080": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-001": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-002": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-003": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-004": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-JUDGE-005": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-JUDGE-006": {
+"c": 0.8,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-007": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-DOUBLE-JUDGE-008": {
+"c": 0.8,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-009": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-010": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-011": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-012": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-013": {
+"c": 0.92,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-014": {
+"c": 0.94,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-015": {
+"c": 0.94,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-016": {
+"c": 0.92,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-017": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-018": {
+"c": 0.93,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-019": {
+"c": 0.94,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-020": {
+"c": 0.92,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-021": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-022": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-023": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-024": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-025": {
+"c": 0.72,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-026": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-027": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-028": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-029": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-030": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-031": {
+"c": 0.87,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-032": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-033": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-034": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-035": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-036": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-037": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-038": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-039": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-040": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-041": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-042": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-043": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-044": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-045": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-046": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-047": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-048": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-049": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-050": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-051": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-052": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-053": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-054": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-055": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-056": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-057": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-058": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-059": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-060": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-DOUBLE-JUDGE-061": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-062": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-063": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-064": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-065": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-066": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-067": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-068": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-BANK-DOUBLE-JUDGE-069": {
+"c": 0.8,
+"k": "K14"
+},
+"MY-BANK-DOUBLE-JUDGE-070": {
+"c": 0.8,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CALCULATION-001": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-002": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-003": {
+"c": 0.8,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-004": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-005": {
+"c": 0.8,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CALCULATION-006": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-007": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-008": {
+"c": 0.7,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-009": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-010": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-011": {
+"c": 0.7,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CALCULATION-012": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-013": {
+"c": 0.75,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CALCULATION-014": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-015": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-016": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-017": {
+"c": 0.7,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-018": {
+"c": 0.75,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CALCULATION-019": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-020": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-021": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-022": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-023": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-024": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-025": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-026": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-027": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CALCULATION-028": {
+"c": 0.7,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CALCULATION-029": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CALCULATION-030": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CALCULATION-031": {
+"c": 0.75,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CALCULATION-032": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-033": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-034": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CALCULATION-035": {
+"c": 0.8,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CALCULATION-036": {
+"c": 0.75,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CALCULATION-037": {
+"c": 0.8,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CALCULATION-038": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CALCULATION-039": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CALCULATION-040": {
+"c": 0.75,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-041": {
+"c": 0.8,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CALCULATION-042": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CALCULATION-043": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CALCULATION-044": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CALCULATION-045": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-046": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-047": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-048": {
+"c": 0.8,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-049": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CALCULATION-050": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-001": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-002": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-003": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-004": {
+"c": 0.96,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-005": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-006": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-007": {
+"c": 0.96,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-008": {
+"c": 0.96,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-009": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-010": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-011": {
+"c": 0.98,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-012": {
+"c": 0.97,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-013": {
+"c": 0.97,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-014": {
+"c": 0.97,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-015": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-016": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-017": {
+"c": 0.94,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-018": {
+"c": 0.97,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-019": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-020": {
+"c": 0.97,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-021": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-022": {
+"c": 0.95,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-023": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-024": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-025": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-026": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-027": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-028": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-029": {
+"c": 0.78,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-030": {
+"c": 0.8,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-031": {
+"c": 0.8,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-032": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-033": {
+"c": 0.75,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-034": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-035": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-036": {
+"c": 0.7,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-037": {
+"c": 0.75,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-038": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-039": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-040": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-041": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-042": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-043": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-044": {
+"c": 0.96,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-045": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-046": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-047": {
+"c": 0.96,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-048": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-049": {
+"c": 0.98,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-050": {
+"c": 0.98,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-051": {
+"c": 0.98,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-052": {
+"c": 0.96,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-053": {
+"c": 0.96,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-054": {
+"c": 0.97,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-055": {
+"c": 0.98,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-056": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-057": {
+"c": 0.97,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-058": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-059": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-060": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-061": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-062": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-063": {
+"c": 0.98,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-064": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-065": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-066": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-067": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-068": {
+"c": 0.8,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-069": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-070": {
+"c": 0.98,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-071": {
+"c": 0.88,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-072": {
+"c": 0.88,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-073": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-074": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-075": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-076": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-077": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-079": {
+"c": 0.98,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-080": {
+"c": 0.95,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-081": {
+"c": 0.86,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-082": {
+"c": 0.95,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-083": {
+"c": 0.8,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-084": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-085": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-086": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-087": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-088": {
+"c": 0.6,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-089": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-090": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-CHOICE-091": {
+"c": 0.75,
+"k": "K1"
+},
+"MY-BANK-SINGLE-CHOICE-092": {
+"c": 0.8,
+"k": "K1"
+},
+"MY-BANK-SINGLE-CHOICE-093": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-SINGLE-CHOICE-094": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-095": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-CHOICE-096": {
+"c": 0.95,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-097": {
+"c": 0.95,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-098": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-CHOICE-099": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-CHOICE-100": {
+"c": 0.95,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-001": {
+"c": 0.99,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-002": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-003": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-004": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-005": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-006": {
+"c": 0.96,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-007": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-008": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-009": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-010": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-011": {
+"c": 0.99,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-012": {
+"c": 0.99,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-013": {
+"c": 0.99,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-014": {
+"c": 0.93,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-015": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-016": {
+"c": 0.98,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-017": {
+"c": 0.98,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-018": {
+"c": 0.97,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-019": {
+"c": 0.97,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-020": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-021": {
+"c": 0.88,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-022": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-023": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-024": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-025": {
+"c": 0.8,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-026": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-027": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-028": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-029": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-030": {
+"c": 0.75,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-031": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-032": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-033": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-034": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-035": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-036": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-037": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-038": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-039": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-040": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-041": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-042": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-043": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-044": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-045": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-046": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-047": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-048": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-049": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-050": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-051": {
+"c": 0.7,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-052": {
+"c": 0.8,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-053": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-054": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-055": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-056": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-057": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-058": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-059": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-060": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-061": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-062": {
+"c": 0.97,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-063": {
+"c": 0.99,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-064": {
+"c": 0.99,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-065": {
+"c": 0.98,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-066": {
+"c": 0.99,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-067": {
+"c": 0.99,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-068": {
+"c": 0.72,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-069": {
+"c": 0.72,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-070": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-071": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-072": {
+"c": 0.98,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-073": {
+"c": 0.96,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-074": {
+"c": 0.72,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-075": {
+"c": 0.88,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-076": {
+"c": 0.88,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-077": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-078": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-079": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-080": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-081": {
+"c": 0.75,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-082": {
+"c": 0.8,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-083": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-084": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-085": {
+"c": 0.7,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-086": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-087": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-088": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-089": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-090": {
+"c": 0.6,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-091": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-092": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-FILL-093": {
+"c": 0.65,
+"k": "K5"
+},
+"MY-BANK-SINGLE-FILL-094": {
+"c": 0.55,
+"k": "K13"
+},
+"MY-BANK-SINGLE-FILL-095": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-BANK-SINGLE-FILL-096": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-FILL-097": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-098": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-SINGLE-FILL-099": {
+"c": 0.9,
+"k": "K13"
+},
+"MY-BANK-SINGLE-FILL-100": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-001": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-002": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-003": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-004": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-005": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-006": {
+"c": 0.96,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-007": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-008": {
+"c": 0.82,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-009": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-010": {
+"c": 0.93,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-011": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-012": {
+"c": 0.97,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-013": {
+"c": 0.97,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-014": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-015": {
+"c": 0.86,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-016": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-017": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-018": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-019": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-020": {
+"c": 0.96,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-021": {
+"c": 0.95,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-022": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-023": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-024": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-025": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-026": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-027": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-028": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-029": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-030": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-031": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-032": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-033": {
+"c": 0.99,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-034": {
+"c": 0.99,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-035": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-036": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-037": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-038": {
+"c": 0.98,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-039": {
+"c": 0.99,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-040": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-041": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-042": {
+"c": 0.95,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-043": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-044": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-045": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-046": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-047": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-048": {
+"c": 0.8,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-049": {
+"c": 0.75,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-050": {
+"c": 0.85,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-051": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-052": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-053": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-054": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-055": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-056": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-057": {
+"c": 0.8,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-058": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-059": {
+"c": 0.9,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-060": {
+"c": 0.85,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-061": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-062": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-063": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-064": {
+"c": 0.95,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-065": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-066": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-067": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-068": {
+"c": 0.85,
+"k": "K3"
+},
+"MY-BANK-SINGLE-JUDGE-069": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-070": {
+"c": 0.7,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-071": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-072": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-073": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-074": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-075": {
+"c": 0.8,
+"k": "K4"
+},
+"MY-BANK-SINGLE-JUDGE-076": {
+"c": 0.7,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-077": {
+"c": 0.9,
+"k": "K5"
+},
+"MY-BANK-SINGLE-JUDGE-078": {
+"c": 0.7,
+"k": "K1"
+},
+"MY-BANK-SINGLE-JUDGE-079": {
+"c": 0.95,
+"k": "K2"
+},
+"MY-BANK-SINGLE-JUDGE-080": {
+"c": 0.65,
+"k": "K1"
+},
+"MY-DEMO-CROSS-MODULE-CALCULATION-008": {
+"c": 0.7,
+"k": "K4"
+},
+"MY-DEMO-CROSS-MODULE-CALCULATION-016": {
+"c": 0.98,
+"k": "K7"
+},
+"MY-DEMO-CROSS-MODULE-CALCULATION-031": {
+"c": 0.9,
+"k": "K11"
+},
+"MY-DEMO-CROSS-MODULE-FILL-024": {
+"c": 0.8,
+"k": "K9"
+},
+"MY-DEMO-DOUBLE-CALCULATION-025": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-DEMO-DOUBLE-CALCULATION-029": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-DEMO-DOUBLE-FILL-002": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-DEMO-DOUBLE-FILL-011": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-DEMO-DOUBLE-FILL-012": {
+"c": 0.98,
+"k": "K6"
+},
+"MY-DEMO-DOUBLE-FILL-027": {
+"c": 0.9,
+"k": "K4"
+},
+"MY-DEMO-DOUBLE-JUDGE-001": {
+"c": 0.97,
+"k": "K6"
+},
+"MY-DEMO-DOUBLE-JUDGE-003": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-DEMO-DOUBLE-JUDGE-004": {
+"c": 0.8,
+"k": "K6"
+},
+"MY-DEMO-DOUBLE-JUDGE-007": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-DEMO-SINGLE-CALCULATION-013": {
+"c": 0.95,
+"k": "K6"
+},
+"MY-DEMO-SINGLE-CALCULATION-014": {
+"c": 0.85,
+"k": "K6"
+},
+"MY-DEMO-SINGLE-CALCULATION-022": {
+"c": 0.98,
+"k": "K5"
+},
+"MY-DEMO-SINGLE-CALCULATION-023": {
+"c": 0.85,
+"k": "K5"
+},
+"MY-DEMO-SINGLE-CALCULATION-026": {
+"c": 0.98,
+"k": "K5"
+},
+"MY-DEMO-SINGLE-CALCULATION-030": {
+"c": 0.9,
+"k": "K6"
+},
+"MY-DEMO-SINGLE-CHOICE-017": {
+"c": 0.9,
+"k": "K3"
+},
+"MY-DEMO-SINGLE-CHOICE-018": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-DEMO-SINGLE-CHOICE-019": {
+"c": 0.97,
+"k": "K4"
+},
+"MY-DEMO-SINGLE-CHOICE-020": {
+"c": 0.95,
+"k": "K3"
+},
+"MY-DEMO-SINGLE-FILL-010": {
+"c": 0.98,
+"k": "K5"
+},
+"MY-DEMO-SINGLE-FILL-015": {
+"c": 0.85,
+"k": "K5"
+}
+}

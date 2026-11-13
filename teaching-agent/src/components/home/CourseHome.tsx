@@ -15,6 +15,9 @@ import { appPath } from "@/lib/app-path";
 import type { AppView } from "@/lib/views";
 import slidesData from "@/content/slides.json";
 import { BeamHero } from "./BeamHero";
+import { linkedCountForK, pickQuestionsForK, useMastery } from "@/lib/progress/store";
+import { requestPractice, requestPracticeTab } from "@/lib/practice-nav";
+import { MasteryRing, masteryLabel } from "@/components/progress/MasteryRing";
 
 const slides = slidesData as { page: number; section: string }[];
 
@@ -29,6 +32,7 @@ const pad = (kid: string) => `K${kid.slice(1).padStart(2, "0")}`;
 
 export function CourseHome({ active, onView }: { active: boolean; onView: (view: AppView) => void }) {
   const [last, setLast] = useState<StudyPosition | null>(null);
+  const mastery = useMastery();
   useEffect(() => { if (active) setLast(readStudyPosition()); }, [active]);
 
   const pages = useMemo(() => {
@@ -41,6 +45,12 @@ export function CourseHome({ active, onView }: { active: boolean; onView: (view:
   }, []);
 
   const openSection = (kid: string) => { requestStudySection(kid); onView("slides"); };
+  const canPractice = useMemo(() => Object.fromEntries(KNOWLEDGE_SECTIONS.map(s => [s.id, pickQuestionsForK(s.id, 1).length > 0 || linkedCountForK(s.id) > 0])), []);
+  const practiceK = (kid: string) => {
+    const ids = pickQuestionsForK(kid, 3);
+    onView("practice");
+    window.setTimeout(() => (ids.length ? requestPractice(ids) : requestPracticeTab("linked")), 60);
+  };
   const resume = () => { if (last) requestStudySection(last.kid); onView("slides"); };
 
   return (
@@ -71,11 +81,19 @@ export function CourseHome({ active, onView }: { active: boolean; onView: (view:
             </div>
           </BlurFade>
           <BlurFade delay={0.3} inView>
-            <dl className="course-stats">
-              <div><dt>页课件</dt><dd><NumberTicker value={slides.length} delay={0.5} /></dd></div>
-              <div><dt>个知识点</dt><dd><NumberTicker value={KNOWLEDGE_SECTIONS.length} delay={0.6} /></dd></div>
-              <div><dt>道题</dt><dd><NumberTicker value={questions.length} delay={0.7} /></dd></div>
-            </dl>
+            {mastery.started ? (
+              <dl className="course-stats">
+                <div><dt>已看课件 / {slides.length} 页</dt><dd><NumberTicker value={mastery.pagesViewed} delay={0.5} /></dd></div>
+                <div><dt>已掌握 / 14 个知识点</dt><dd><NumberTicker value={mastery.mastered} delay={0.6} /></dd></div>
+                <div><dt>待改错题</dt><dd><NumberTicker value={mastery.wrongOpen} delay={0.7} /></dd></div>
+              </dl>
+            ) : (
+              <dl className="course-stats">
+                <div><dt>页课件</dt><dd><NumberTicker value={slides.length} delay={0.5} /></dd></div>
+                <div><dt>个知识点</dt><dd><NumberTicker value={KNOWLEDGE_SECTIONS.length} delay={0.6} /></dd></div>
+                <div><dt>道题</dt><dd><NumberTicker value={questions.length} delay={0.7} /></dd></div>
+              </dl>
+            )}
           </BlurFade>
         </div>
         <div className="course-wrap relative mt-10">
@@ -108,7 +126,13 @@ export function CourseHome({ active, onView }: { active: boolean; onView: (view:
                         <button type="button" className="kmap-row" data-here={here || undefined} onClick={() => openSection(kid)}>
                           <span className="kmap-code">{pad(kid)}</span>
                           <span className="kmap-name">{s.name}</span>
-                          <span className="kmap-meta">{here ? <><span className="kmap-here" />上次学到</> : pages.get(kid) ? `${pages.get(kid)} 页` : "习题"}</span>
+                          <span className="kmap-meta">{here ? <><span className="kmap-here" />上次学到</> : masteryLabel(mastery.byK[kid], pages.get(kid))}</span>
+                          <MasteryRing m={mastery.byK[kid]} />
+                          {canPractice[kid] ? <span
+                            role="button" tabIndex={0} className="kmap-practice"
+                            onClick={e => { e.stopPropagation(); practiceK(kid); }}
+                            onKeyDown={e => { if (e.key === "Enter") { e.stopPropagation(); practiceK(kid); } }}
+                          >练 3 题</span> : null}
                           <ArrowRight className="kmap-arrow" />
                         </button>
                       </li>

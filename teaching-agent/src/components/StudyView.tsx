@@ -1,5 +1,6 @@
 "use client";
 
+import { FirstHint } from "@/components/FirstHint";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bookmark, BookmarkX, ChevronDown, ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import slidesData from "@/content/slides.json";
 import { questions } from "@/lib/questions";
 import { appPath } from "@/lib/app-path";
 import { STUDY_GOTO_EVENT, kidOfSection, readStudyPosition, writeStudyPosition } from "@/lib/study-nav";
+import { trackSlideView } from "@/lib/progress/store";
 
 type Slide = { page: number; section: string; title: string; bullets: string[]; image: string };
 
@@ -173,9 +175,15 @@ export function StudyView() {
   };
 
   /** 课程主页 / 知识地图请求跳到某个知识点；首次进入时恢复上次的位置。 */
-  const gotoKid = (kid: string) => {
+  const gotoKid = (target: string) => {
+    const [kid, pageText] = target.split("@");
     const g = groups.find((x) => kidOfSection(x.section) === kid);
-    if (g) return goSection(g.section);
+    if (g) {
+      goSection(g.section);
+      const page = Number(pageText);
+      if (page && g.pages.some((p) => p.page === page)) setPos(`s:${page}`);
+      return;
+    }
     if (bookOnly.some((b) => b.id === kid)) { setChapterGate(false); setBookSel(kid); }
   };
   const gotoRef = useRef(gotoKid);
@@ -258,6 +266,14 @@ export function StudyView() {
     if (bookSel) writeStudyPosition({ kid: bookSel, name: KNOWLEDGE_SECTIONS.find((s) => s.id === bookSel)?.name ?? "" });
     else if (selSection && kidOfSection(selSection) !== "K0") writeStudyPosition({ kid: kidOfSection(selSection), name: selSection.replace(/^K\d+\s*/, ""), page: anchorPage });
   }, [bookSel, selSection, anchorPage]);
+
+  /** 停留 3 秒算看过这一页，计入掌握度的课件覆盖 */
+  useEffect(() => {
+    if (bookSel || !slide || item?.kind !== "slide") return;
+    const k = kidOfSection(slide.section);
+    const timer = window.setTimeout(() => trackSlideView(k, slide.page), 3000);
+    return () => window.clearTimeout(timer);
+  }, [bookSel, slide, item?.kind]);
 
   const pageCtx = {
     page: anchorPage ?? 0,
@@ -456,7 +472,10 @@ export function StudyView() {
                   />
                 </div>
               ) : (
-              <SlideStage page={slide.page} alt={noteBlock.title} />
+              <div className="relative">
+                <FirstHint id="slide-pick">点课件上的文字或图片，可以收藏或追问</FirstHint>
+                <SlideStage page={slide.page} alt={noteBlock.title} />
+              </div>
               )}
               {onLab || onQuiz ? null : (
               <div className="absolute right-2 top-2 z-20 flex items-center gap-1">
