@@ -1,7 +1,7 @@
-import { BookOpen, Calculator, Download, MessageSquare, PencilLine, Radio, SquareActivity, type LucideIcon } from "lucide-react";
+import { BookOpen, Calculator, Download, MessageSquare, NotebookPen, PencilLine, Radio, SquareActivity, type LucideIcon } from "lucide-react";
 
 /** 应用内的每个视图都对应一个真实路径：可刷新、可分享、可从二维码直达。 */
-export type AppView = "home" | "slides" | "chat" | "practice" | "classroom" | "lab" | "demo" | "materials";
+export type AppView = "home" | "slides" | "chat" | "practice" | "classroom" | "lab" | "demo" | "materials" | "notes";
 
 export type ViewDef = { id: AppView; path: string; label: string; icon?: LucideIcon; group?: "learn" | "practice" | "tools" | "more" };
 
@@ -14,6 +14,7 @@ export const VIEWS: ViewDef[] = [
   { id: "lab", path: "/lab", label: "配筋计算", icon: Calculator, group: "tools" },
   { id: "demo", path: "/demo", label: "受力演示", icon: SquareActivity, group: "tools" },
   { id: "materials", path: "/materials", label: "资料下载", icon: Download, group: "tools" },
+  { id: "notes", path: "/notes", label: "笔记", icon: NotebookPen },
 ];
 
 export const NAV_GROUPS: { id: NonNullable<ViewDef["group"]>; label: string }[] = [

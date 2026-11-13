@@ -1102,3 +1102,23 @@ summary::-webkit-details-marker { display: none; }
 .mat-preview-grid img { width: 100%; border-radius: 8px; border: 1px solid var(--kimi-separator); }
 .mat-preview-q { width: 100%; max-height: 60vh; object-fit: contain; border-radius: 8px; border: 1px solid var(--kimi-separator); }
 @media (max-width: 640px) { .mat-featured { grid-template-columns: 1fr; } .mat-preview-grid { grid-template-columns: 1fr 1fr; } }
+
+/* ===== 笔记页 ===== */
+.sidebar-notes-link { display: flex !important; width: 100%; align-items: center; cursor: pointer; }
+.sidebar-notes-all { margin-left: auto; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; opacity: 0; transition: opacity .15s ease; }
+.sidebar-notes-link:hover .sidebar-notes-all { opacity: 1; }
+.notes-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 72px 16px; text-align: center; }
+.notes-empty-icon { display: flex; width: 52px; height: 52px; align-items: center; justify-content: center; margin-bottom: 10px; border-radius: 16px; border: 1px solid var(--kimi-separator); }
+.notes-group { margin-top: 22px; }
+.notes-group-title { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--kimi-separator); font-size: 15px; }
+.notes-count { font-family: var(--mono); font-size: 11px; color: var(--kimi-text-tertiary); }
+.notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.note-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 14px; border: 1px solid var(--kimi-separator); background: var(--kimi-paper); transition: border-color .2s ease, box-shadow .2s ease; }
+.note-card:hover { border-color: #11111133; box-shadow: 0 14px 30px -24px #00000059; }
+.note-img { display: block; height: 120px; overflow: hidden; background: var(--kimi-surface); border-bottom: 1px solid var(--kimi-separator); }
+.note-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.note-body { flex: 1; padding: 12px 14px 4px; }
+.note-meta { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; color: var(--kimi-text-tertiary); }
+.note-title { margin-top: 4px; font-size: 13.5px; font-weight: 500; }
+.note-text { margin-top: 4px; font-size: 13px; line-height: 20px; color: var(--kimi-text-secondary); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.note-actions { display: flex; align-items: center; justify-content: flex-end; gap: 2px; padding: 4px 6px 6px; }

@@ -26,6 +26,7 @@ import { readStudyPosition, type StudyPosition } from "@/lib/study-nav";
 import { KNOWLEDGE_SECTIONS } from "@/lib/sections";
 import { CommandSearch } from "./search/CommandSearch";
 import { MobileTabBar } from "./MobileTabBar";
+import { NotesPage } from "./notes/NotesPage";
 import { Toaster } from "@/components/ui/sonner";
 
 /** 统一的加载骨架：用形状提示即将出现的内容，不用“正在读取…”文字 */
@@ -177,6 +178,10 @@ export function AppShell() {
               </Pane>
               <Pane id="classroom" view={view} reduce={reduce}><ClassroomPane active={view === "classroom"} /></Pane>
               <Pane id="materials" view={view} reduce={reduce}><MaterialsView /></Pane>
+              <Pane id="notes" view={view} reduce={reduce}>
+                <PaneHeader title="笔记" />
+                <div className="min-h-0 flex-1 overflow-y-auto"><NotesPage onView={go} /></div>
+              </Pane>
               {lazy("demo") ? (
                 <Pane id="demo" view={view} reduce={reduce}>
                   <PaneHeader title="受力演示" />

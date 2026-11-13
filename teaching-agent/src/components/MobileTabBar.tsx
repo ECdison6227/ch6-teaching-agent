@@ -21,7 +21,7 @@ const MORE: { id: AppView | "notes" | "search"; label: string; icon: typeof Book
   { id: "lab", label: "配筋计算", icon: Calculator },
   { id: "demo", label: "受力演示", icon: SquareActivity },
   { id: "materials", label: "资料下载", icon: Download },
-  { id: "notes", label: "笔记", icon: NotebookPen },
+  { id: "notes" as AppView, label: "笔记", icon: NotebookPen },
 ];
 
 /** 手机端底部标签栏：常用的 4 个 + 更多。桌面端不渲染（CSS 隐藏）。 */
@@ -55,7 +55,6 @@ export function MobileTabBar({ view, onView }: { view: AppView; onView: (v: AppV
               <button key={m.id} type="button" onClick={() => {
                 setMore(false);
                 if (m.id === "search") window.setTimeout(openSearch, 200);
-                else if (m.id === "notes") window.setTimeout(() => setOpenMobile(true), 200);
                 else onView(m.id);
               }}>
                 <span className="mobile-more-icon"><m.icon /></span>{m.label}

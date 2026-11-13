@@ -96,7 +96,7 @@ export function Sidebar({
           ))}
           <SidebarGroup className="min-h-0 flex-1 pt-2">
             <div className="flex w-full min-w-0 items-center gap-1">
-              <SidebarGroupLabel className="nav-group-label w-auto shrink-0">笔记{notes.length ? <span className="ml-1.5 tabular-nums">{notes.length}</span> : null}</SidebarGroupLabel>
+              <SidebarGroupLabel asChild className="nav-group-label w-auto shrink-0"><button type="button" className="sidebar-notes-link" onClick={() => goView("notes")}>笔记{notes.length ? <span className="ml-1.5 tabular-nums">{notes.length}</span> : null}<span className="sidebar-notes-all">全部 →</span></button></SidebarGroupLabel>
               {notes.length ? (
                 <Button type="button" variant="ghost" size="sm" className="ml-auto h-6 shrink-0 px-2 text-[11.5px] text-muted-foreground" disabled={exporting} onClick={exportPdf}>
                   {exporting ? "正在汇总…" : "导出 PDF"}
