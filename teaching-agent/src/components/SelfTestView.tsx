@@ -20,6 +20,7 @@ import { exportMarkdown, selectExportRecords, SCOPE_LABELS, TEMPLATE_LABELS, typ
 import { downloadMarkdown, printWrongbook } from "@/lib/wrongbook/browser-export";
 import { trackAttempts } from "@/lib/progress/store";
 import { PRACTICE_START_EVENT, PRACTICE_TAB_EVENT } from "@/lib/practice-nav";
+import { PracticeHome } from "@/components/practice/PracticeHome";
 
 const TYPES = Object.keys(QUESTION_TYPE_LABELS) as Question["type"][];
 const LEVELS = Object.keys(DIFFICULTY_LABELS) as QuestionDifficulty[];
@@ -147,11 +148,13 @@ export function SelfTestView() {
     {tab === "linked" ? <LinkedPracticeView embedded /> : !saved.ready || !book.ready ? <p className="kimi-quiet-state" role="status">正在读取自测…</p> : <>
       {saved.dirty || book.dirty ? <p role="status" className="mb-4 text-xs text-muted-foreground">正在保存，请暂勿关闭页面。</p> : null}
       {!canReplace ? <p role="status" className="mb-4 text-xs text-muted-foreground">正在保存错题，完成后可开始新自测。</p> : null}
-      {tab === "test" ? !session ? <Card className="kimi-stage"><CardContent className="kimi-start-state">
-        <p className="kimi-eyebrow">随机组卷</p><h2>{settings.countText} 道题</h2><p>{typeSummary} · {levelSummary}</p>
-        <Button className="kimi-primary" disabled={!!settingError || !saved.writable} onClick={start}>开始自测<ArrowRight /></Button>
-        {settingError ? <p role="alert" className="text-destructive">{settingError}</p> : null}
-      </CardContent></Card> : session.status === "answering" && question ? <>
+      {tab === "test" ? !session ? <PracticeHome
+        wrongCount={book.value.records.length}
+        onStart={ids => { const picked = getQuestionCatalog().filter(q => ids.includes(q.id) && isUsableQuestion(q)); if (picked.length) replace(createSession(picked)); }}
+        onWrongbook={() => { if (book.value.records.length) replace(createSession(book.value.records.map(r => r.question), "wrongbook-snapshot")); }}
+        onLinked={() => setTab("linked")}
+        onCustom={() => { setDraftSettings(settings); setSettingsOpen(true); }}
+      /> : session.status === "answering" && question ? <>
         <Card className="kimi-stage"><CardContent className="kimi-question-content" ref={questionRef} tabIndex={-1} aria-label={`第 ${session.cursor + 1} 题`}>
           <div className="kimi-row"><p className="text-sm">第 {session.cursor + 1} <span className="text-muted-foreground">/ {session.questions.length} 题</span></p>{session.cursor < session.questions.length - 1 ? <Button variant="ghost" size="sm" disabled={!saved.writable} onClick={() => unanswered.length ? setConfirmation({ kind: "submit" }) : submit()}>交卷</Button> : null}</div>
           <div className="kimi-progress" role="progressbar" aria-label="自测进度" aria-valuemin={0} aria-valuemax={summary!.total} aria-valuenow={summary!.answered}><span style={{ width: percent(summary!.completion) }} /></div>

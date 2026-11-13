@@ -42,6 +42,7 @@ function assertRedacted(state, question) {
     if (round.submission) assert.equal(Object.hasOwn(round.submission, "grade"), false);
   }
   assert.equal(Object.hasOwn(state, "participants"), false);
+  if (Object.hasOwn(state, "participantCount")) assert.equal(typeof state.participantCount, "number");
   assert.ok(!JSON.stringify(state).includes(process.env.CLASSROOM_TEACHER_ACCESS_CODE));
   assert.ok(!JSON.stringify(state).includes('"submissions"'));
   if (question.analysis) assert.ok(!JSON.stringify(state).includes(JSON.stringify(question.analysis).slice(1, -1)));

@@ -74,7 +74,7 @@ export function StudentClassroom({ code: initialCode = "", embedded = false }: {
           {!current ? <Card className="kimi-stage"><CardContent className="kimi-start-state class-wait">
             {live.state.classroom.status !== "ended" ? <span className="wait-pulse" aria-hidden><i /><i /><i /></span> : null}
             <h2>{live.state.classroom.status === "ended" ? "下次课堂见" : live.state.classroom.status === "waiting" ? "等老师开始上课" : "等老师发题"}</h2>
-            {live.state.classroom.status !== "ended" && live.state.participants !== undefined ? <p className="wait-count">已有 <motion.b key={live.state.participants} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>{live.state.participants}</motion.b> 人加入</p> : null}
+            {live.state.classroom.status !== "ended" && live.state.participantCount !== undefined ? <p className="wait-count">已有 <motion.b key={live.state.participantCount} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>{live.state.participantCount}</motion.b> 人加入</p> : null}
           </CardContent></Card> : <motion.div key={current.id} initial={{ opacity: 0, y: 24, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}><Card className="kimi-stage" role="region" aria-label="当前课堂题目"><CardContent className="kimi-question-content">
             <div className="kimi-row"><p className="kimi-eyebrow">第 {current.sequence} 题 · {current.question.type === "choice" ? "选择" : current.question.type === "judge" ? "判断" : "填空"}</p><span className="kimi-eyebrow">{canAnswer ? "作答中" : current.status === "revealed" ? "已公布" : "已收题"}</span></div>
             <Markdown text={current.question.prompt} className="kimi-question-prompt" />

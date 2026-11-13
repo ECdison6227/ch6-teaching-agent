@@ -94,3 +94,41 @@ export function pickQuestionsForK(k: string, n = 3): string[] {
 export function linkedCountForK(k: string): number {
   return Object.values(linkedTags as Record<string, { k: string }>).filter(v => v.k === k).length;
 }
+
+/**
+ * 智能组卷：薄弱知识点优先，其次没做过的题、上次做错的题；每个知识点最多 4 道，保证覆盖面。
+ * 返回题目 ID 和本组主要覆盖的知识点。
+ */
+export function pickSmartSet(n = 10): { ids: string[]; ks: string[] } {
+  const state = progressStore.getSnapshot().value;
+  const wrong = new Set(wrongbookStore.getSnapshot().value.records.map(r => r.questionId));
+  const usable = getQuestionCatalog().filter(isUsableQuestion);
+  const tags = mainTags as Record<string, { k: string }>;
+  const weakness = (k: string) => {
+    const m = computeMastery(state, k, SLIDE_PAGES[k] ?? 0, [...wrong]);
+    return m.score === null ? (m.answered ? 0.65 : 0.55) : 1 - m.score;
+  };
+  const now = Date.now();
+  const ranked = usable
+    .map(q => {
+      const k = tags[q.id]?.k;
+      const last = state.attempts[q.id]?.log.at(-1);
+      let p = k ? weakness(k) : 0.3;
+      if (!last) p += 0.3;
+      else if (!last.ok) p += 0.5;
+      else p -= Math.max(0, 0.6 - (now - last.at) / (7 * 86_400_000));
+      if (wrong.has(q.id)) p += 0.3;
+      return { id: q.id, k: k ?? "", p: p + Math.random() * 0.25 };
+    })
+    .sort((a, b) => b.p - a.p);
+  const perK: Record<string, number> = {};
+  const ids: string[] = [];
+  for (const x of ranked) {
+    if (ids.length >= n) break;
+    if ((perK[x.k] ?? 0) >= 4) continue;
+    perK[x.k] = (perK[x.k] ?? 0) + 1;
+    ids.push(x.id);
+  }
+  const ks = Object.entries(perK).sort((a, b) => b[1] - a[1]).map(([k]) => k).filter(Boolean);
+  return { ids, ks };
+}

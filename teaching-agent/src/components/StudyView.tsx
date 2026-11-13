@@ -25,7 +25,8 @@ import slidesData from "@/content/slides.json";
 import { questions } from "@/lib/questions";
 import { appPath } from "@/lib/app-path";
 import { STUDY_GOTO_EVENT, kidOfSection, readStudyPosition, writeStudyPosition } from "@/lib/study-nav";
-import { trackSlideView } from "@/lib/progress/store";
+import { trackSlideView, useProgress } from "@/lib/progress/store";
+import { DeckScrubber } from "@/components/study/DeckScrubber";
 
 type Slide = { page: number; section: string; title: string; bullets: string[]; image: string };
 
@@ -267,6 +268,21 @@ export function StudyView() {
     else if (selSection && kidOfSection(selSection) !== "K0") writeStudyPosition({ kid: kidOfSection(selSection), name: selSection.replace(/^K\d+\s*/, ""), page: anchorPage });
   }, [bookSel, selSection, anchorPage]);
 
+  const progress = useProgress();
+  const viewedPages = useMemo(() => new Set(Object.values(progress.value.viewed).flatMap((p) => p ?? [])), [progress.value.viewed]);
+  /** ← → 翻页（只在课件视图可见、且没在输入时生效） */
+  const navRef = useRef({ prev: () => {}, next: () => {} });
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const typing = e.target instanceof HTMLElement && (e.target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName));
+      if (typing || e.metaKey || e.ctrlKey || e.altKey || window.location.pathname.replace(/\/$/, "").slice(-7) !== "/slides") return;
+      if (e.key === "ArrowLeft") { e.preventDefault(); navRef.current.prev(); }
+      if (e.key === "ArrowRight") { e.preventDefault(); navRef.current.next(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   /** 停留 3 秒算看过这一页，计入掌握度的课件覆盖 */
   useEffect(() => {
     if (bookSel || !slide || item?.kind !== "slide") return;
@@ -333,6 +349,8 @@ export function StudyView() {
     }
   };
 
+  navRef.current = { prev: goPrev, next: goNext };
+
   return (
     <div ref={shellRef} className="relative h-full min-h-0 overflow-y-auto">
       <div className="flex min-h-full flex-col">
@@ -381,7 +399,7 @@ export function StudyView() {
                 g.section === selSection && !bookSel ? "bg-paper-soft text-ink" : "text-ink-soft hover:bg-paper-soft"
               }`}
             >
-              {g.section}
+              <span className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate">{g.section}</span>{(() => { const seen = g.pages.filter((p) => viewedPages.has(p.page)).length; return seen === g.pages.length && seen ? <span className="toc-done">✓</span> : seen ? <span className="toc-count">{seen}/{g.pages.length}</span> : null; })()}</span>
             </button>
           ))}
           <div className="mt-2 px-2 text-[11px] text-ink-faint">教材补充</div>
@@ -442,11 +460,13 @@ export function StudyView() {
           <>
             <div className={`mb-3 flex items-center gap-3 ${onQuiz ? "justify-end" : "justify-between"}`}>
               {/* 随堂题页不再显示位置说明，只留右上的「这页没看懂」 */}
-              {onQuiz ? null : (
-                <span className="text-[12px] tabular-nums text-ink-faint">
-                  {onLab ? "配筋率互动" : <>本节 {idx + 1} / {deck.length}<span className="mx-2 opacity-40">·</span>P.{String(slide.page).padStart(3, "0")}</>}
-                </span>
-              )}
+              <DeckScrubber
+                items={deck.map((d) => ({ id: deckId(d), kind: d.kind, page: d.kind === "slide" ? d.page : d.kind === "quiz" ? d.afterPage : LAB_AFTER }))}
+                index={idx}
+                viewed={viewedPages}
+                onJump={(id) => { setNotesOpen(false); setPos(id); }}
+                label={onLab ? "配筋率互动" : onQuiz ? "随堂题" : <>{idx + 1}<span className="opacity-40"> / {deck.length}</span><span className="mx-2 opacity-30">·</span>P.{String(slide.page).padStart(3, "0")}</>}
+              />
             </div>
             <div className="mx-[-0.5rem] flex items-center gap-1 md:mx-[-2.5rem] md:gap-0">
               <Button
