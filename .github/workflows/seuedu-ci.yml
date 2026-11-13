@@ -1,0 +1,52 @@
+name: seuedu CI
+
+# seuedu.top 发布分支：每次推送跑类型检查、单元测试、生产构建和冒烟测试。
+# 只检查，不部署；部署仍由 seuedu/deploy/deploy.sh 在本地执行。
+on:
+  push:
+    branches: [seuedu-redesign]
+  pull_request:
+    branches: [seuedu-redesign]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seuedu-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  check:
+    name: typecheck · test · build · smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: teaching-agent
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24' # 与服务器 /opt/node-v24 一致
+          cache: npm
+          cache-dependency-path: teaching-agent/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run test:math
+      - run: node scripts/qa-slide-notes.mjs
+      - run: npm run build
+      - name: Production smoke
+        run: |
+          npx next start -p 3555 > /tmp/next.log 2>&1 &
+          for i in $(seq 1 40); do curl -sf -o /dev/null http://127.0.0.1:3555/ && break; sleep 1; done
+          fail=0
+          for p in / /slides /chat /practice /classroom /lab /demo /materials /notes /api/models /api/health; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:3555$p")
+            echo "$p $code"; [ "$code" = 200 ] || fail=1
+          done
+          [ $fail = 0 ] || { tail -50 /tmp/next.log; exit 1; }
