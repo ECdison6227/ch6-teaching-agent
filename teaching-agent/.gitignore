@@ -15,3 +15,4 @@ test-results/
 *.sqlite-shm
 
 .next-kimi/
+.next-seuedu/

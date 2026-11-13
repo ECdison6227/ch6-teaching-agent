@@ -10,7 +10,7 @@ import { appPath } from "@/lib/app-path";
 import type { StudentSnapshot } from "@/lib/classroom/types";
 import { classroomFetch, classroomRequestId, useClassroom } from "@/hooks/use-classroom";
 
-export function StudentClassroom({ code: initialCode = "" }: { code?: string }) {
+export function StudentClassroom({ code: initialCode = "", embedded = false }: { code?: string; embedded?: boolean }) {
   const [code, setCode] = useState(initialCode), [name, setName] = useState(""), [studentNo, setStudentNo] = useState("");
   const [id, setId] = useState<string | null>(null), [ready, setReady] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState("");
   const [draft, setDraft] = useState(""), [submissionStatus, setSubmissionStatus] = useState("");
@@ -59,11 +59,11 @@ export function StudentClassroom({ code: initialCode = "" }: { code?: string }) 
   const reset = () => { try { localStorage.removeItem(storageKey); } catch { /* Cookie supports rejoin. */ } setId(null); setError(""); };
   const canAnswer = current?.status === "open" && live.state?.classroom.status !== "ended";
   const changed = draft.trim() !== (current?.submission?.answer ?? "");
-  return <div className="kimi-student-shell">
-    <header className="kimi-toolbar"><span>第六章 · 课堂</span><Button variant="ghost" size="sm" className="ml-auto" asChild><a href={appPath("/")}><ChevronLeft />返回学习</a></Button></header>
+  return <div className={embedded ? "" : "kimi-student-shell"}>
+    {embedded ? null : <header className="kimi-toolbar"><span>第六章 · 课堂</span><Button variant="ghost" size="sm" className="ml-auto" asChild><a href={appPath("/classroom")}><ChevronLeft />返回学习</a></Button></header>}
     <main className="kimi-page" aria-label="学生课堂">
       {!ready ? <p role="status" className="kimi-quiet-state">正在恢复课堂…</p> : !id ? <>
-        <header className="kimi-page-heading"><div><h1>加入课堂</h1><p>输入课堂码，和同学一起练习。</p></div></header>
+        <header className="kimi-page-heading"><div><h1>加入课堂</h1></div></header>
         <Card className="kimi-stage mt-8"><CardContent className="kimi-auth-content"><form onSubmit={join} className="space-y-5">
           <label className="kimi-field">课堂码<Input name="code" placeholder="6 位数字" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={e => setCode(e.target.value)} autoComplete="off" /></label>
           <label className="kimi-field">姓名<Input name="name" placeholder="让老师认出你" maxLength={60} required value={name} onChange={e => setName(e.target.value)} autoComplete="name" /></label>

@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -163,9 +164,15 @@ export function PracticePanel({
                 </>
               ) : (
                 <>
-                  <span className={`text-[11.5px] font-medium ${s.correct === null ? "text-ink-soft" : s.correct ? "text-emerald-600" : "text-red-600"}`}>
-                    {s.correct === null ? "待核对，请对照答案与解析" : s.correct ? "答对了" : "答错了"}
-                  </span>
+                  <motion.span
+                    key={String(s.correct)}
+                    initial={s.correct ? { scale: 0.6, opacity: 0 } : s.correct === false ? { x: 0 } : { opacity: 0 }}
+                    animate={s.correct ? { scale: 1, opacity: 1 } : s.correct === false ? { x: [0, -6, 6, -4, 4, 0] } : { opacity: 1 }}
+                    transition={s.correct ? { type: "spring", stiffness: 520, damping: 18 } : { duration: 0.38 }}
+                    className={`inline-flex items-center gap-1 text-[11.5px] font-medium ${s.correct === null ? "text-ink-soft" : s.correct ? "text-emerald-700" : "text-red-600"}`}
+                  >
+                    {s.correct === null ? "待核对" : s.correct ? "✓ 答对了" : "✕ 答错了"}
+                  </motion.span>
                   <Button
                     type="button"
                     variant="outline"

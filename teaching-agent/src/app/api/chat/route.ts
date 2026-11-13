@@ -39,7 +39,12 @@ export async function POST(req: Request) {
             const guide = createFirstTurnGuide(body.messages, body.pageContext, send);
             const parser = createChatParser(guide.emit);
             const provider = getProvider(choice.provider);
-            for await (const delta of provider.chat([{ role: "system", content: system + guide.instruction }, ...body.messages], scope.signal, choice.model)) {
+            for await (const delta of provider.chat(
+              [{ role: "system", content: system + guide.instruction }, ...body.messages],
+              scope.signal,
+              choice.model,
+              { effort: body.effort },
+            )) {
               scope.signal.throwIfAborted();
               parser.push(delta);
             }

@@ -1,6 +1,14 @@
 import "server-only";
 import type { ChatModelOption } from "@/lib/models/options";
 import { readSseData } from "@/lib/sse";
+
+export type ReasoningEffort = "none" | "low" | "medium" | "high";
+
+export type ChatCallOptions = {
+  /** 仅 agnes 通道会向上游发送；none / 缺省时省略 reasoning_effort */
+  effort?: ReasoningEffort;
+};
+
 type ProviderId = ChatModelOption["provider"];
 
 /** 多模态内容：文字，或学生直接上传的图片（data URL） */
@@ -27,7 +35,12 @@ export interface ProviderConfig {
 export interface ModelProvider {
   readonly id: ProviderId;
   readonly chatModel: string;
-  chat(messages: ChatMessage[], signal?: AbortSignal, model?: string): AsyncIterable<string>;
+  chat(
+    messages: ChatMessage[],
+    signal?: AbortSignal,
+    model?: string,
+    options?: ChatCallOptions,
+  ): AsyncIterable<string>;
 }
 
 const trim = (u: string) => u.replace(/\/+$/, "");
@@ -143,7 +156,12 @@ class OpenAICompatProvider implements ModelProvider {
     return this.cfg.chatModel;
   }
 
-  async *chat(messages: ChatMessage[], signal?: AbortSignal, requestedModel?: string): AsyncIterable<string> {
+  async *chat(
+    messages: ChatMessage[],
+    signal?: AbortSignal,
+    requestedModel?: string,
+    options?: ChatCallOptions,
+  ): AsyncIterable<string> {
     const withImage = messages.some(
       (m) => Array.isArray(m.content) && m.content.some((p) => p.type === "image_url"),
     );
@@ -160,20 +178,24 @@ class OpenAICompatProvider implements ModelProvider {
       base = this.cfg.visionBaseUrl || this.cfg.baseUrl;
       key = this.cfg.visionApiKey || this.cfg.chatApiKey;
     }
+    const payload: Record<string, unknown> = {
+      model,
+      messages,
+      stream: true,
+      temperature: 0.4,
+      // 推理型模型会先用掉一部分输出额度，给足 token 避免卡片 JSON 被截断
+      max_tokens: Number(process.env.MODEL_MAX_TOKENS || 4096),
+    };
+    if (this.id === "agnes" && options?.effort && options.effort !== "none") {
+      payload.reasoning_effort = options.effort;
+    }
     const res = await fetch(`${base}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${key}`,
       },
-      body: JSON.stringify({
-        model,
-        messages,
-        stream: true,
-        temperature: 0.4,
-        // 推理型模型会先用掉一部分输出额度，给足 token 避免卡片 JSON 被截断
-        max_tokens: Number(process.env.MODEL_MAX_TOKENS || 4096),
-      }),
+      body: JSON.stringify(payload),
       signal,
     });
 

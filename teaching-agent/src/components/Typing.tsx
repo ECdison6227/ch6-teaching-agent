@@ -1,24 +1,33 @@
 "use client";
 
-/** 等待首个 token 时的思考动画 */
-export function Thinking({ label = "老师在想…" }: { label?: string }) {
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { THINKING_STEP_LABELS, ThinkingIndicator } from "./ThinkingIndicator";
+
+/** 等待首个 token 时的思考动画：粒子形变 + 五步进度文案（来自线上 thinking-renderer，已回源为组件） */
+export function Thinking() {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setStep((s) => Math.min(s + 1, THINKING_STEP_LABELS.length - 1)), 1700);
+    return () => window.clearInterval(id);
+  }, []);
   return (
-    <div className="flex items-center gap-2.5">
-      <span className="relative flex h-6 w-6 items-center justify-center">
-        <span className="absolute inset-0 animate-ping rounded-full bg-paper-line opacity-70" />
-        <span className="relative flex h-4 w-4 items-center justify-center gap-[3px]">
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className="h-1 w-1 rounded-full bg-ink-faint"
-              style={{ animation: "ch6-bounce 1.2s ease-in-out infinite", animationDelay: `${i * 0.16}s` }}
-            />
-          ))}
-        </span>
-      </span>
-      <span className="text-[13px] text-ink-faint">{label}</span>
-      <span className="h-[3px] w-24 overflow-hidden rounded-full bg-paper-line">
-        <span className="block h-full w-1/3 rounded-full bg-ink-faint/50 ch6-shimmer" />
+    <div className="thinking-row">
+      <span className="thinking-canvas"><ThinkingIndicator active step={step} /></span>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={step}
+          className="thinking-label"
+          initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -6, filter: "blur(4px)" }}
+          transition={{ duration: 0.28 }}
+        >
+          {THINKING_STEP_LABELS[step]}
+        </motion.span>
+      </AnimatePresence>
+      <span className="thinking-steps" aria-hidden>
+        {THINKING_STEP_LABELS.map((_, i) => <span key={i} data-on={i <= step || undefined} />)}
       </span>
     </div>
   );

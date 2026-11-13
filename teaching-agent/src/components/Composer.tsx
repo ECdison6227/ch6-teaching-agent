@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
-import { ImagePlus, Sparkles, Square, X } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { REASONING_EFFORTS, useChatSettings, type ReasoningEffort } from "@/lib/chat-settings";
+import { ImagePlus, Settings2, Sparkles, Square, X } from "lucide-react";
 import { appPath } from "@/lib/app-path";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { ChatModelOption } from "@/lib/models/options";
 import { MAX_MESSAGE_CHARS } from "@/lib/request-limits";
 
@@ -70,6 +71,58 @@ function ModelIcon({ model }: { model?: ChatModelOption | null }) {
   return <Sparkles className="size-3.5 shrink-0 text-ink-soft" aria-hidden />;
 }
 
+const EFFORT_LABEL: Record<ReasoningEffort, string> = { none: "关", low: "简", medium: "中", high: "深" };
+
+/** 模型与思考深度收进一个设置面板；学生默认不必碰它。 */
+function ComposerSettings({ models, selected, onModelChange, disabled }: { models: ChatModelOption[]; selected: ChatModelOption | null; onModelChange?: (id: string) => void; disabled: boolean }) {
+  const [open, setOpen] = useState(false);
+  const { effort, setEffort } = useChatSettings();
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: MouseEvent) => { if (!rootRef.current?.contains(e.target as Node)) setOpen(false); };
+    const esc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", close); document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", esc); };
+  }, [open]);
+  return (
+    <div ref={rootRef} className="relative">
+      <Button type="button" variant="ghost" size="icon" className="shrink-0 rounded-full" aria-label="对话设置" aria-expanded={open} title="对话设置" disabled={disabled} onClick={() => setOpen(v => !v)}><Settings2 /></Button>
+      <AnimatePresence>
+        {open ? (
+          <motion.div
+            className="composer-settings"
+            initial={{ opacity: 0, y: 6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.98 }}
+            transition={{ duration: 0.16, ease: "easeOut" }}
+          >
+            <p className="composer-settings-label">思考深度</p>
+            <div className="composer-seg" role="radiogroup" aria-label="思考深度">
+              {REASONING_EFFORTS.map(e => (
+                <button key={e} type="button" role="radio" aria-checked={effort === e} onClick={() => setEffort(e)}>
+                  {effort === e ? <motion.span layoutId="effort-pill" className="composer-seg-pill" transition={{ type: "spring", stiffness: 520, damping: 40 }} /> : null}
+                  <span className="relative">{EFFORT_LABEL[e]}</span>
+                </button>
+              ))}
+            </div>
+            {models.length > 1 ? <>
+              <p className="composer-settings-label mt-4">模型</p>
+              <div className="space-y-0.5">
+                {models.map(m => (
+                  <button key={m.id} type="button" className="composer-model" aria-pressed={selected?.id === m.id} onClick={() => onModelChange?.(m.id)}>
+                    <ModelIcon model={m} /><span className="min-w-0 flex-1 truncate text-left">{m.label}</span>{selected?.id === m.id ? <span className="size-1.5 rounded-full bg-current" /> : null}
+                  </button>
+                ))}
+              </div>
+            </> : null}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export function Composer({
   value,
   onChange,
@@ -130,15 +183,11 @@ export function Composer({
           <div className="kimi-composer-actions">
             <Button type="button" variant="ghost" size="icon" onClick={() => fileRef.current?.click()} disabled={blocked || busy} title="上传或粘贴图片" aria-label="上传图片" className="shrink-0 rounded-full"><ImagePlus /></Button>
             <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple className="hidden" onChange={e => { takeImages([...(e.target.files ?? [])]); e.target.value = ""; }} />
+            <ComposerSettings models={models} selected={selected} onModelChange={onModelChange} disabled={busy} />
             <span className="min-w-0 flex-1" />
-            <Select value={selected ? selected.id : undefined} onValueChange={id => onModelChange?.(id)} disabled={models.length === 0 || busy}>
-              <SelectTrigger aria-label="选择模型" title={selected?.label || "暂无可用模型"} className="kimi-model-select"><SelectValue placeholder="暂无可用模型" /></SelectTrigger>
-              <SelectContent side="top" align="end" className="z-[60] w-[290px] rounded-2xl p-2">{models.map(m => <SelectItem key={m.id} value={m.id} textValue={m.label}><span className="flex items-center gap-2"><ModelIcon model={m} />{m.label}</span></SelectItem>)}</SelectContent>
-            </Select>
             {busy ? <Button type="button" size="icon" className="kimi-send" onClick={onStop} aria-label="停止生成" title="停止生成"><Square className="size-4 fill-current" /></Button> : <Button type="button" size="icon" className="kimi-send" onClick={onSend} disabled={!canSend} aria-label="发送"><span aria-hidden className="kimi-source-icon kimi-send-icon" style={{ maskImage: `url(${appPath("/design/kimi-web/arrow.svg")})` }} /></Button>}
           </div>
         </div>
-        <div className="kimi-underlay" aria-live="polite"><span className="inline-flex min-w-0 items-center gap-2"><span aria-hidden className="kimi-source-icon" style={{ maskImage: `url(${appPath("/design/kimi-web/document.svg")})` }} />{blocked ? "请先完成当前卡片" : busy ? "正在生成 · 停止后保留已收到的内容" : "支持图片与多行输入"}</span><span className="kimi-draft-status">{draftStatus}</span></div>
       </div>
     </div>
   );

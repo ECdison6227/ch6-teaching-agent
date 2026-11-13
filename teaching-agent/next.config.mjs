@@ -11,7 +11,14 @@ const nextConfig = {
     serverActions: { bodySizeLimit: "10mb" },
   },
   async redirects() {
-    return [{ source: "/study", destination: "/", permanent: false }];
+    // 旧地址（含 nginx 的 /rc-beam → /beam-lab）统一指到新路由
+    return [
+      { source: "/study", destination: "/slides", permanent: true },
+      { source: "/beam-lab", destination: "/lab", permanent: true },
+      { source: "/self-test", destination: "/practice", permanent: true },
+      { source: "/linked-practice", destination: "/practice?tab=linked", permanent: true },
+      { source: "/reinforcement-demo", destination: "/demo", permanent: true },
+    ];
   },
 };
 

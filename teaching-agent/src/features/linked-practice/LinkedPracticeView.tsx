@@ -75,7 +75,7 @@ export default function LinkedPracticeView({ embedded = false }: { embedded?: bo
   const Shell = embedded ? "section" : "main";
   return <Shell className={embedded ? "" : "kimi-page"} aria-label="关联练习">
     {embedded ? state.screen === "practice" ? <div className="mb-3 flex justify-end">{actions}</div> : null : <header className="kimi-page-heading">
-      <div><h1>关联练习</h1><p>从一道题开始，把相关知识串起来。</p></div>
+      <div><h1>专项练习</h1></div>
       {actions}
     </header>}
     <div className="kimi-category-tabs" role="group" aria-label="关联练习页面">
@@ -91,7 +91,7 @@ export default function LinkedPracticeView({ embedded = false }: { embedded?: bo
           <p className="text-sm text-muted-foreground">{summary.checked ? "核对 " + summary.checked + " 题 · 答对 " + summary.correct + " 题" : "还没有核对记录"}{summary.selfReviewed ? " · 自评 " + summary.selfReviewed + " 题" : ""}</p>
           <Button variant="ghost" size="sm" disabled={!state.attempts.length} onClick={() => { try { downloadMarkdown(exportLinkedMarkdown(state), "关联练习-学习记录.md"); setMessageIsError(false); setMessage("已发起下载，请查看浏览器下载记录。"); } catch { setMessageIsError(true); setMessage("导出失败，请重试。"); } }}><Download />导出记录</Button>
         </div>
-        {!state.attempts.length ? <Card className="kimi-stage"><div className="kimi-start-state"><h2>从第一道题开始</h2><p>每次作答和补练都会保存在这里。</p><Button className="kimi-primary" disabled={!saved.writable} onClick={() => update(value => ({ ...value, screen: "start" }))}>去练习<ArrowRight /></Button></div></Card>
+        {!state.attempts.length ? <Card className="kimi-stage"><div className="kimi-start-state"><h2>从第一道题开始</h2><Button className="kimi-primary" disabled={!saved.writable} onClick={() => update(value => ({ ...value, screen: "start" }))}>去练习<ArrowRight /></Button></div></Card>
           : <ol className="divide-y divide-border/60">{[...state.attempts].reverse().map(attempt => <li key={attempt.id} className="flex items-start justify-between gap-4 py-5">
             <div className="min-w-0"><p className="text-xs text-muted-foreground">{TOPIC_LABELS[attempt.question.topic]} · {TYPE_LABELS[attempt.question.type]}</p><p className="my-2 line-clamp-2 text-sm leading-6">{attempt.question.prompt}</p><p className="text-xs text-muted-foreground">{outcomeText(attempt)}</p></div>
             <Button variant="ghost" size="sm" className="shrink-0" onClick={() => setRecord(attempt)}>查看</Button>

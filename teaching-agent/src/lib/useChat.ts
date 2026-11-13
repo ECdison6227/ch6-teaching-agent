@@ -7,6 +7,7 @@ import { readSseData } from "@/lib/sse";
 import { requestScope, requestError, MODEL_TIMEOUT_MS } from "@/lib/request-lifecycle";
 import { MAX_IMAGE_BYTES, MAX_REQUEST_BYTES, MAX_MESSAGE_CHARS, MAX_HISTORY_CHARS } from "@/lib/request-limits";
 import { appPath } from "@/lib/app-path";
+import { getChatSettings, type ReasoningEffort } from "@/lib/chat-settings";
 
 export type Msg = {
   id: string;
@@ -152,7 +153,11 @@ export function useChat(context?: PageCtx | null) {
   );
 
   const callApi = useCallback(
-    async (history: ReturnType<typeof toHistory>, pageContext?: PageCtx | null): Promise<boolean> => {
+    async (
+      history: ReturnType<typeof toHistory>,
+      pageContext?: PageCtx | null,
+      effort?: ReasoningEffort,
+    ): Promise<boolean> => {
       if (requestRef.current) return false;
       const controller = new AbortController();
       requestRef.current = controller;
@@ -164,7 +169,13 @@ export function useChat(context?: PageCtx | null) {
       lastRequestRef.current = { history, context: ctx, assistantId: id };
       commit((p) => [...p, { id, role: "assistant" as const, content: "", status: "streaming" }]);
       try {
-        const packed = { messages: history, pageContext: ctx, model: modelRef.current };
+        const resolvedEffort = effort ?? getChatSettings().effort;
+        const packed = {
+          messages: history,
+          pageContext: ctx,
+          model: modelRef.current,
+          effort: resolvedEffort,
+        };
         const textLength = () => packed.messages.reduce((total, message) => total + (typeof message.content === "string"
           ? message.content.length : message.content.reduce((size, part) => size + (part.type === "text" ? part.text.length : 0), 0)), 0);
         // 只丢弃最早的历史；当前消息始终保留，避免图片历史使后续每轮都超限。

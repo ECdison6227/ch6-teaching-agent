@@ -1,26 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, MotionConfig } from "motion/react";
 import { useHydratedReducedMotion } from "@/hooks/use-hydrated-reduced-motion";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { KNOWLEDGE_SECTIONS } from "@/lib/sections";
+import { LEGACY_HASH, pathOf, viewFromPath, type AppView } from "@/lib/views";
 import { ChatView } from "./ChatView";
 import { useChat } from "@/lib/useChat";
 import { AiDrawerProvider, AiSidePanel, useAiDrawer } from "./AiDrawer";
 import { NotesProvider } from "./notes";
 import { MaterialsView } from "./MaterialsView";
-import { Sidebar, type AppView } from "./Sidebar";
+import { Sidebar } from "./Sidebar";
 import { StudyView } from "./StudyView";
 import { SelfTestView } from "./SelfTestView";
 import { ClassroomView } from "./ClassroomView";
-const LinkedPracticeView = dynamic(() => import("@/features/linked-practice/LinkedPracticeView"), { loading: () => <p className="kimi-quiet-state" role="status">正在读取关联练习…</p> });
-const BeamDemoView = dynamic(() => import("@/features/beam-demo/BeamDemoView"), { loading: () => <p className="kimi-quiet-state" role="status">正在读取演示…</p> });
-const BeamLabView = dynamic(() => import("./BeamLabView").then(module => module.BeamLabView), { loading: () => <p className="kimi-quiet-state" role="status">正在读取智能配筋…</p> });
+import { StudentClassroom } from "./StudentClassroom";
+import { CourseHome } from "./home/CourseHome";
+
+const Loading = ({ label }: { label: string }) => <p className="kimi-quiet-state" role="status">{label}</p>;
+const BeamDemoView = dynamic(() => import("@/features/beam-demo/BeamDemoView"), { loading: () => <Loading label="正在载入演示…" /> });
+const BeamLabView = dynamic(() => import("./BeamLabView").then(module => module.BeamLabView), { loading: () => <Loading label="正在载入配筋计算…" /> });
 
 const SUGGESTIONS = [
   "帮我判断这个梁截面会不会超筋",
@@ -28,22 +30,30 @@ const SUGGESTIONS = [
   "斜截面受剪有哪几种破坏形态",
 ];
 
+/** 每个工作视图顶上的同一条工具栏：侧栏开关 + 视图名，右侧可放操作。 */
+export function PaneHeader({ title, children }: { title: string; children?: ReactNode }) {
+  return (
+    <header className="kimi-toolbar">
+      <SidebarTrigger />
+      <span className="pane-title">{title}</span>
+      {children ? <div className="ml-auto flex items-center gap-1">{children}</div> : null}
+    </header>
+  );
+}
+
 function ChatPane() {
   const chat = useChat(null);
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="kimi-toolbar">
-        <SidebarTrigger /><span>引导对话</span><span className="ml-auto text-xs text-muted-foreground">第六章</span>
-      </div>
+      <PaneHeader title="AI 助教" />
       <div className="min-h-0 flex-1">
         <ChatView
           chat={chat}
           suggestions={SUGGESTIONS}
           welcome={
             <div className="kimi-chat-welcome">
-              <p className="mb-3 text-xs tracking-wide text-muted-foreground">第六章 · 引导式学习</p>
-              <h1>钢筋混凝土梁承载力计算原理</h1>
-              <p className="text-sm leading-6 text-muted-foreground">先看资料，再做题。</p>
+              <p className="mono-kicker">AI 助教 · 第六章</p>
+              <h1 className="font-serif-cn">从一个问题开始</h1>
             </div>
           }
         />
@@ -52,9 +62,7 @@ function ChatPane() {
   );
 }
 
-const PREVIEW_SECTION_COUNT = 3;
-
-/** 自学天地 + 右侧 AI 面板：手机上面板打开时课件先让位，免得两边都被挤扁 */
+/** 课件 + 右侧 AI 面板：手机上面板打开时课件先让位，免得两边都被挤扁 */
 function StudyPane() {
   const { open } = useAiDrawer();
   return (
@@ -67,110 +75,88 @@ function StudyPane() {
   );
 }
 
-function Landing({ onEnter }: { onEnter: () => void }) {
-  const [sectionsOpen, setSectionsOpen] = useState(false);
-  const visibleSections = sectionsOpen ? KNOWLEDGE_SECTIONS : KNOWLEDGE_SECTIONS.slice(0, PREVIEW_SECTION_COUNT);
-  return <div className="h-full overflow-y-auto">
-    <header className="kimi-toolbar"><SidebarTrigger /><span>课程概览</span><span className="ml-auto text-xs text-muted-foreground">第六章 · 工程结构设计原理</span></header>
-    <main className="kimi-page">
-      <header className="kimi-page-heading"><div><p>工程结构设计原理 · 第六章</p></div></header>
-      <Card className="kimi-stage"><div className="kimi-start-state"><h2>钢筋混凝土梁承载力计算原理</h2><div className="kimi-actions mt-3"><Button className="kimi-primary" onClick={onEnter}>开始学习<ArrowRight /></Button></div><span className="mt-3 text-xs text-muted-foreground">148 页课件 · 14 个知识点 · 随学随记</span></div></Card>
-      <ol className="divide-y divide-border/60">{visibleSections.map(section => <li key={section.id} className="flex items-baseline gap-4 py-4 text-sm"><span className="w-7 shrink-0 text-xs tabular-nums text-muted-foreground">{section.id}</span><span>{section.name}</span></li>)}</ol>
-      <Button variant="ghost" className="mt-3 text-muted-foreground" aria-expanded={sectionsOpen} onClick={() => setSectionsOpen(open => !open)}>{sectionsOpen ? "收起目录" : "全部知识点"}{sectionsOpen ? <ChevronUp /> : <ChevronDown />}</Button>
-    </main>
-  </div>;
+/** 课堂：学生入口是主体；教师控制台收在页面底部。 */
+function ClassroomPane({ active }: { active: boolean }) {
+  const [teacher, setTeacher] = useState(false);
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <PaneHeader title={teacher ? "课堂 · 教师" : "课堂"} />
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {teacher ? <ClassroomView active={active} /> : <StudentClassroom embedded />}
+        <div className="pb-10 text-center">
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => setTeacher(v => !v)}>
+            {teacher ? "返回学生入口" : "我是教师"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
+/** 常驻挂载的视图层：切走时只是隐藏，回来时状态还在。 */
+function Pane({ id, view, reduce, className = "flex flex-col", children }: { id: AppView; view: AppView; reduce: boolean; className?: string; children: ReactNode }) {
+  const active = view === id;
+  return (
+    <motion.div
+      className={`absolute inset-0 min-h-0 ${className}`}
+      initial={false}
+      animate={{ opacity: active ? 1 : 0, y: active || reduce ? 0 : 6 }}
+      transition={{ duration: reduce ? 0 : active ? 0.28 : 0.12, ease: [0.22, 1, 0.36, 1] }}
+      style={{ pointerEvents: active ? "auto" : "none", visibility: active ? "visible" : "hidden", zIndex: active ? 1 : 0 }}
+      aria-hidden={!active}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
-/** 各业务视图保留挂载和本地状态；课堂订阅仅在激活时运行。 */
 export function AppShell() {
-  const [view, setViewState] = useState<AppView>("home");
-  const [beamVisited, setBeamVisited] = useState(false);
-  useEffect(() => { if (view === "beam-lab") setBeamVisited(true); }, [view]);
+  const pathname = usePathname();
+  const router = useRouter();
+  const view = viewFromPath(pathname);
   const reduce = useHydratedReducedMotion();
+  const [visited, setVisited] = useState<Set<AppView>>(() => new Set([view]));
+  useEffect(() => { setVisited(prev => (prev.has(view) ? prev : new Set(prev).add(view))); }, [view]);
+
+  /** 旧版 /#beam-lab 一类地址：换成新路径 */
   useEffect(() => {
-    const sync = () => { const next = window.location.hash.slice(1); setViewState((["home", "chat", "study", "materials", "self-test", "classroom", "linked-practice", "reinforcement-demo", "beam-lab"] as string[]).includes(next) ? next as AppView : "home"); };
-    sync(); window.addEventListener("hashchange", sync); return () => window.removeEventListener("hashchange", sync);
-  }, []);
-  const setView = (next: AppView) => { if (next !== view) window.history.pushState(null, "", next === "home" ? window.location.pathname + window.location.search : "#" + next); setViewState(next); };
+    const legacy = LEGACY_HASH[window.location.hash.slice(1)];
+    if (legacy) router.replace(legacy);
+  }, [router]);
+
+  const go = (next: AppView) => { if (next !== view) router.push(pathOf(next)); };
+  const lazy = (id: AppView) => visited.has(id) || view === id;
 
   return (
     <MotionConfig reducedMotion="user"><NotesProvider>
       <AiDrawerProvider>
         <SidebarProvider>
-          <Sidebar view={view} onView={setView} />
+          <Sidebar view={view} onView={go} />
           <SidebarInset className="kimi-canvas flex min-h-0 flex-col bg-background">
             <div className="relative min-h-0 flex-1">
-              <motion.div
-                className="absolute inset-0"
-                animate={{ opacity: view === "home" ? 1 : 0 }}
-                transition={{ duration: reduce ? 0 : 0.15 }}
-                style={{
-                  pointerEvents: view === "home" ? "auto" : "none",
-                  visibility: view === "home" ? "visible" : "hidden",
-                }}
-              >
-                <Landing onEnter={() => setView("chat")} />
-              </motion.div>
-              <motion.div
-                className="absolute inset-0 flex flex-col"
-                animate={{ opacity: view === "chat" ? 1 : 0 }}
-                transition={{ duration: reduce ? 0 : 0.15 }}
-                style={{
-                  pointerEvents: view === "chat" ? "auto" : "none",
-                  visibility: view === "chat" ? "visible" : "hidden",
-                }}
-              >
-                <ChatPane />
-              </motion.div>
-              <motion.div
-                className="absolute inset-0 flex min-h-0"
-                animate={{ opacity: view === "study" ? 1 : 0 }}
-                transition={{ duration: reduce ? 0 : 0.15 }}
-                style={{
-                  pointerEvents: view === "study" ? "auto" : "none",
-                  visibility: view === "study" ? "visible" : "hidden",
-                }}
-              >
-                <StudyPane />
-              </motion.div>
-              <motion.div
-                className="absolute inset-0 flex min-h-0 flex-col"
-                animate={{ opacity: view === "materials" ? 1 : 0 }}
-                transition={{ duration: reduce ? 0 : 0.15 }}
-                style={{
-                  pointerEvents: view === "materials" ? "auto" : "none",
-                  visibility: view === "materials" ? "visible" : "hidden",
-                }}
-              >
-                <MaterialsView />
-              </motion.div>
-              {(["self-test", "classroom"] as const).map(pane => (
-                <motion.div
-                  key={pane}
-                  className="absolute inset-0 flex min-h-0 flex-col"
-                  animate={{ opacity: view === pane ? 1 : 0 }}
-                  transition={{ duration: reduce ? 0 : 0.15 }}
-                  style={{ pointerEvents: view === pane ? "auto" : "none", visibility: view === pane ? "visible" : "hidden" }}
-                >
-                  <header className="kimi-toolbar"><SidebarTrigger /><span>{pane === "self-test" ? "题库自测" : "实时课堂"}</span></header>
-                  <div className="min-h-0 flex-1 overflow-y-auto">
-                    {pane === "self-test" ? <SelfTestView /> : <ClassroomView active={view === "classroom"} />}
-                  </div>
-                </motion.div>
-              ))}
-              {view === "linked-practice" ? <motion.div className="absolute inset-0 flex min-h-0 flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.15 }}>
-                <header className="kimi-toolbar"><SidebarTrigger /><span>关联练习</span></header>
-                <div className="min-h-0 flex-1 overflow-y-auto"><LinkedPracticeView /></div>
-              </motion.div> : null}
-              {view === "reinforcement-demo" ? <motion.div className="absolute inset-0 flex min-h-0 flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.15 }}>
-                <header className="kimi-toolbar"><SidebarTrigger /><span>单筋与双筋</span></header>
-                <div className="min-h-0 flex-1 overflow-y-auto"><BeamDemoView /></div>
-              </motion.div> : null}
-              {beamVisited || view === "beam-lab" ? <motion.div className="absolute inset-0 flex min-h-0 flex-col" initial={{ opacity: 0 }} animate={{ opacity: view === "beam-lab" ? 1 : 0 }} style={{ visibility: view === "beam-lab" ? "visible" : "hidden", pointerEvents: view === "beam-lab" ? "auto" : "none" }} transition={{ duration: reduce ? 0 : 0.15 }}>
-                <header className="kimi-toolbar"><SidebarTrigger /><span>智能配筋</span></header>
-                <div className="min-h-0 flex flex-1"><BeamLabView active={view === "beam-lab"} /></div>
-              </motion.div> : null}
+              <Pane id="home" view={view} reduce={reduce} className="">
+                <CourseHome active={view === "home"} onView={go} />
+              </Pane>
+              <Pane id="chat" view={view} reduce={reduce}><ChatPane /></Pane>
+              <Pane id="slides" view={view} reduce={reduce} className="flex"><StudyPane /></Pane>
+              <Pane id="practice" view={view} reduce={reduce}>
+                <PaneHeader title="练习" />
+                <div className="min-h-0 flex-1 overflow-y-auto"><SelfTestView /></div>
+              </Pane>
+              <Pane id="classroom" view={view} reduce={reduce}><ClassroomPane active={view === "classroom"} /></Pane>
+              <Pane id="materials" view={view} reduce={reduce}><MaterialsView /></Pane>
+              {lazy("demo") ? (
+                <Pane id="demo" view={view} reduce={reduce}>
+                  <PaneHeader title="受力演示" />
+                  <div className="min-h-0 flex-1 overflow-y-auto"><BeamDemoView /></div>
+                </Pane>
+              ) : null}
+              {lazy("lab") ? (
+                <Pane id="lab" view={view} reduce={reduce}>
+                  <PaneHeader title="配筋计算" />
+                  <div className="flex min-h-0 flex-1"><BeamLabView active={view === "lab"} /></div>
+                </Pane>
+              ) : null}
             </div>
           </SidebarInset>
         </SidebarProvider>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bookmark, BookmarkX, ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
+import { Bookmark, BookmarkX, ChevronDown, ChevronLeft, ChevronRight, StickyNote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAiDrawer } from "@/components/AiDrawer";
@@ -23,6 +23,7 @@ import { ReinforcementLab } from "@/components/ReinforcementLab";
 import slidesData from "@/content/slides.json";
 import { questions } from "@/lib/questions";
 import { appPath } from "@/lib/app-path";
+import { STUDY_GOTO_EVENT, kidOfSection, readStudyPosition, writeStudyPosition } from "@/lib/study-nav";
 
 type Slide = { page: number; section: string; title: string; bullets: string[]; image: string };
 
@@ -124,14 +125,6 @@ export function StudyView() {
     setBeta(window.localStorage.getItem(BETA_KEY) === "1");
   }, []);
 
-  const toggleBeta = () => {
-    setBeta((on) => {
-      const next = !on;
-      window.localStorage.setItem(BETA_KEY, next ? "1" : "0");
-      if (!next) setPos((cur) => (cur === "lab" ? `s:${LAB_AFTER}` : cur));
-      return next;
-    });
-  };
 
   /** 切章 / 翻页时把各栏的滚动位置拉回顶部（移动端整页共用一个滚动容器） */
   const shellRef = useRef<HTMLDivElement>(null);
@@ -153,10 +146,10 @@ export function StudyView() {
       for (const question of afterSlide.get(s.page) ?? []) {
         items.push({ kind: "quiz", afterPage: s.page, question });
       }
-      if (beta && s.page === LAB_AFTER) items.push({ kind: "lab" });
+      if (s.page === LAB_AFTER) items.push({ kind: "lab" });
     }
     return items;
-  }, [group, afterSlide, beta]);
+  }, [group, afterSlide]);
   const idx = deckIndex(deck, pos);
   const item = deck[idx];
   const anchorPage =
@@ -178,6 +171,32 @@ export function StudyView() {
     setSelSection(section);
     if (g?.pages[0]) setPos(`s:${g.pages[0].page}`);
   };
+
+  /** 课程主页 / 知识地图请求跳到某个知识点；首次进入时恢复上次的位置。 */
+  const gotoKid = (kid: string) => {
+    const g = groups.find((x) => kidOfSection(x.section) === kid);
+    if (g) return goSection(g.section);
+    if (bookOnly.some((b) => b.id === kid)) { setChapterGate(false); setBookSel(kid); }
+  };
+  const gotoRef = useRef(gotoKid);
+  gotoRef.current = gotoKid;
+  const restoredRef = useRef(false);
+  useEffect(() => {
+    const onGoto = (event: Event) => gotoRef.current((event as CustomEvent<string>).detail);
+    window.addEventListener(STUDY_GOTO_EVENT, onGoto);
+    if (!restoredRef.current) {
+      restoredRef.current = true;
+      const fromUrl = new URLSearchParams(window.location.search).get("k");
+      const last = readStudyPosition();
+      if (fromUrl) gotoRef.current(fromUrl.toUpperCase());
+      else if (last) {
+        gotoRef.current(last.kid);
+        if (last.page && !bookOnly.some((b) => b.id === last.kid)) setPos(`s:${last.page}`);
+      }
+    }
+    return () => window.removeEventListener(STUDY_GOTO_EVENT, onGoto);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const atLast = !bookSel && deck.length > 0 && idx >= deck.length - 1;
   const nextLabel = (() => {
@@ -234,6 +253,12 @@ export function StudyView() {
     [bookSel, activeSection],
   );
 
+  useEffect(() => {
+    if (!restoredRef.current) return;
+    if (bookSel) writeStudyPosition({ kid: bookSel, name: KNOWLEDGE_SECTIONS.find((s) => s.id === bookSel)?.name ?? "" });
+    else if (selSection && kidOfSection(selSection) !== "K0") writeStudyPosition({ kid: kidOfSection(selSection), name: selSection.replace(/^K\d+\s*/, ""), page: anchorPage });
+  }, [bookSel, selSection, anchorPage]);
+
   const pageCtx = {
     page: anchorPage ?? 0,
     section: activeSection,
@@ -246,11 +271,6 @@ export function StudyView() {
     classmate: beta,
   };
 
-  const discuss = () =>
-    ask({
-      question: "请老师先讲我正在看的这一页里最关键的一步，同学再用自己的话追问一个点。先不要出题。",
-      context: pageCtx,
-    });
 
   useEffect(() => {
     if (!notesOpen) return;
@@ -276,13 +296,6 @@ export function StudyView() {
     });
   }, [slide, bookSel, bindSlide]);
 
-  const askPage = () =>
-    ask({
-      question: onQuiz
-        ? `我看完第 ${anchorPage} 页，后面这道题还是不会：${quizQuestions.map((q) => q.prompt).join("；")}`
-        : `帮我讲讲第 ${slide?.page} 页的 ${noteBlock.title}`,
-      context: pageCtx,
-    });
 
   const goPrev = () => {
     if (idx <= 0) return;
@@ -312,37 +325,21 @@ export function StudyView() {
         <Button variant="ghost" size="sm"
           type="button"
           aria-expanded={chaptersOpen}
-          aria-label="章节"
+          aria-label="选择知识点"
           onClick={() => setChaptersOpen((v) => !v)}
-
+          className="study-section-picker min-w-0 max-w-[60%] justify-start gap-1.5"
         >
-          {chaptersOpen ? "收起章节" : "章节"}
+          <span className="truncate">{bookSel ? activeSection : slide?.section}</span>
+          <ChevronDown className={`size-3.5 shrink-0 opacity-60 transition-transform ${chaptersOpen ? "rotate-180" : ""}`} />
         </Button>
-        <span className="min-w-0 flex-1 truncate text-[12px] text-ink-faint">
-          {bookSel ? activeSection : slide?.section}
-        </span>
-        <Button
-          type="button"
-          size="sm"
-          variant={beta ? "default" : "outline"}
-          aria-pressed={beta}
-          onClick={toggleBeta}
-        >
-          实验
-        </Button>
-        {beta ? (
-          <Button type="button" size="sm" variant="outline" onClick={discuss}>
-            同学
-          </Button>
-        ) : null}
+        <span className="flex-1" />
         {nextLabel ? (
           <Button variant="ghost" size="sm"
             type="button"
             onClick={goNextChapter}
-            title={`下一章：${nextLabel}`}
-
+            title={`下一节：${nextLabel}`}
           >
-            下一章
+            下一节
           </Button>
         ) : null}
         <Button variant="ghost" size="sm"
@@ -371,7 +368,7 @@ export function StudyView() {
               {g.section}
             </button>
           ))}
-          <div className="mt-2 px-2 text-[11px] text-ink-faint">仅教材</div>
+          <div className="mt-2 px-2 text-[11px] text-ink-faint">教材补充</div>
           {bookOnly.map((s) => (
             <button
               key={s.id}
@@ -431,16 +428,9 @@ export function StudyView() {
               {/* 随堂题页不再显示位置说明，只留右上的「这页没看懂」 */}
               {onQuiz ? null : (
                 <span className="text-[12px] tabular-nums text-ink-faint">
-                  {onLab ? `第 ${LAB_AFTER} 页之后 · 配筋率示意` : `${idx + 1} / ${deck.length} · 第 ${slide.page} 页`}
+                  {onLab ? "配筋率互动" : <>本节 {idx + 1} / {deck.length}<span className="mx-2 opacity-40">·</span>P.{String(slide.page).padStart(3, "0")}</>}
                 </span>
               )}
-              <button
-                type="button"
-                onClick={askPage}
-                className="rounded-lg border border-paper-line px-2.5 py-1 text-[12px] text-ink-soft hover:bg-paper"
-              >
-                这页没看懂
-              </button>
             </div>
             <div className="mx-[-0.5rem] flex items-center gap-1 md:mx-[-2.5rem] md:gap-0">
               <Button

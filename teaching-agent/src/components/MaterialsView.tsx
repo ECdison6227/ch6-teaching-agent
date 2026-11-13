@@ -49,7 +49,7 @@ export function MaterialsView() {
     <header className="kimi-toolbar"><SidebarTrigger /><span>资料下载</span></header>
     <div className="min-h-0 flex-1 overflow-y-auto">
       <div className="kimi-page kimi-catalog">
-        <div className="kimi-page-heading"><div><h1 >资料下载</h1><p >课件、讲解与练习，随时带走。</p></div><label className="relative w-full sm:w-64"><Search aria-hidden className="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground" /><Input aria-label="搜索资料" placeholder="搜索章节或资料" value={query} onChange={e => setQuery(e.target.value)} className="pl-9" /></label></div>
+        <div className="kimi-page-heading"><div><h1>资料下载</h1></div><label className="relative w-full sm:w-64"><Search aria-hidden className="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground" /><Input aria-label="搜索资料" placeholder="搜索章节或资料" value={query} onChange={e => setQuery(e.target.value)} className="pl-9" /></label></div>
         <div className="kimi-category-tabs" role="group" aria-label="资料分类">{[["all","全部资料"],["original","原版课件"],["explain","逐页讲解"],["questions","题目"]].map(([id,label]) => <Button key={id} variant="ghost" aria-pressed={category === id} onClick={() => setCategory(id)}>{label}</Button>)}</div>
         <div role="status" className="mb-4 text-xs text-muted-foreground">{notice || (downloading ? "正在准备文件…" : `共 ${results.length} 份资料`)}</div>
         {error ? <Card className="mb-5 border-destructive/30 bg-destructive/5 p-4"><p role="alert" className="text-sm text-destructive">{error}</p>{failed ? <Button className="mt-2" variant="outline" onClick={() => void downloadMaterial(failed)}><RefreshCw />重试下载</Button> : null}</Card> : null}

@@ -15,6 +15,8 @@ const ContentPartSchema = z.discriminatedUnion("type", [
     url: z.string().max(MAX_IMAGE_URL_LENGTH).regex(/^data:image\/(?:png|jpeg|webp|gif);base64,[A-Za-z0-9+/=\r\n]+$/, "图片格式不支持或数据损坏"),
   }) }),
 ]);
+export const ReasoningEffortSchema = z.enum(["none", "low", "medium", "high"]);
+
 export const ChatRequestSchema = z.object({
   messages: z.array(z.object({
     role: z.enum(["user", "assistant"]),
@@ -22,6 +24,8 @@ export const ChatRequestSchema = z.object({
   })).max(24).default([]),
   pageContext: PageContextSchema.nullish(),
   model: z.string().max(200).nullish(),
+  /** Agnes 思考深度；none / 缺省时不向模型传 reasoning_effort */
+  effort: ReasoningEffortSchema.optional(),
 }).superRefine((body, ctx) => {
   let textLength = 0;
   for (const message of body.messages) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Bookmark, MessageSquarePlus } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import elementsJson from "@/content/slide-elements.json";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -113,11 +113,28 @@ export function SlideStage({ page, alt }: { page: number; alt: string }) {
   const anchorX = pickedBox ? Math.min(82, Math.max(18, (pickedBox.x + pickedBox.w / 2) * 100)) : 50;
   const anchorY = pickedBox ? (placeAbove ? pickedBox.y : pickedBox.y + pickedBox.h) * 100 : 0;
 
+  /** 翻页方向：往后翻从右侧滑入，往前翻从左侧滑入 */
+  const prevPage = useRef(page);
+  const dir = page >= prevPage.current ? 1 : -1;
+  useEffect(() => { prevPage.current = page; }, [page]);
+
   return (
       <div className="relative" ref={rootRef}>
         <div className="relative overflow-hidden rounded-2xl border border-paper-line bg-paper">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={alt} className="block w-full" />
+          <AnimatePresence initial={false} custom={dir} mode="popLayout">
+            <motion.img
+              key={src}
+              src={src}
+              alt={alt}
+              custom={dir}
+              variants={{ enter: (d: number) => ({ opacity: 0, x: 28 * d }), center: { opacity: 1, x: 0 }, exit: (d: number) => ({ opacity: 0, x: -28 * d }) }}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+              className="block w-full"
+            />
+          </AnimatePresence>
           {boxes.map((box) => {
             const on = box.id === picked;
             return (
@@ -135,8 +152,8 @@ export function SlideStage({ page, alt }: { page: number; alt: string }) {
                 }}
                 className={`absolute rounded-sm border transition-shadow ${
                   on
-                    ? "z-10 border-amber-400 bg-amber-100/30 shadow-[0_0_0_2px_rgba(251,191,36,0.95),0_0_16px_rgba(245,158,11,0.7)]"
-                    : "border-transparent hover:border-amber-300 hover:bg-amber-100/25 hover:shadow-[0_0_0_1px_rgba(252,211,77,0.95),0_0_12px_rgba(251,191,36,0.5)]"
+                    ? "z-10 border-neutral-900 bg-black/[0.03] shadow-[0_0_0_3px_rgba(17,17,17,0.14)]"
+                    : "border-transparent hover:border-neutral-900/40 hover:bg-black/[0.02]"
                 }`}
               />
             );

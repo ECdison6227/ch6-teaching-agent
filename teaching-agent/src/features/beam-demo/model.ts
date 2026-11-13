@@ -80,22 +80,65 @@ export function getBeamFrame(id: CaseId, rawProgress: number) {
     concreteStatus: concreteCrushed ? "已压碎" : progress === 0 ? "未加载" : progress > .92 && id !== "single-low" ? "接近极限" : "受压",
   };
 }
+/** 梁高一半（像素），用于端部转角与截面深度换算。 */
+const BEAM_HALF_HEIGHT = 70;
+/** 梁跨净宽（像素）：左支座内侧 62 → 右支座内侧 538。 */
+const BEAM_SPAN = 476;
+
+/** 挠度引起的梁端转角：跨中挠度对半跨的近似斜率。 */
+export function beamEndAngle(sag: number) {
+  return Math.atan((4 * sag) / BEAM_SPAN);
+}
+
 export function beamY(x: number, depth: number, sag: number) {
-  const t = (x - 62) / 476;
-  return 112 + 70 * depth + 4 * sag * t * (1 - t);
+  const t = (x - 62) / BEAM_SPAN;
+  return 112 + BEAM_HALF_HEIGHT * depth + 4 * sag * t * (1 - t);
 }
+
+/** 带挠度的梁轮廓；端部随转角倾斜（tilt）。 */
 export function beamOutline(sag: number) {
-  return "M62 112 Q300 " + (112 + sag * 2) + " 538 112 L538 182 Q300 " + (182 + sag * 2) + " 62 182 Z";
+  const angle = beamEndAngle(sag);
+  const sin = Math.sin(angle);
+  const cos = Math.cos(angle);
+  const leftTopX = 62 + BEAM_HALF_HEIGHT * sin;
+  const rightTopX = 538 - BEAM_HALF_HEIGHT * sin;
+  const topY = 182 - BEAM_HALF_HEIGHT * cos;
+  const midTopY = 42 + 2 * sag + BEAM_HALF_HEIGHT * cos;
+  return "M" + leftTopX + " " + topY
+    + " Q300 " + midTopY + " " + rightTopX + " " + topY
+    + " L538 182 Q300 " + (182 + 2 * sag) + " 62 182 Z";
 }
-export function steelPath(depth: number, sag: number) {
-  const y = 112 + 70 * depth;
-  const end = beamY(78, depth, sag);
-  return "M78 " + end + " Q300 " + (2 * (y + sag) - end) + " 522 " + end;
+
+/** 纵筋中心线；受拉筋可带端部弯钩示意。 */
+export function steelPath(depth: number, sag: number, withEndHooks = false) {
+  const midDepthY = 112 + BEAM_HALF_HEIGHT * depth;
+  const endY = beamY(78, depth, sag);
+  const controlY = 2 * (midDepthY + sag) - endY;
+  const spine = "M78 " + endY + " Q300 " + controlY + " 522 " + endY;
+  if (!withEndHooks) return spine;
+  return "M78 " + (endY - 11) + " L78 " + endY + " Q300 " + controlY + " 522 " + endY + " L522 " + (endY - 11);
 }
+
+/** 受压区填充轮廓，端部同样随转角倾斜。 */
 export function compressionOutline(sag: number, depth: number) {
-  const y = 112 + 70 * depth;
-  return "M62 112 Q300 " + (112 + sag * 2) + " 538 112 L538 " + y + " Q300 " + (y + sag * 2) + " 62 " + y + " Z";
+  const angle = beamEndAngle(sag);
+  const sin = Math.sin(angle);
+  const cos = Math.cos(angle);
+  const leftTopX = 62 + BEAM_HALF_HEIGHT * sin;
+  const rightTopX = 538 - BEAM_HALF_HEIGHT * sin;
+  const topY = 182 - BEAM_HALF_HEIGHT * cos;
+  const midTopY = 42 + 2 * sag + BEAM_HALF_HEIGHT * cos;
+  const leftNeutralX = leftTopX + BEAM_HALF_HEIGHT * depth * sin;
+  const rightNeutralX = rightTopX - BEAM_HALF_HEIGHT * depth * sin;
+  const neutralY = topY + BEAM_HALF_HEIGHT * depth * cos;
+  const midNeutralY = 42 + 2 * sag + 140 * depth + BEAM_HALF_HEIGHT * cos - BEAM_HALF_HEIGHT * depth * cos;
+  return "M" + leftTopX + " " + topY
+    + " Q300 " + midTopY + " " + rightTopX + " " + topY
+    + " L" + rightNeutralX + " " + neutralY
+    + " Q300 " + midNeutralY + " " + leftNeutralX + " " + neutralY + " Z";
 }
+
+/** 旧折线裂缝（测试与兼容保留）。 */
 export function crackPoints(x: number, extent: number, neutralDepth: number, sag: number) {
   const maxHeight = Math.max(.12, 1 - neutralDepth - .08);
   return Array.from({ length: 6 }, (_, index) => {
@@ -103,3 +146,69 @@ export function crackPoints(x: number, extent: number, neutralDepth: number, sag
     return (x + (index % 2 ? 3 : -3)) + "," + beamY(x, depth, sag);
   }).join(" ");
 }
+
+/** 梁变形视图的楔形裂缝路径；extent 过小返回 null。 */
+export function crackWedgePath(
+  x: number,
+  extent: number,
+  neutralDepth: number,
+  sag: number,
+  width: number,
+  overshoot = 0,
+) {
+  const bottomY = beamY(x, 1, sag) - 1;
+  const topY = beamY(x, Math.max(0, neutralDepth - overshoot), sag) + 2;
+  const height = (bottomY - topY) * extent;
+  if (height < 1) return null;
+  const tipY = bottomY - height;
+  const midY = bottomY - .55 * height;
+  const halfWidth = width * (.5 + .5 * extent);
+  const taper = Math.min(2, .05 * height);
+  return "M" + (x - halfWidth) + " " + bottomY
+    + " L" + (x - .45 * halfWidth - taper) + " " + midY
+    + " L" + (x - .5) + " " + tipY
+    + " L" + (x + .5) + " " + tipY
+    + " L" + (x + .45 * halfWidth + taper) + " " + midY
+    + " L" + (x + halfWidth) + " " + bottomY + " Z";
+}
+
+/** 截面视图的楔形裂缝路径。 */
+export function sectionCrackWedgePath(x: number, extent: number, neutralY: number, width: number) {
+  const height = (252 - neutralY) * extent;
+  if (height < 1) return null;
+  const tipY = 252 - height;
+  const midY = 252 - .5 * height;
+  const halfWidth = width * (.5 + .5 * extent);
+  return "M" + (x - halfWidth) + " 252"
+    + " L" + (x - .4 * halfWidth - 1.5) + " " + midY
+    + " L" + (x - .5) + " " + tipY
+    + " L" + (x + .5) + " " + tipY
+    + " L" + (x + .4 * halfWidth + 1.5) + " " + midY
+    + " L" + (x + halfWidth) + " 252 Z";
+}
+
+/** 确定性混凝土斑点，避免每次渲染抖动。 */
+export function concreteSpeckles(
+  seed: number,
+  count: number,
+  originX: number,
+  originY: number,
+  width: number,
+  height: number,
+) {
+  const points: Array<{ x: number; y: number; r: number }> = [];
+  let state = seed;
+  for (let index = 0; index < count; index++) {
+    state = (9301 * state + 49297) % 233280;
+    const u = state / 233280;
+    state = (9301 * state + 49297) % 233280;
+    const v = state / 233280;
+    state = (9301 * state + 49297) % 233280;
+    const w = state / 233280;
+    points.push({ x: originX + u * width, y: originY + v * height, r: .8 + 1.5 * w });
+  }
+  return points;
+}
+
+/** 梁跨内箍筋示意竖线的 x 坐标。 */
+export const STIRRUP_XS = [84, 120, 156, 192, 228, 264, 300, 336, 372, 408, 444, 480, 516] as const;

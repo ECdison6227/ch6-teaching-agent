@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { celebrate } from "@/lib/celebrate";
 import dynamic from "next/dynamic";
 import { ArrowRight, Check, ChevronDown, ChevronLeft, Download, Printer, RefreshCw, SlidersHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,6 +39,16 @@ export function SelfTestView() {
   const book = useSyncExternalStore(wrongbookStore.subscribe, wrongbookStore.getSnapshot, wrongbookStore.getSnapshot);
   const session = saved.value;
   const [tab, setTab] = useState<"test" | "wrongbook" | "linked">("test");
+  /** 整组全对：撒一次彩带（每次交卷只撒一次） */
+  const celebrated = useRef<string | null>(null);
+  useEffect(() => {
+    if (session?.status !== "submitted") return;
+    const key = `${session.questions.length}:${session.questions[0]?.id ?? ""}`;
+    const s = summarizeSession(session);
+    if (s.accuracy === 1 && s.total > 0 && celebrated.current !== key) { celebrated.current = key; celebrate(); }
+  }, [session]);
+  /** /practice?tab=linked|wrongbook 直达对应页签 */
+  useEffect(() => { const t = new URLSearchParams(window.location.search).get("tab"); if (t === "linked" || t === "wrongbook") setTab(t); }, []);
   const [settings, setSettings] = useState(initialSettings), [draftSettings, setDraftSettings] = useState(initialSettings);
   const [settingsOpen, setSettingsOpen] = useState(false), [exportOpen, setExportOpen] = useState(false);
   const [bookType, setBookType] = useState("all"), [bookLevel, setBookLevel] = useState("all");
@@ -103,18 +115,18 @@ export function SelfTestView() {
       <DialogFooter><Button variant="outline" disabled={!exportRecords.length || exporting} onClick={() => void runExport(false)}><Download />Markdown</Button><Button disabled={!exportRecords.length || exporting} onClick={() => void runExport(true)}><Printer />{exporting ? "准备中…" : "打印 / PDF"}</Button></DialogFooter>
     </DialogContent>
   </Dialog>;
-  return <main className="kimi-page" aria-label="题库自测">
-    <header className="kimi-page-heading"><div><h1>题库自测</h1><p>{tab === "linked" ? "从一道题开始，把相关知识串起来。" : "练习、核对，再把错题练一遍。"}</p></div><div className="kimi-actions">{tab !== "linked" ? <>{renderSettings()}{(tab === "wrongbook" || session?.status === "submitted") ? renderExport() : null}</> : null}</div></header>
-    <div className="kimi-category-tabs" role="group" aria-label="自测页面"><Button variant="ghost" aria-pressed={tab === "test"} onClick={() => setTab("test")}>自测</Button><Button variant="ghost" aria-pressed={tab === "wrongbook"} onClick={() => setTab("wrongbook")}>错题本<span className="text-xs text-muted-foreground">{book.value.records.length}</span></Button><Button variant="ghost" aria-pressed={tab === "linked"} onClick={() => setTab("linked")}>关联练习</Button></div>
+  return <main className="kimi-page" aria-label="练习">
+    <header className="kimi-page-heading"><div><h1>练习</h1></div><div className="kimi-actions">{tab !== "linked" ? <>{renderSettings()}{(tab === "wrongbook" || session?.status === "submitted") ? renderExport() : null}</> : null}</div></header>
+    <div className="kimi-category-tabs" role="group" aria-label="自测页面"><Button variant="ghost" aria-pressed={tab === "test"} onClick={() => setTab("test")}>自测</Button><Button variant="ghost" aria-pressed={tab === "wrongbook"} onClick={() => setTab("wrongbook")}>错题本<span className="text-xs text-muted-foreground">{book.value.records.length}</span></Button><Button variant="ghost" aria-pressed={tab === "linked"} onClick={() => setTab("linked")}>专项练习</Button></div>
     {[{ snapshot: saved, store: sessionStore }, { snapshot: book, store: wrongbookStore }].map(({ snapshot, store }, i) => snapshot.error ? <div key={i} className="kimi-feedback" role="alert"><span>{snapshot.error}</span><Button variant="outline" size="sm" onClick={() => void store.retry()}><RefreshCw />{snapshot.writable ? "重试保存" : "重试读取"}</Button></div> : null)}
     {tab !== "linked" && message && !exportOpen ? <p role="alert" className="kimi-feedback text-destructive">{message}</p> : null}
     {tab === "linked" ? <LinkedPracticeView embedded /> : !saved.ready || !book.ready ? <p className="kimi-quiet-state" role="status">正在读取自测…</p> : <>
       {saved.dirty || book.dirty ? <p role="status" className="mb-4 text-xs text-muted-foreground">正在保存，请暂勿关闭页面。</p> : null}
       {!canReplace ? <p role="status" className="mb-4 text-xs text-muted-foreground">正在保存错题，完成后可开始新自测。</p> : null}
       {tab === "test" ? !session ? <Card className="kimi-stage"><CardContent className="kimi-start-state">
-        <p className="kimi-eyebrow">第六章 · 练习</p><h2>从 {settings.countText} 道题开始</h2><p>{typeSummary} · {levelSummary}</p>
+        <p className="kimi-eyebrow">随机组卷</p><h2>{settings.countText} 道题</h2><p>{typeSummary} · {levelSummary}</p>
         <Button className="kimi-primary" disabled={!!settingError || !saved.writable} onClick={start}>开始自测<ArrowRight /></Button>
-        {settingError ? <p role="alert" className="text-destructive">{settingError}</p> : null}<span className="text-xs text-muted-foreground">进度与错题保存在本机</span>
+        {settingError ? <p role="alert" className="text-destructive">{settingError}</p> : null}
       </CardContent></Card> : session.status === "answering" && question ? <>
         <Card className="kimi-stage"><CardContent className="kimi-question-content" ref={questionRef} tabIndex={-1} aria-label={`第 ${session.cursor + 1} 题`}>
           <div className="kimi-row"><p className="text-sm">第 {session.cursor + 1} <span className="text-muted-foreground">/ {session.questions.length} 题</span></p>{session.cursor < session.questions.length - 1 ? <Button variant="ghost" size="sm" disabled={!saved.writable} onClick={() => unanswered.length ? setConfirmation({ kind: "submit" }) : submit()}>交卷</Button> : null}</div>
@@ -127,10 +139,10 @@ export function SelfTestView() {
         <details className="kimi-disclosure"><summary>答题卡<span>{unanswered.length ? `${unanswered.length} 题未答` : "全部已答"}<ChevronDown /></span></summary><div className="space-y-4 pt-4"><div className="kimi-question-grid">{session.questions.map((q, index) => <Button key={q.id} variant="ghost" aria-label={`第 ${index + 1} 题，${session.answers[q.id]?.trim() ? "已答" : "未答"}`} aria-pressed={index === session.cursor} data-answered={!!session.answers[q.id]?.trim()} onClick={() => move(index)} disabled={!saved.writable}>{index + 1}{session.answers[q.id]?.trim() ? <Check className="size-3" /> : null}</Button>)}</div>{unanswered.length ? <Button variant="ghost" size="sm" disabled={!saved.writable} onClick={() => move(session.questions.findIndex(q => !(session.answers[q.id] ?? "").trim()))}>跳到未答题<ArrowRight /></Button> : null}</div></details>
         {session.source === "wrongbook-snapshot" ? <p className="kimi-footnote">正在重练错题保存的版本，原记录会保留。</p> : null}
       </> : <>
-        <Card className="kimi-stage"><CardContent className="kimi-result-summary"><div><p className="kimi-eyebrow">本次正确率</p><p className="kimi-score">{summary!.accuracy === null ? "—" : percent(summary!.accuracy)}</p><p className="text-xs text-muted-foreground">共 {summary!.total} 题 · 答对 {summary!.correct} · 答错 {summary!.wrong}{summary!.pending ? ` · 待核对 ${summary!.pending}` : ""}{summary!.unanswered ? ` · 未答 ${summary!.unanswered}` : ""}</p></div><Button className="kimi-primary" disabled={!saved.writable || !canReplace} onClick={() => replace(createSession(session.questions, session.source))}>再练一次<ArrowRight /></Button></CardContent></Card>
+        <Card className="kimi-stage"><CardContent className="kimi-result-summary"><div><p className="kimi-eyebrow">本次正确率</p><p className="kimi-score">{summary!.accuracy === null ? "—" : <><NumberTicker value={Math.round(summary!.accuracy * 100)} className="kimi-score-num" />%</>}</p><p className="text-xs text-muted-foreground">共 {summary!.total} 题 · 答对 {summary!.correct} · 答错 {summary!.wrong}{summary!.pending ? ` · 待核对 ${summary!.pending}` : ""}{summary!.unanswered ? ` · 未答 ${summary!.unanswered}` : ""}</p></div><Button className="kimi-primary" disabled={!saved.writable || !canReplace} onClick={() => replace(createSession(session.questions, session.source))}>再练一次<ArrowRight /></Button></CardContent></Card>
         <div className="kimi-row my-6"><p className="text-xs text-muted-foreground">{summary!.wrong ? `${summary!.wrong} 道错题${canReplace ? "已收录" : "待保存"}，展开查看解析。` : "展开题目，核对答案与解析。"}</p><Button variant="ghost" size="sm" aria-pressed={onlyErrors} onClick={() => setOnlyErrors(value => !value)}>{onlyErrors ? "查看全部" : "待复习"}</Button></div>
         <div className="kimi-review-list">{session.questions.map((q, index) => { const result = session.results[index]; if (onlyErrors && result.status === "correct") return null; return <details key={`${session.id}:${q.id}`} className="kimi-review-item" open={result.status !== "correct" ? true : undefined}><summary><span className="kimi-eyebrow">{String(index + 1).padStart(2, "0")}</span><div className="min-w-0 flex-1"><Markdown text={displayPrompt(q)} /><span className="kimi-eyebrow">{q.id} · {STATUS_LABELS[result.status]}</span></div><ChevronDown className="size-4 shrink-0" /></summary><div className="kimi-review-body">{q.type === "choice" ? q.options.map(o => <Markdown key={o.id} text={`${o.id}．${o.text}`} />) : null}<div className="kimi-answer-comparison"><div><p>我的答案</p><Markdown text={answerLabel(q, result.answer)} /></div><div><p>标准答案</p><Markdown text={answerLabel(q)} /></div></div><Markdown text={q.analysis?.trim() || "暂无解析"} /></div></details>; })}</div>
-        <p className="kimi-footnote">正确率按可判定题目计算。未答与待核对题保留在本次结果中。</p>
+        
       </> : <>
         <div className="kimi-row mb-5"><div className="kimi-actions"><Select value={bookType} onValueChange={setBookType}><SelectTrigger className="w-32" aria-label="错题题型"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">全部题型</SelectItem>{TYPES.map(type => <SelectItem key={type} value={type}>{QUESTION_TYPE_LABELS[type]}</SelectItem>)}</SelectContent></Select><Select value={bookLevel} onValueChange={setBookLevel}><SelectTrigger className="w-32" aria-label="错题难度"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">全部难度</SelectItem>{LEVELS.map(level => <SelectItem key={level} value={level}>{DIFFICULTY_LABELS[level]}</SelectItem>)}</SelectContent></Select></div><Button className="kimi-primary" disabled={!(selectedIds.length || filteredRecords.length) || !saved.writable || !canReplace} onClick={() => replace(createSession(book.value.records.filter(r => selectedIds.length ? selectedIds.includes(r.questionId) : filteredRecords.some(item => item.questionId === r.questionId)).map(r => r.question), "wrongbook-snapshot"))}>重练{selectedIds.length ? `所选 ${selectedIds.length} 题` : "错题"}<ArrowRight /></Button></div>
         {!filteredRecords.length ? <div className="kimi-quiet-state"><p>这里还没有错题</p><p>交卷后，答错的题会自动收录。</p><Button variant="outline" className="mt-5 rounded-full" onClick={() => { if (book.value.records.length) { setBookType("all"); setBookLevel("all"); } else setTab("test"); }}>{book.value.records.length ? "清除筛选" : "去自测"}</Button></div> : <>

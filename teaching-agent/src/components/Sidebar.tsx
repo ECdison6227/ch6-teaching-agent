@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bookmark, BookOpen, BookOpenCheck, Calculator, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Download, Home, MessageSquare, MessageSquarePlus, Radio, SquareActivity, StickyNote, Trash2 } from "lucide-react";
+import { Bookmark, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, MessageSquarePlus, StickyNote, Trash2 } from "lucide-react";
+import { NAV_GROUPS, VIEWS, type AppView } from "@/lib/views";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -30,7 +31,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { Card as AnswerCardData } from "@/lib/cards";
 import { AnswerCard } from "./AnswerCard";
 import { NoteEditor, exportNotePdf, useNotes, type Note } from "./notes";
@@ -81,7 +81,7 @@ const HELP: { id: HelpId; title: string }[] = [
   { id: "save", title: "收藏这一页" },
   { id: "ask", title: "问 AI" },
   { id: "practice", title: "做练习" },
-  { id: "model", title: "换模型" },
+  { id: "model", title: "模型与思考深度" },
   { id: "notes", title: "笔记" },
 ];
 
@@ -91,7 +91,7 @@ function PickShot({ compact }: { compact?: boolean }) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={appPath("/slides/slide-002.png")} alt="课件上亮着的选框" className="block w-full" />
       <div
-        className="pointer-events-none absolute rounded-sm border border-amber-400 bg-amber-100/30 shadow-[0_0_0_2px_rgba(251,191,36,0.95),0_0_16px_rgba(245,158,11,0.7)]"
+        className="pointer-events-none absolute rounded-sm border border-neutral-900 bg-black/[0.03] shadow-[0_0_0_3px_rgba(17,17,17,0.14)]"
         style={{
           left: `${PICK_BOX.x * 100}%`,
           top: `${PICK_BOX.y * 100}%`,
@@ -159,7 +159,7 @@ function HelpDetail({ id }: { id: HelpId }) {
   if (id === "slides") {
     return (
       <p>
-        点侧栏「自学天地」。页眉是「1 / n · 第 x 页」。课件外侧左右各有一个半透明圆箭头，左边上一页，右边下一页。这一章最后一页再点右边，中间是「进入下一章」。
+        点侧栏「课件」。顶栏左侧是当前知识点，点开可以切换。课件两侧的圆箭头翻页，本节最后一页再往后，进入下一节。
       </p>
     );
   }
@@ -197,10 +197,9 @@ function HelpDetail({ id }: { id: HelpId }) {
     return (
       <div className="space-y-2">
         <p>
-          自学天地顶栏右侧「问 AI」，右边滑出对话，和课件并排。当前这一页的图放进输入框，写完再发送。再点这个按钮会变成「收起」。
+          课件顶栏右侧「问 AI」，右边滑出对话，和课件并排。当前这一页会自动带上，写完再发送。
         </p>
-        <p>页码右边的「这页没看懂」会直接请老师讲这一页。</p>
-        <p>老师有时会甩出下面这几种必答卡。还有没答的卡时，输入框会锁住。</p>
+                <p>老师有时会甩出下面这几种必答卡。还有没答的卡时，输入框会锁住。</p>
         {DEMO_CARDS.map((card) => (
           <AnswerCard key={card.kind} card={card} onSubmit={() => {}} />
         ))}
@@ -215,16 +214,16 @@ function HelpDetail({ id }: { id: HelpId }) {
     );
   }
   if (id === "model") {
-    return <p>输入框里、发送按钮左边是当前模型。点开换成另一个，之后发出去的话就用新选的。</p>;
+    return <p>输入框左下角的设置里可以换模型、调整思考深度。</p>;
   }
   return (
     <p>
-      在「引导对话」里选中老师的一句话，出现「追问」和「收藏到笔记」。到侧栏点开这条笔记，改完文字再点「保存」。有笔记时，点「笔记」右边的「汇总并导出 PDF」，会整理成一篇并打开打印窗口。
+      在「AI 助教」里选中一句话，出现「追问」和「收藏到笔记」。到侧栏点开这条笔记，改完文字再点「保存」。有笔记时，点「笔记」右边的「导出 PDF」，会整理成一篇并打开打印窗口。
     </p>
   );
 }
 
-export type AppView = "home" | "chat" | "study" | "materials" | "self-test" | "classroom" | "linked-practice" | "reinforcement-demo" | "beam-lab";
+export type { AppView } from "@/lib/views";
 
 export function Sidebar({
   view,
@@ -233,21 +232,13 @@ export function Sidebar({
   view: AppView;
   onView: (v: AppView) => void;
 }) {
-  const { state, isMobile, setOpenMobile } = useSidebar();
+  const { setOpenMobile } = useSidebar();
   const { notes, remove, storageError, retrySave } = useNotes();
   const [openNote, setOpenNote] = useState<Note | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [helpId, setHelpId] = useState<HelpId | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
-  const nav: { id: Exclude<AppView, "home">; label: string; icon: typeof MessageSquare }[] = [
-    { id: "chat", label: "引导对话", icon: MessageSquare },
-    { id: "study", label: "自学天地", icon: BookOpen },
-    { id: "self-test", label: "题库自测", icon: BookOpenCheck },
-    { id: "classroom", label: "实时课堂", icon: Radio },
-    { id: "beam-lab", label: "智能配筋", icon: Calculator },
-    { id: "materials", label: "资料下载", icon: Download },
-  ];
   const help = HELP.find((item) => item.id === helpId) ?? null;
 
   /** 手机上的侧栏是抽屉，切换视图后要收起来，不然一直盖着内容 */
@@ -256,7 +247,6 @@ export function Sidebar({
     setOpenMobile(false);
   };
 
-  /** 手机上从首页进来时，不要沿用上一次留下的抽屉状态 */
   useEffect(() => {
     setOpenMobile(false);
   }, [view, setOpenMobile]);
@@ -272,109 +262,66 @@ export function Sidebar({
   return (
     <>
       <Side collapsible="offcanvas">
-        <div className="flex min-h-0 w-full flex-1 flex-col pt-3.5">
-        <SidebarHeader className="group-data-[collapsible=icon]:px-0">
-          <div className="flex min-w-0 items-center gap-2 px-1 py-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-1 group-data-[collapsible=icon]:px-0">
-            <div aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-              <BookOpen className="size-4" />
-            </div>
-            <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
-              <div className="truncate text-sm font-medium">第六章</div>
-              <div className="truncate text-xs text-muted-foreground">工程结构设计原理</div>
-            </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="ml-auto h-7 w-7 shrink-0 group-data-[collapsible=icon]:ml-0"
-                  aria-label="返回首页"
-                  onClick={() => goView("home")}
-                >
-                  <Home />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side={isMobile || state === "expanded" ? "bottom" : "right"}>返回首页</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="ml-auto h-7 w-7 shrink-0 group-data-[collapsible=icon]:ml-0"
-                  aria-label="用法说明"
-                  onClick={() => setHelpOpen(true)}
-                >
-                  <CircleHelp />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side={isMobile || state === "expanded" ? "bottom" : "right"}>用法说明</TooltipContent>
-            </Tooltip>
-          </div>
+        <div className="flex min-h-0 w-full flex-1 flex-col pt-3">
+        <SidebarHeader className="px-3">
+          <button type="button" className="seu-brand" onClick={() => goView("home")} aria-label="课程主页" aria-current={view === "home" ? "page" : undefined}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={appPath("/seu-badge.svg")} alt="" className="seu-brand-badge" />
+            <span className="min-w-0 flex-1 text-left">
+              <span className="block truncate text-[13.5px] font-semibold tracking-wide">工程结构设计原理</span>
+              <span className="block truncate text-[11.5px] text-muted-foreground">第六章 · 钢筋混凝土梁</span>
+            </span>
+          </button>
         </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarMenu>
-              {nav.map((n) => (
-                <SidebarMenuItem key={n.id}>
-                  <SidebarMenuButton isActive={view === n.id || (n.id === "self-test" && view === "linked-practice")} tooltip={n.label} onClick={() => goView(n.id)}>
-                    <n.icon />
-                    <span>{n.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
-          <SidebarGroup className="border-t border-border/60 pt-3">
-            <SidebarGroupLabel>新增功能</SidebarGroupLabel>
-            <SidebarMenu>
-              <SidebarMenuItem><SidebarMenuButton isActive={view === "reinforcement-demo"} tooltip="单筋与双筋" onClick={() => goView("reinforcement-demo")}><SquareActivity /><span>单筋与双筋</span></SidebarMenuButton></SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroup>
-          <SidebarGroup className="min-h-0 flex-1 border-t border-border/60 pt-4">
-            <div className="flex w-full min-w-0 items-center gap-1 group-data-[collapsible=icon]:hidden">
-              <SidebarGroupLabel className="w-auto shrink-0">笔记</SidebarGroupLabel>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="ml-auto h-7 shrink-0 px-2 text-xs"
-                disabled={!notes.length || exporting}
-                onClick={exportPdf}
-              >
-                {exporting ? "正在汇总…" : "汇总并导出 PDF"}
-              </Button>
+        <SidebarContent className="pt-2">
+          {NAV_GROUPS.map((group) => (
+            <SidebarGroup key={group.id} className="py-0">
+              <SidebarGroupLabel className="nav-group-label">{group.label}</SidebarGroupLabel>
+              <SidebarMenu>
+                {VIEWS.filter((v) => v.group === group.id).map((n) => {
+                  const Icon = n.icon!;
+                  const active = view === n.id;
+                  return (
+                    <SidebarMenuItem key={n.id} className="relative">
+                      {active ? <motion.span layoutId="nav-active" className="nav-active-pill" transition={{ type: "spring", stiffness: 520, damping: 42 }} /> : null}
+                      <SidebarMenuButton isActive={active} tooltip={n.label} onClick={() => goView(n.id)} className="relative z-[1]">
+                        <Icon />
+                        <span>{n.label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroup>
+          ))}
+          <SidebarGroup className="min-h-0 flex-1 pt-2">
+            <div className="flex w-full min-w-0 items-center gap-1">
+              <SidebarGroupLabel className="nav-group-label w-auto shrink-0">笔记{notes.length ? <span className="ml-1.5 tabular-nums">{notes.length}</span> : null}</SidebarGroupLabel>
+              {notes.length ? (
+                <Button type="button" variant="ghost" size="sm" className="ml-auto h-6 shrink-0 px-2 text-[11.5px] text-muted-foreground" disabled={exporting} onClick={exportPdf}>
+                  {exporting ? "正在汇总…" : "导出 PDF"}
+                </Button>
+              ) : null}
             </div>
-            {exportError ? (
-              <p className="px-2 text-[11px] leading-4 text-muted-foreground group-data-[collapsible=icon]:hidden">{exportError}</p>
-            ) : null}
+            {exportError ? <p className="px-2 text-[11px] leading-4 text-muted-foreground">{exportError}</p> : null}
             {storageError ? (
-              <div role="alert" className="px-2 text-xs leading-5 text-destructive group-data-[collapsible=icon]:hidden">
+              <div role="alert" className="px-2 text-xs leading-5 text-destructive">
                 {storageError}
                 <Button type="button" variant="ghost" size="sm" onClick={retrySave}>重试保存</Button>
               </div>
             ) : null}
             {notes.length === 0 ? (
-              <p className="px-2 text-xs leading-5 text-muted-foreground group-data-[collapsible=icon]:hidden">
-                还没有笔记。在对话中收藏回答，或在课件上点击书签。
-              </p>
+              <p className="px-2 text-[12px] leading-5 text-muted-foreground/80">收藏的内容会出现在这里</p>
             ) : (
-              <ul className="space-y-1 overflow-y-auto px-1 group-data-[collapsible=icon]:hidden">
+              <ul className="space-y-0.5 overflow-y-auto">
                 {notes.map((n) => (
-                  <li key={n.id} className="rounded-lg px-2 py-1.5 hover:bg-sidebar-accent">
-                    <button type="button" onClick={() => setOpenNote(n)} className="block w-full text-left">
-                      <p className="truncate text-xs font-medium">{n.title}</p>
-                      <p className="mt-0.5 line-clamp-2 text-xs leading-5 text-muted-foreground">{n.text}</p>
+                  <li key={n.id} className="group/note relative rounded-lg hover:bg-sidebar-accent">
+                    <button type="button" onClick={() => setOpenNote(n)} className="block w-full px-2 py-1.5 pr-8 text-left">
+                      <p className="truncate text-[12.5px]">{n.title}</p>
+                      <p className="mt-0.5 line-clamp-1 text-[11.5px] leading-5 text-muted-foreground">{n.text}</p>
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => remove(n.id)}
-                      className="mt-1 inline-flex items-center gap-1 text-[11px] text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                      删除
+                    <button type="button" aria-label="删除笔记" onClick={() => remove(n.id)} className="absolute right-1.5 top-2 hidden rounded-md p-1 text-muted-foreground hover:bg-background hover:text-destructive group-hover/note:block">
+                      <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </li>
                 ))}
@@ -382,6 +329,12 @@ export function Sidebar({
             )}
           </SidebarGroup>
         </SidebarContent>
+        <div className="seu-sidebar-foot">
+          <span className="font-serif-cn tracking-[0.3em]">止于至善</span>
+          <button type="button" className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => setHelpOpen(true)}>
+            <CircleHelp className="size-3.5" />用法
+          </button>
+        </div>
         </div>
       </Side>
       <Sheet
@@ -403,7 +356,7 @@ export function Sidebar({
         >
           <SheetHeader className="shrink-0 space-y-1 px-5 pb-2 pr-12 pt-5 text-left">
             <SheetTitle>怎么用</SheetTitle>
-            <SheetDescription>点一条看怎么做。</SheetDescription>
+            <SheetDescription className="sr-only">用法说明</SheetDescription>
           </SheetHeader>
           <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-5 pb-6">
             {HELP.map((item, i) => (

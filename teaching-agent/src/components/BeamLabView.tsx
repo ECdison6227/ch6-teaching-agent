@@ -310,7 +310,7 @@ export function BeamLabView({ active = true }: { active?: boolean }) {
     <div className="flex h-full min-h-0 min-w-0 flex-1">
       <div className={`min-h-0 min-w-0 flex-1 overflow-y-auto bg-background ${open && active ? "hidden md:block" : ""}`}>
         <main className="kimi-page kimi-beam-page">
-          <header className="kimi-page-heading"><div><h1>智能配筋</h1><p>设置截面，比较模型预测与公式参考。</p></div></header>
+          <header className="kimi-page-heading"><div><h1>配筋计算</h1></div></header>
           <div className="kimi-choice-pills mt-6" role="group" aria-label="选择实验任务">
             {TASK_OPTIONS.map(({ key, Icon }) => <Button key={key} type="button" variant="ghost" className="rounded-full text-sm" disabled={loading} aria-pressed={task === key} onClick={() => chooseTask(key)}><Icon aria-hidden />{TASK_LABELS[key]}</Button>)}
           </div>
@@ -320,7 +320,7 @@ export function BeamLabView({ active = true }: { active?: boolean }) {
             <Card className="min-w-0 overflow-hidden rounded-[20px] border-border/60 bg-card shadow-none ">
               <CardHeader className="space-y-1.5 border-b border-border/60 px-5 py-4">
                 <div className="flex items-center justify-between gap-3"><CardTitle className="text-sm font-medium text-foreground">{doubleTask ? "设置双筋设计条件" : task === "design" ? "设置设计条件" : "填写实际截面与配筋"}</CardTitle><span className="shrink-0 text-xs font-medium tracking-wider text-muted-foreground">输入参数</span></div>
-                <CardDescription className="text-xs leading-5 text-muted-foreground">{task === "double-a" ? "输入截面、两侧材料与钢筋位置，同时预测受拉和受压连续面积。" : task === "double-b" ? "输入已有受压面积，预测所需受拉连续面积，并单独展示公式参考和数值复核。" : task === "design" ? "由弯矩需求预测连续钢筋面积，选筋排布后再做实配复核。" : "填写实际几何与钢筋面积，比较承载力与弯矩需求。"}</CardDescription>
+                
               </CardHeader>
               <CardContent className="px-5 pb-5 pt-4">
                 <form onSubmit={submit}>
@@ -340,7 +340,7 @@ export function BeamLabView({ active = true }: { active?: boolean }) {
                         <div className="min-w-0 space-y-1.5 text-xs text-muted-foreground"><label htmlFor={`beam-${task}-steel`}>{doubleTask ? "受拉钢筋等级" : "钢筋等级"}</label><Select value={form.steel} onValueChange={(value) => update("steel", value)} disabled={loading}><SelectTrigger id={`beam-${task}-steel`} className="h-11 rounded-xl border-border/60 bg-muted/50 shadow-none focus:ring-ring/25"><SelectValue /></SelectTrigger><SelectContent>{["HRB400", "HRB500"].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent></Select></div>
                         {doubleTask ? <div className="col-span-2 min-w-0 space-y-1.5 text-xs text-muted-foreground"><label htmlFor={`beam-${task}-compression-steel`}>受压钢筋等级</label><Select value={form.compressionSteel} onValueChange={(value) => update("compressionSteel", value)} disabled={loading}><SelectTrigger id={`beam-${task}-compression-steel`} className="h-11 rounded-xl border-border/60 bg-muted/50 shadow-none focus:ring-ring/25"><SelectValue /></SelectTrigger><SelectContent>{["HRB400", "HRB500"].map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent></Select></div> : null}
                       </div>
-                      {doubleTask ? <p className="rounded-lg bg-muted/50 px-3 py-2 text-xs leading-5 text-muted-foreground">等级由后台映射为模型所需的强度设计值。受拉、受压钢筋可分别选择；本次实际采用的 fc、ft、fy、fy′ 将随结果显示。</p> : null}
+                      
                     </section>
                     <Separator className="bg-muted/50" />
                     <section className="kimi-beam-geometry space-y-3" aria-labelledby="beam-geometry-heading">
@@ -387,7 +387,7 @@ export function BeamLabView({ active = true }: { active?: boolean }) {
             <div ref={resultRef} tabIndex={-1} className="min-w-0 space-y-4 outline-none" aria-label="计算结果" aria-live="polite" aria-busy={loading}>
               {loading ? <Card className="rounded-[20px] border-border/60 bg-card shadow-none "><CardContent className="flex min-h-80 flex-col items-center justify-center gap-4 p-6 text-center"><div className="flex size-14 items-center justify-center rounded-[20px] bg-muted/50"><LoaderCircle className="size-6 animate-spin text-foreground" aria-hidden /></div><p className="text-sm font-medium text-foreground">{doubleTask ? "正在执行规则检查与双筋面积预测…" : "正在执行规则检查、分类与数值预测…"}</p><p className="text-xs leading-5 text-muted-foreground">计算完成后，模型值与公式参考将在这里并列显示。</p></CardContent></Card> : null}
               {!result && !loading ? <Card className="overflow-hidden rounded-[20px] border-border/60 bg-card shadow-none ">
-                <CardHeader className="space-y-2 px-5 pb-0 pt-5"><div className="flex items-center gap-2 text-xs font-medium tracking-normal text-foreground"><span className="size-1.5 rounded-full bg-primary" />实验预览</div><CardTitle className="text-lg font-medium tracking-tight text-foreground">{edited ? "参数已变更，请重新计算" : "从一个梁截面开始"}</CardTitle><CardDescription className="text-xs leading-5 text-muted-foreground">{edited ? "上一次结果已清除，页面只展示与当前提交参数对应的结果。" : "填写截面条件，计算后查看模型与公式对照。"}</CardDescription></CardHeader>
+                <CardHeader className="space-y-2 px-5 pb-0 pt-5"><CardTitle className="text-lg font-medium tracking-tight text-foreground">{edited ? "参数已变更，请重新计算" : "截面示意"}</CardTitle></CardHeader>
                 <CardContent className="px-5 pb-5"><details className="kimi-disclosure !border-0 !pb-0"><summary>查看截面示意<ChevronDown aria-hidden /></summary>
                   <figure className="mt-5 rounded-xl border border-border/60 bg-muted/50 px-2 pb-3 pt-2">
                     <svg viewBox="0 0 360 260" role="img" aria-label={`矩形梁截面概念示意：b为梁宽，h为梁高，h₀为受压边缘至受拉钢筋合力位置的距离。${doubleTask ? "a′ₛ为受压边缘至受压钢筋合力位置的距离。" : ""}图中位置固定，不表示实际配筋排布。`} className="mx-auto block h-auto w-full max-w-[340px] text-muted-foreground">
