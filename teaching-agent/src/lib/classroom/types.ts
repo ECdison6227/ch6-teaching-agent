@@ -20,6 +20,8 @@ export type ClassroomSummary = {
 export type StudentSnapshot = {
   classroom: ClassroomSummary;
   participant: { id: string; name: string };
+  /** 课堂里的总人数（学生端只看数字，不看名单） */
+  participants?: number;
   rounds: RoundView[];
 };
 export type TeacherRound = RoundView & {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
 import { ArrowRight, Check, ChevronDown, ChevronLeft, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -67,18 +68,22 @@ export function StudentClassroom({ code: initialCode = "", embedded = false }: {
         <ClassroomJoin initialCode={initialCode} onJoined={(classroomId) => setId(classroomId)} />
       </> : <>
         <header className="kimi-page-heading"><div><h1>{live.state?.classroom.title || "课堂"}</h1><p>{live.state ? `${live.state.participant.name} · 课堂码 ${live.state.classroom.code}` : "正在连接课堂…"}</p></div><Button variant="ghost" size="icon" aria-label="重新同步" title="重新同步" onClick={live.refresh}><RefreshCw /></Button></header>
-        <p className="kimi-eyebrow my-6" role="status">{live.connection}</p>
+        <p className="live-dot my-5" role="status" data-ok={!live.error || undefined}><span />{live.error ? "连接中断" : "实时同步"}</p>
         {live.error ? <div role="alert" className="kimi-feedback"><span>{live.error}</span><Button variant="outline" size="sm" onClick={live.expired ? reset : live.refresh}>{live.expired ? "重新入课" : "重试"}</Button></div> : null}
         {live.state ? <>
-          {!current ? <Card className="kimi-stage"><CardContent className="kimi-start-state"><p className="kimi-eyebrow">{live.state.classroom.status === "ended" ? "已结束" : "已加入课堂"}</p><h2>{live.state.classroom.status === "ended" ? "下次课堂见" : live.state.classroom.status === "waiting" ? "等老师开始上课" : "等老师发题"}</h2><p>{live.state.classroom.status === "ended" ? "感谢参与。" : "题目会自动出现在这里。"}</p></CardContent></Card> : <Card className="kimi-stage" role="region" aria-label="当前课堂题目"><CardContent className="kimi-question-content">
+          {!current ? <Card className="kimi-stage"><CardContent className="kimi-start-state class-wait">
+            {live.state.classroom.status !== "ended" ? <span className="wait-pulse" aria-hidden><i /><i /><i /></span> : null}
+            <h2>{live.state.classroom.status === "ended" ? "下次课堂见" : live.state.classroom.status === "waiting" ? "等老师开始上课" : "等老师发题"}</h2>
+            {live.state.classroom.status !== "ended" && live.state.participants !== undefined ? <p className="wait-count">已有 <motion.b key={live.state.participants} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>{live.state.participants}</motion.b> 人加入</p> : null}
+          </CardContent></Card> : <motion.div key={current.id} initial={{ opacity: 0, y: 24, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}><Card className="kimi-stage" role="region" aria-label="当前课堂题目"><CardContent className="kimi-question-content">
             <div className="kimi-row"><p className="kimi-eyebrow">第 {current.sequence} 题 · {current.question.type === "choice" ? "选择" : current.question.type === "judge" ? "判断" : "填空"}</p><span className="kimi-eyebrow">{canAnswer ? "作答中" : current.status === "revealed" ? "已公布" : "已收题"}</span></div>
             <Markdown text={current.question.prompt} className="kimi-question-prompt" />
             <form onSubmit={submit} className="space-y-5">
               {current.question.type === "fill" ? <label className="kimi-field">你的答案<Input aria-label="你的答案" placeholder="多空用分号分隔" maxLength={2000} value={draft} onChange={e => edit(e.target.value)} disabled={!canAnswer || busy} /></label> : <fieldset className="kimi-answer-options" disabled={!canAnswer || busy}><legend className="sr-only">选择答案</legend>{(current.question.type === "judge" ? [{ id: "T", text: "正确" }, { id: "F", text: "错误" }] : current.question.options).map(o => <Button key={o.id} type="button" variant="outline" aria-pressed={draft === o.id} onClick={() => edit(o.id)}><span className="kimi-option-key">{o.id}</span><Markdown text={o.text} className="md-inline min-w-0" />{draft === o.id ? <Check className="ml-auto text-[var(--kimi-accent)]" /> : null}</Button>)}</fieldset>}
               <div className="kimi-row border-t pt-5"><p role="status" className="text-xs text-muted-foreground">{submissionStatus || (canAnswer ? current.submission ? changed ? "修改后请再次提交" : "已提交，收题前可修改" : "选好答案后提交" : current.status === "revealed" ? "答案已公布" : "等待老师公布答案")}</p>{canAnswer ? <Button type="submit" className="kimi-primary" disabled={busy || !draft.trim() || !changed || live.expired}>{busy ? "提交中…" : current.submission ? "更新答案" : "提交答案"}<ArrowRight /></Button> : null}</div>
             </form>
-            {current.status === "revealed" ? <div className="kimi-revealed"><p className="mb-3 text-sm font-medium">{current.submission?.grade === true ? "回答正确" : current.submission?.grade === false ? "再想一想这道题" : current.submission ? "待老师核对" : "本题未作答"}</p><Markdown text={`标准答案：${current.answer ?? ""}`} />{current.analysis ? <Markdown text={current.analysis} /> : null}</div> : null}
-          </CardContent></Card>}
+            {current.status === "revealed" ? <motion.div className="kimi-revealed reveal-card" data-grade={String(current.submission?.grade ?? "none")} initial={{ rotateX: -90, opacity: 0 }} animate={{ rotateX: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 260, damping: 22 }} style={{ transformPerspective: 800, transformOrigin: "top center" }}><p className="reveal-verdict">{current.submission?.grade === true ? "✓ 回答正确" : current.submission?.grade === false ? "✕ 再想一想" : current.submission ? "待老师核对" : "本题未作答"}</p><Markdown text={`标准答案：${current.answer ?? ""}`} />{current.analysis ? <Markdown text={current.analysis} /> : null}</motion.div> : null}
+          </CardContent></Card></motion.div>}
           {live.state.rounds.length > 1 ? <details className="kimi-disclosure mt-6"><summary>之前的题目<span>{live.state.rounds.length - 1} 题<ChevronDown /></span></summary><div className="kimi-review-list mt-4">{live.state.rounds.slice(0, -1).reverse().map(r => <details className="kimi-review-item" key={r.id}><summary><span className="kimi-eyebrow">{r.sequence}</span><div className="min-w-0 flex-1"><Markdown text={r.question.prompt} /></div><ChevronDown className="size-4" /></summary><div className="kimi-review-body"><p className="text-sm">{r.submission ? `我的答案：${r.submission.answer}` : "未作答"}</p>{r.status === "revealed" ? <><Markdown text={`标准答案：${r.answer}`} />{r.analysis ? <Markdown text={r.analysis} /> : null}</> : <p className="text-xs text-muted-foreground">答案尚未公布</p>}</div></details>)}</div></details> : null}
           {live.state.classroom.status === "ended" && current ? <p role="status" className="kimi-footnote">课堂已结束，感谢参与。</p> : null}
         </> : !live.error ? <p role="status" className="kimi-quiet-state">正在获取课堂…</p> : null}

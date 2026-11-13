@@ -254,7 +254,8 @@ export class ClassroomStore {
     return this.read(() => {
       const p = this.participant(raw, id);
       const c = this.get("SELECT * FROM classrooms WHERE id=?", id)!;
-      return { classroom: summary(c), participant: { id: String(p.id), name: String(p.name) },
+      const participants = Number(this.get("SELECT COUNT(*) AS n FROM participants WHERE classroom_id=?", id)?.n ?? 0);
+      return { classroom: summary(c), participant: { id: String(p.id), name: String(p.name) }, participants,
         rounds: this.all("SELECT * FROM rounds WHERE classroom_id=? ORDER BY sequence", id).map(r => {
           const reveal = r.status === "revealed";
           const s = this.get("SELECT * FROM submissions WHERE round_id=? AND participant_id=?", r.id, p.id);
